@@ -1,0 +1,4016 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Session 02 — Hệ thống thông tin, SDLC & UML</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+      :root {
+        --bg: #fff;
+        --panel: #f7f4f4;
+        --panel2: #fbe9e9;
+        --red: #c41230;
+        --red2: #8c0e22;
+        --redDim: rgba(196, 18, 48, 0.14);
+        --ink: #17151a;
+        --text: #242127;
+        --sub: #706b73;
+        --line: #e9e2e4;
+        --amber: #b4740a;
+        --green: #18764a;
+        --purple: #2b2560;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, sans-serif;
+        overflow-x: hidden;
+      }
+      .display {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+      ::selection {
+        background: var(--red);
+        color: #fff;
+      }
+      #progress {
+        position: fixed;
+        inset: 0 auto auto 0;
+        width: 0;
+        height: 3px;
+        background: var(--red);
+        z-index: 100;
+      }
+      .brand {
+        position: fixed;
+        left: 25px;
+        top: 21px;
+        z-index: 90;
+        color: var(--sub);
+        font: 500 10px 'JetBrains Mono';
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+      .brand b {
+        color: var(--red);
+      }
+      .counter {
+        position: fixed;
+        left: 25px;
+        bottom: 22px;
+        z-index: 90;
+        color: var(--sub);
+        font: 12px 'JetBrains Mono';
+      }
+      .counter b {
+        color: var(--red);
+      }
+      .navdots {
+        position: fixed;
+        right: 22px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 90;
+      }
+      .navdots a {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--line);
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .navdots a:hover {
+        transform: scale(1.6);
+        background: var(--red);
+        box-shadow: 0 0 0 3px var(--redDim);
+      }
+      .navdots a.active {
+        width: 9px;
+        height: 9px;
+        background: var(--red);
+        box-shadow: 0 0 0 4px var(--redDim);
+      }
+      .navbtns {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        display: flex;
+        gap: 8px;
+        z-index: 90;
+      }
+      .navbtns button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+      .navbtns button:hover {
+        color: #fff;
+        background: var(--red);
+        border-color: var(--red);
+        transform: translateY(-3px) scale(1.08);
+        box-shadow: 0 8px 20px rgba(196, 18, 48, 0.3);
+      }
+      .slide {
+        width: 100%;
+        min-height: 100vh;
+        padding: 8vh 9vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        border-bottom: 1px solid var(--line);
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        overflow: hidden;
+      }
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 17px;
+        color: var(--red);
+        font: 500 11px 'JetBrains Mono';
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .eyebrow:before {
+        content: '';
+        width: 23px;
+        height: 1px;
+        background: var(--red);
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+      .title {
+        font-size: clamp(31px, 4.2vw, 58px);
+        line-height: 1.08;
+        letter-spacing: -0.035em;
+      }
+      .section-title {
+        font-size: clamp(27px, 3.4vw, 46px);
+        line-height: 1.1;
+        letter-spacing: -0.025em;
+      }
+      .accent {
+        color: var(--red);
+      }
+      .lead {
+        color: var(--sub);
+        font-size: clamp(15px, 1.4vw, 19px);
+        line-height: 1.65;
+        max-width: 700px;
+      }
+      .kicker {
+        margin-top: 20px;
+        color: var(--sub);
+        font: 11px 'JetBrains Mono';
+        letter-spacing: 0.05em;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1.03fr 0.97fr;
+        gap: 5vw;
+        align-items: center;
+      }
+      .panel {
+        position: relative;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 28px;
+        min-height: 330px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.35s;
+      }
+      .panel:hover {
+        transform: translateY(-3px);
+        border-color: #e7b7c0;
+        box-shadow: 0 18px 45px rgba(43, 37, 96, 0.07);
+      }
+      .tag {
+        position: absolute;
+        left: 20px;
+        top: 16px;
+        color: var(--sub);
+        font: 10px 'JetBrains Mono';
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .topic-list {
+        list-style: none;
+        margin-top: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .topic-list li {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 16px;
+        align-items: center;
+        padding: 14px 14px;
+        border-bottom: 1px solid var(--line);
+        opacity: 0;
+        transform: translateX(-14px);
+        border-radius: 14px;
+        cursor: pointer;
+        transition:
+          background 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+          padding 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+          transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+          box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .topic-list li:hover {
+        background: #ffffff;
+        padding-left: 20px;
+        transform: translateX(6px);
+        box-shadow: 0 8px 24px rgba(43, 37, 96, 0.07);
+        border-bottom-color: transparent;
+      }
+      .idx {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--panel2);
+        color: var(--red);
+        font: 700 15px/1 'JetBrains Mono';
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(196, 18, 48, 0.16);
+        flex-shrink: 0;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 2px 6px rgba(196, 18, 48, 0.05);
+      }
+      .topic-list li:hover .idx {
+        background: var(--red);
+        color: #fff;
+        border-color: var(--red);
+        transform: scale(1.1);
+        box-shadow: 0 6px 18px rgba(196, 18, 48, 0.3);
+      }
+      .topic-list h3 {
+        font-size: 16px;
+        margin-bottom: 4px;
+        transition: color 0.25s ease;
+      }
+      .topic-list li:hover h3 {
+        color: var(--red);
+      }
+      .topic-list p {
+        color: var(--sub);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .quote {
+        border-left: 3px solid var(--red);
+        padding: 16px 19px;
+        background: linear-gradient(90deg, var(--panel2), transparent);
+        font-size: 16px;
+        line-height: 1.6;
+        margin-top: 24px;
+        border-radius: 0 12px 12px 0;
+        transition: all 0.3s ease;
+      }
+      .quote:hover {
+        transform: translateX(4px);
+        background: linear-gradient(90deg, var(--panel2), rgba(251, 233, 233, 0.3));
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 22px;
+      }
+      .chips.center {
+        justify-content: center;
+      }
+      .chip {
+        padding: 8px 15px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        font: 600 11px 'JetBrains Mono';
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: pointer;
+        background: #fff;
+      }
+      .chip:hover {
+        border-color: var(--red);
+        color: var(--red);
+        background: var(--panel2);
+        transform: translateY(-3px) scale(1.04);
+        box-shadow: 0 6px 16px rgba(196, 18, 48, 0.12);
+      }
+      svg {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+      }
+      .svgbox {
+        fill: #fff;
+        stroke: #d9d0d3;
+        stroke-width: 1.6;
+      }
+      .svgbox.hot {
+        fill: var(--red);
+        stroke: var(--red);
+      }
+      .svgtxt {
+        fill: var(--ink);
+        font: 500 11px 'JetBrains Mono';
+      }
+      .svgtxt.white {
+        fill: #fff;
+      }
+      .svgsub {
+        fill: var(--sub);
+        font: 9px 'Inter';
+      }
+      .svglink {
+        stroke: var(--red);
+        stroke-width: 1.7;
+        fill: none;
+        opacity: 0.5;
+        stroke-linecap: round;
+      }
+      .arrow {
+        fill: var(--red);
+      }
+      #hero {
+        text-align: center;
+        align-items: center;
+        background: radial-gradient(
+          circle at 50% 72%,
+          rgba(196, 18, 48, 0.07),
+          transparent 34%
+        );
+      }
+      #hero .title {
+        max-width: 940px;
+        font-size: clamp(42px, 6.3vw, 82px);
+      }
+      #hero .lead {
+        margin: 20px auto 0;
+      }
+      .hero-map {
+        width: min(760px, 88vw);
+        margin: 35px auto 0;
+      }
+      .hero-stats {
+        display: flex;
+        gap: 45px;
+        margin-top: 26px;
+        color: var(--sub);
+        font: 11px 'JetBrains Mono';
+      }
+      .hero-stats b {
+        display: block;
+        color: var(--ink);
+        font: 600 22px 'Space Grotesk';
+      }
+      .roadmap {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        margin-top: 46px;
+        position: relative;
+      }
+      .roadmap:before {
+        content: '';
+        position: absolute;
+        left: 8%;
+        right: 8%;
+        top: 29px;
+        height: 2px;
+        background: var(--line);
+      }
+      .roadmap-fill {
+        position: absolute;
+        left: 8%;
+        top: 29px;
+        width: 0;
+        height: 2px;
+        background: var(--red);
+      }
+      .step {
+        position: relative;
+        text-align: center;
+        z-index: 2;
+        cursor: pointer;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .step:hover {
+        transform: translateY(-4px);
+      }
+      .step .dot {
+        width: 18px;
+        height: 18px;
+        margin: 20px auto 22px;
+        border-radius: 50%;
+        border: 2px solid var(--red);
+        background: #fff;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .step:hover .dot {
+        transform: scale(1.3);
+        background: var(--panel2);
+        box-shadow: 0 0 0 8px var(--redDim);
+      }
+      .step.active .dot {
+        background: var(--red);
+        box-shadow: 0 0 0 6px var(--redDim);
+      }
+      .step b {
+        display: block;
+        font: 600 13px 'Space Grotesk';
+        transition: color 0.25s ease;
+      }
+      .step:hover b {
+        color: var(--red);
+      }
+      .step span {
+        display: block;
+        color: var(--sub);
+        font-size: 11px;
+        line-height: 1.4;
+        margin-top: 5px;
+      }
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 42px 1fr;
+        gap: 15px;
+        align-items: stretch;
+        width: 100%;
+      }
+      .compare-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px 22px;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 6px 18px rgba(43, 37, 96, 0.03);
+      }
+      .compare-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(196, 18, 48, 0.35);
+        box-shadow: 0 16px 36px rgba(43, 37, 96, 0.1);
+      }
+      .compare-card .label {
+        font: 600 12px 'JetBrains Mono';
+        color: var(--red);
+        margin-bottom: 18px;
+      }
+      .raw {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .raw i {
+        font-style: normal;
+        padding: 7px 10px;
+        background: var(--panel);
+        border-radius: 7px;
+        color: var(--sub);
+        font: 10px 'JetBrains Mono';
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: default;
+      }
+      .raw i:hover {
+        background: var(--panel2);
+        color: var(--red);
+        transform: translateY(-2px);
+      }
+      .info {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--purple);
+        line-height: 1.25;
+      }
+      .versus {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--red);
+        font: 600 12px 'JetBrains Mono';
+      }
+      .cards4 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        width: 100%;
+      }
+      .syscard {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: pointer;
+      }
+      .syscard:hover {
+        border-color: var(--red);
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 16px 36px rgba(196, 18, 48, 0.12);
+      }
+      .syscard b {
+        display: block;
+        color: var(--red);
+        font: 600 17px 'Space Grotesk';
+        transition: transform 0.25s ease;
+      }
+      .syscard:hover b {
+        transform: translateX(3px);
+      }
+      .syscard span {
+        color: var(--sub);
+        font-size: 11px;
+        line-height: 1.45;
+      }
+      .pyramid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+      }
+      .level {
+        height: 58px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font: 600 11px 'JetBrains Mono';
+        clip-path: polygon(14% 0, 86% 0, 100% 100%, 0 100%);
+      }
+      .level:nth-child(1) {
+        width: 42%;
+        background: var(--red);
+      }
+      .level:nth-child(2) {
+        width: 66%;
+        background: var(--purple);
+      }
+      .level:nth-child(3) {
+        width: 90%;
+        background: #6d687e;
+      }
+      .flow5 {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        width: 100%;
+        align-items: stretch;
+      }
+      .flow5 .phase {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px 12px;
+        text-align: center;
+        min-height: 135px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 4px 14px rgba(43, 37, 96, 0.03);
+      }
+      .flow5 .phase:hover {
+        transform: translateY(-8px) scale(1.03);
+        border-color: var(--red);
+        box-shadow: 0 18px 38px rgba(196, 18, 48, 0.14);
+        background: linear-gradient(145deg, #fff, #fff6f7);
+      }
+      .flow5 .phase:hover strong {
+        transform: scale(1.18);
+      }
+      .phase strong {
+        display: inline-block;
+        color: var(--red);
+        font: 700 20px 'Space Grotesk';
+        margin-bottom: 2px;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .phase .en-title {
+        display: block;
+        color: var(--purple);
+        font: 700 11.5px 'JetBrains Mono';
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 2px;
+      }
+      .phase b {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 5px;
+      }
+      .phase small {
+        font-size: 10px;
+        color: var(--sub);
+        line-height: 1.4;
+      }
+      .model-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        width: 100%;
+      }
+      .model {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px 20px;
+        min-height: 210px;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 4px 14px rgba(43, 37, 96, 0.03);
+      }
+      .model:hover {
+        transform: translateY(-7px) scale(1.02);
+        border-color: var(--red);
+        box-shadow: 0 18px 42px rgba(196, 18, 48, 0.12);
+      }
+      .model b {
+        font: 600 17px 'Space Grotesk';
+        transition: color 0.25s ease;
+      }
+      .model:hover b {
+        color: var(--red);
+      }
+      .model p {
+        color: var(--sub);
+        font-size: 11px;
+        line-height: 1.5;
+        margin-top: 8px;
+      }
+      .mini-viz {
+        height: 73px;
+        margin: 17px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .water {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .water i {
+        display: block;
+        width: 100px;
+        height: 7px;
+        background: var(--red);
+        opacity: calc(1 - var(--i) * 0.14);
+        transform: translateX(calc(var(--i) * 10px));
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .model:hover .water i {
+        transform: translateX(calc(var(--i) * 15px));
+      }
+      .spiral {
+        width: 70px;
+        height: 70px;
+        border: 3px solid var(--purple);
+        border-left-color: transparent;
+        border-radius: 50%;
+        position: relative;
+        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .spiral:after {
+        content: '';
+        position: absolute;
+        inset: 12px;
+        border: 3px solid var(--red);
+        border-right-color: transparent;
+        border-radius: 50%;
+      }
+      .model:hover .spiral {
+        transform: rotate(180deg) scale(1.12);
+      }
+      .sprints {
+        display: flex;
+        gap: 5px;
+      }
+      .sprints i {
+        display: block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 3px solid var(--red);
+        border-left-color: var(--line);
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .model:hover .sprints i {
+        transform: scale(1.15) rotate(15deg);
+        border-color: var(--red);
+      }
+      .formula {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 25px;
+        align-items: center;
+        margin-top: 35px;
+      }
+      .formula-box {
+        border: 1px solid var(--line);
+        border-radius: 17px;
+        padding: 30px;
+        background: var(--panel);
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .formula-box:hover {
+        transform: translateY(-6px) scale(1.02);
+        border-color: var(--red);
+        background: #fff;
+        box-shadow: 0 20px 45px rgba(196, 18, 48, 0.1);
+      }
+      .formula-box b {
+        display: block;
+        color: var(--red);
+        font: 700 clamp(34px, 5vw, 64px) 'Space Grotesk';
+      }
+      .formula-box p {
+        font-size: 14px;
+        color: var(--sub);
+        line-height: 1.5;
+      }
+      .operator {
+        font: 500 28px 'JetBrains Mono';
+        color: var(--sub);
+      }
+      .uml-groups {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        width: 100%;
+      }
+      .uml-group {
+        border-radius: 16px;
+        padding: 24px 22px;
+        background: #fff;
+        border: 1px solid var(--line);
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 4px 14px rgba(43, 37, 96, 0.03);
+      }
+      .uml-group:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 20px 45px rgba(43, 37, 96, 0.12);
+        border-color: rgba(196, 18, 48, 0.35);
+      }
+      .uml-group:first-child {
+        border-top: 4px solid var(--purple);
+      }
+      .uml-group:last-child {
+        border-top: 4px solid var(--red);
+      }
+      .uml-group b {
+        font: 600 16px 'Space Grotesk';
+        transition: color 0.25s ease;
+      }
+      .uml-group:hover b {
+        color: var(--red);
+      }
+      .uml-group ul {
+        margin: 14px 0 0 17px;
+        color: var(--sub);
+        font-size: 12px;
+        line-height: 1.8;
+      }
+      .three {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        width: 100%;
+      }
+      .diagram-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px 18px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 4px 14px rgba(43, 37, 96, 0.03);
+      }
+      .diagram-card:hover {
+        transform: translateY(-8px) scale(1.03);
+        border-color: var(--red);
+        box-shadow: 0 20px 45px rgba(196, 18, 48, 0.13);
+      }
+      .diagram-card svg {
+        height: 112px;
+        width: 100%;
+        max-width: 220px;
+        margin: 0 auto 10px;
+        display: block;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .diagram-card:hover svg {
+        transform: scale(1.05);
+      }
+      .diagram-card b {
+        font: 600 14px 'Space Grotesk';
+        transition: color 0.25s ease;
+      }
+      .diagram-card:hover b {
+        color: var(--red);
+      }
+      .diagram-card p {
+        color: var(--sub);
+        font-size: 10px;
+        line-height: 1.45;
+        margin-top: 5px;
+      }
+      .takeaways {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-top: 40px;
+      }
+      .takeaway {
+        padding: 26px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--panel);
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .takeaway:hover {
+        transform: translateY(-7px) scale(1.02);
+        background: #fff;
+        border-color: var(--red);
+        box-shadow: 0 20px 45px rgba(196, 18, 48, 0.1);
+      }
+      .takeaway .num {
+        color: var(--red);
+        font: 600 12px 'JetBrains Mono';
+      }
+      .takeaway h3 {
+        font-size: 19px;
+        margin: 15px 0 8px;
+        transition: color 0.25s ease;
+      }
+      .takeaway:hover h3 {
+        color: var(--red);
+      }
+      .takeaway p {
+        font-size: 13px;
+        color: var(--sub);
+        line-height: 1.55;
+      }
+      #outro {
+        text-align: center;
+        align-items: center;
+      }
+      .final-loop {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 38px 0;
+      }
+      .final-loop span {
+        padding: 12px 18px;
+        border-radius: 999px;
+        background: var(--panel);
+        font: 11px 'JetBrains Mono';
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .final-loop span:hover {
+        transform: translateY(-3px) scale(1.08);
+        background: var(--red);
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(196, 18, 48, 0.25);
+      }
+      .final-loop span:hover i {
+        color: #fff;
+      }
+      .final-loop i {
+        font-style: normal;
+        color: var(--red);
+        transition: color 0.2s ease;
+      }
+      @media (max-width: 900px) {
+        .slide {
+          padding: 9vh 7vw;
+          min-height: auto;
+          height: 100vh;
+          overflow-y: auto;
+        }
+        .grid2 {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+        .panel {
+          min-height: 250px;
+          padding: 20px;
+        }
+        .navdots,
+        .navbtns,
+        .counter,
+        .brand {
+          display: none;
+        }
+        .topic-list li {
+          padding: 10px;
+        }
+        .roadmap {
+          gap: 5px;
+        }
+        .step span {
+          display: none;
+        }
+        .cards4,
+        .model-grid,
+        .three,
+        .takeaways {
+          grid-template-columns: 1fr 1fr;
+        }
+        .flow5 {
+          gap: 3px;
+        }
+        .phase small {
+          display: none;
+        }
+      }
+      @media (max-width: 600px) {
+        .cards4,
+        .model-grid,
+        .three,
+        .takeaways {
+          grid-template-columns: 1fr;
+        }
+        .panel {
+          display: none;
+        }
+        .formula {
+          grid-template-columns: 1fr;
+        }
+        .operator {
+          display: none;
+        }
+        .hero-map {
+          display: none;
+        }
+        .hero-stats {
+          margin-top: 40px;
+        }
+        .slide {
+          height: auto;
+          min-height: 100vh;
+        }
+        .roadmap {
+          grid-template-columns: 1fr;
+        }
+        .roadmap:before,
+        .roadmap-fill {
+          display: none;
+        }
+        .step .dot {
+          margin: 5px auto;
+        }
+        .flow5 {
+          grid-template-columns: 1fr;
+        }
+        .uml-groups {
+          grid-template-columns: 1fr;
+        }
+      }
+      /* Enhanced opening slide */
+      #hero {
+        align-items: stretch;
+        text-align: left;
+        background: linear-gradient(135deg, #fff 0%, #fff 52%, #faf5f6 100%);
+      }
+      #hero:before {
+        content: '';
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        right: -170px;
+        top: -190px;
+        border: 1px solid rgba(196, 18, 48, 0.14);
+        border-radius: 50%;
+        box-shadow:
+          0 0 0 60px rgba(196, 18, 48, 0.025),
+          0 0 0 120px rgba(196, 18, 48, 0.018);
+        pointer-events: none;
+      }
+      .hero-layout {
+        display: grid;
+        grid-template-columns: minmax(420px, 0.94fr) minmax(480px, 1.06fr);
+        gap: 5vw;
+        align-items: center;
+        width: 100%;
+        position: relative;
+        z-index: 2;
+      }
+      .hero-copy {
+        max-width: 720px;
+      }
+      .hero-session {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 7px 14px 7px 10px;
+        margin-bottom: 25px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--sub);
+        font: 500 10px 'JetBrains Mono';
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: default;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .hero-session:hover {
+        transform: translateY(-2px);
+        border-color: rgba(196, 18, 48, 0.3);
+        box-shadow: 0 6px 18px rgba(196, 18, 48, 0.08);
+      }
+      .hero-session i {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--red);
+        box-shadow: 0 0 0 4px var(--redDim);
+      }
+      #hero .title {
+        max-width: 720px;
+        font-size: clamp(48px, 5.8vw, 84px);
+        line-height: 0.98;
+      }
+      .hero-line {
+        display: block;
+      }
+      .hero-accent {
+        position: relative;
+        display: inline-block;
+        color: var(--red);
+      }
+      .hero-accent:after {
+        content: '';
+        position: absolute;
+        left: 2px;
+        right: 0;
+        bottom: -7px;
+        height: 4px;
+        border-radius: 4px;
+        background: var(--red);
+        transform-origin: left center;
+        transform: scaleX(0);
+        animation: heroUnderline 0.55s 1s forwards;
+      }
+      @keyframes heroUnderline {
+        to {
+          transform: scaleX(1);
+        }
+      }
+      #hero .lead {
+        margin: 26px 0 0;
+        max-width: 610px;
+        font-size: clamp(15px, 1.25vw, 18px);
+      }
+      .hero-stats {
+        display: flex;
+        gap: 0;
+        margin-top: 32px;
+        color: var(--sub);
+        font: 10px 'JetBrains Mono';
+      }
+      .hero-stat {
+        min-width: 112px;
+        padding: 0 22px;
+        border-left: 1px solid var(--line);
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: default;
+      }
+      .hero-stat:hover {
+        transform: translateY(-3px);
+      }
+      .hero-stat:hover b {
+        color: var(--red);
+      }
+      .hero-stat:first-child {
+        padding-left: 0;
+        border-left: 0;
+      }
+      .hero-stats b {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--ink);
+        font: 600 24px 'Space Grotesk';
+        transition: color 0.25s ease;
+      }
+      .hero-visual {
+        position: relative;
+        min-height: 470px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .hero-orbit {
+        position: absolute;
+        width: min(44vw, 530px);
+        aspect-ratio: 1;
+        border: 1px solid rgba(196, 18, 48, 0.08);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+      .hero-orbit:before,
+      .hero-orbit:after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        border: 1px dashed rgba(196, 18, 48, 0.08);
+      }
+      .hero-orbit:before {
+        inset: 14%;
+      }
+      .hero-orbit:after {
+        inset: 28%;
+      }
+      .hero-map {
+        width: min(49vw, 610px);
+        margin: 0;
+        position: relative;
+        z-index: 2;
+        filter: drop-shadow(0 18px 35px rgba(43, 37, 96, 0.08));
+      }
+      .hero-link {
+        stroke: var(--red);
+        stroke-width: 1.7;
+        fill: none;
+        opacity: 0.35;
+        stroke-linecap: round;
+        stroke-dasharray: 5 6;
+      }
+      .hero-card {
+        cursor: pointer;
+      }
+      .hero-card rect {
+        fill: rgba(255, 255, 255, 0.96);
+        stroke: #ded5d8;
+        stroke-width: 1.5;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .hero-card:hover rect {
+        stroke: var(--red);
+        stroke-width: 2;
+        fill: #ffffff;
+        filter: drop-shadow(0 12px 28px rgba(196, 18, 48, 0.22));
+      }
+      .hero-card .card-title {
+        transition: fill 0.25s ease;
+      }
+      .hero-card:hover .card-title {
+        fill: var(--red);
+      }
+      .card-kicker {
+        fill: var(--red);
+        font: 600 9px 'JetBrains Mono';
+        letter-spacing: 0.12em;
+      }
+      .card-title {
+        fill: var(--ink);
+        font: 600 17px 'Space Grotesk';
+      }
+      .card-sub {
+        fill: var(--sub);
+        font: 10px 'Inter';
+      }
+      .hero-core-ring {
+        fill: rgba(196, 18, 48, 0.08);
+        stroke: rgba(196, 18, 48, 0.22);
+        stroke-width: 1;
+      }
+      .hero-core {
+        fill: var(--red);
+      }
+      .hero-packet {
+        fill: var(--red);
+        filter: drop-shadow(0 0 5px rgba(196, 18, 48, 0.75));
+      }
+      .scroll-cue {
+        position: absolute;
+        left: 50%;
+        bottom: 22px;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--sub);
+        font: 9px 'JetBrains Mono';
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .scroll-cue i {
+        display: block;
+        width: 18px;
+        height: 29px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        position: relative;
+      }
+      .scroll-cue i:after {
+        content: '';
+        position: absolute;
+        width: 3px;
+        height: 6px;
+        border-radius: 3px;
+        background: var(--red);
+        left: 7px;
+        top: 6px;
+        animation: scrollDot 1.2s ease-in-out infinite;
+      }
+      @keyframes scrollDot {
+        to {
+          transform: translateY(10px);
+          opacity: 0.1;
+        }
+      }
+      @media (max-width: 900px) {
+        .hero-layout {
+          grid-template-columns: 1fr 1fr;
+          gap: 2vw;
+        }
+        .hero-visual {
+          min-height: 390px;
+        }
+        .hero-stats {
+          margin-top: 24px;
+        }
+        .scroll-cue {
+          display: none;
+        }
+      }
+      @media (max-width: 600px) {
+        .hero-layout {
+          grid-template-columns: 1fr;
+        }
+        .hero-visual {
+          display: none;
+        }
+        .hero-stats {
+          margin-top: 34px;
+        }
+        .hero-stat {
+          min-width: 86px;
+          padding: 0 12px;
+        }
+        .hero-stat b {
+          font-size: 20px;
+        }
+        #hero .title {
+          font-size: clamp(43px, 14vw, 65px);
+        }
+      }
+      /* Slide 03 · System anatomy */
+      #system-anatomy {
+        background: linear-gradient(180deg, #fff 0%, #fff 67%, #faf7f8 100%);
+      }
+      .anatomy-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 230px;
+        gap: 40px;
+        align-items: end;
+        margin-bottom: 7vh;
+      }
+      .anatomy-head .section-title {
+        max-width: 820px;
+        font-size: clamp(35px, 4.6vw, 62px);
+      }
+      .anatomy-head .lead {
+        max-width: 760px;
+        margin-top: 18px;
+      }
+      .anatomy-mark {
+        justify-self: end;
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        color: var(--red);
+      }
+      .anatomy-mark strong {
+        font: 700 clamp(74px, 9vw, 126px)/0.72 'Space Grotesk';
+        letter-spacing: -0.08em;
+      }
+      .anatomy-mark span {
+        padding-bottom: 4px;
+        font: 500 10px/1.5 'JetBrains Mono';
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--sub);
+      }
+      .anatomy-track {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 14px;
+        padding-top: 28px;
+      }
+      .anatomy-rail {
+        position: absolute;
+        left: 4%;
+        right: 4%;
+        top: 6px;
+        height: 2px;
+        background: var(--line);
+        overflow: hidden;
+      }
+      .anatomy-rail i {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--purple), var(--red));
+      }
+      .anatomy-card {
+        position: relative;
+        min-height: 230px;
+        padding: 25px 22px 22px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 10px 35px rgba(43, 37, 96, 0.035);
+        transition: 0.3s;
+        overflow: hidden;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+      }
+      .anatomy-card:before {
+        content: '';
+        position: absolute;
+        top: 15px;
+        right: 17px;
+        width: 10px;
+        height: 10px;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        background: var(--purple);
+        box-shadow: 0 0 0 1px rgba(43, 37, 96, 0.2);
+      }
+      .anatomy-card:last-child:before {
+        background: #fff;
+        border-color: rgba(255, 255, 255, 0.35);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
+      }
+      .anatomy-card:hover {
+        transform: translateY(-7px);
+        border-color: rgba(196, 18, 48, 0.32);
+        box-shadow: 0 18px 42px rgba(43, 37, 96, 0.09);
+      }
+      .anatomy-card .card-no {
+        display: block;
+        margin-bottom: 25px;
+        color: var(--sub);
+        font: 500 10px 'JetBrains Mono';
+        letter-spacing: 0.12em;
+      }
+      .anatomy-icon {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 18px;
+        border-radius: 12px;
+        background: #f2eff5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--purple);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .anatomy-icon svg {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex-shrink: 0;
+      }
+      .anatomy-card:hover .anatomy-icon {
+        transform: scale(1.1);
+        background: var(--panel2);
+        color: var(--red);
+      }
+      .anatomy-card.goal:hover .anatomy-icon {
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
+      }
+      .anatomy-card h3 {
+        font-size: 18px;
+        margin-bottom: 9px;
+      }
+      .anatomy-card p {
+        color: var(--sub);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      .anatomy-card.goal {
+        color: #fff;
+        border-color: var(--red);
+        background: var(--red);
+        box-shadow: 0 16px 38px rgba(196, 18, 48, 0.18);
+      }
+      .anatomy-card.goal .card-no,
+      .anatomy-card.goal p {
+        color: rgba(255, 255, 255, 0.72);
+      }
+      .anatomy-card.goal .anatomy-icon {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.14);
+      }
+      .anatomy-card.goal:hover {
+        border-color: var(--red);
+        box-shadow: 0 22px 46px rgba(196, 18, 48, 0.25);
+      }
+      @media (max-width: 900px) {
+        .anatomy-head {
+          grid-template-columns: 1fr 140px;
+          margin-bottom: 4vh;
+        }
+        .anatomy-track {
+          grid-template-columns: repeat(5, minmax(150px, 1fr));
+          overflow-x: auto;
+          padding-bottom: 12px;
+        }
+        .anatomy-card {
+          min-height: 205px;
+        }
+        .anatomy-rail {
+          display: none;
+        }
+      }
+      @media (max-width: 600px) {
+        .anatomy-head {
+          grid-template-columns: 1fr;
+        }
+        .anatomy-mark {
+          display: none;
+        }
+        .anatomy-track {
+          grid-template-columns: 1fr 1fr;
+          overflow: visible;
+        }
+        .anatomy-card {
+          min-height: 180px;
+        }
+        .anatomy-card.goal {
+          grid-column: 1/-1;
+        }
+      }
+      /* Slide 04 · Data lab */
+      #data-information .data-panel {
+        min-height: 430px;
+        padding: 27px 24px 22px;
+        background: linear-gradient(145deg, #f8f5f6, #f2eef3);
+        overflow: hidden;
+      }
+      .data-lab {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 104px 1.18fr;
+        gap: 13px;
+        align-items: center;
+      }
+      .lab-stage {
+        position: relative;
+        min-height: 300px;
+        padding: 22px 19px;
+        border: 1px solid rgba(222, 213, 216, 0.9);
+        border-radius: 17px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 13px 30px rgba(43, 37, 96, 0.045);
+      }
+      .lab-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 21px;
+        color: var(--red);
+        font: 600 10px 'JetBrains Mono';
+        letter-spacing: 0.12em;
+      }
+      .lab-label i {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--red);
+        box-shadow: 0 0 0 4px var(--redDim);
+      }
+      .data-events {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .data-event {
+        display: grid;
+        grid-template-columns: 34px 1fr auto;
+        align-items: center;
+        gap: 9px;
+        padding: 9px 12px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .data-event:hover {
+        transform: translateX(8px);
+        border-color: rgba(196, 18, 48, 0.35);
+        box-shadow: 0 6px 18px rgba(196, 18, 48, 0.1);
+        background: #fffbfb;
+      }
+      .data-event .event-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+        background: #f1eef4;
+        color: var(--purple);
+        display: grid;
+        place-items: center;
+        font: 600 11px 'JetBrains Mono';
+        transition: all 0.25s ease;
+      }
+      .data-event:hover .event-icon {
+        background: var(--panel2);
+        color: var(--red);
+        transform: scale(1.12);
+      }
+      .data-event b {
+        font: 600 10px 'JetBrains Mono';
+      }
+      .data-event small {
+        color: var(--sub);
+        font: 9px 'Inter';
+      }
+      .data-event em {
+        color: var(--red);
+        font: 500 9px 'JetBrains Mono';
+        font-style: normal;
+      }
+      .processor {
+        position: relative;
+        height: 260px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .processor-core {
+        position: relative;
+        width: 72px;
+        height: 72px;
+        border-radius: 19px;
+        background: var(--purple);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        box-shadow: 0 13px 30px rgba(43, 37, 96, 0.22);
+        font: 600 22px 'JetBrains Mono';
+        z-index: 2;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .processor-core:hover {
+        transform: scale(1.15) rotate(12deg);
+        background: var(--red);
+        box-shadow: 0 16px 36px rgba(196, 18, 48, 0.4);
+      }
+      .processor-core:before,
+      .processor-core:after {
+        content: '';
+        position: absolute;
+        inset: -10px;
+        border: 1px solid rgba(43, 37, 96, 0.18);
+        border-radius: 25px;
+        animation: processPulse 1.8s ease-in-out infinite;
+      }
+      .processor-core:after {
+        inset: -20px;
+        opacity: 0.45;
+        animation-delay: 0.35s;
+      }
+      .process-step {
+        margin-top: 20px;
+        color: var(--sub);
+        font: 9px/1.7 'JetBrains Mono';
+        text-align: center;
+      }
+      .process-step span {
+        color: var(--red);
+      }
+      .flow-line {
+        position: absolute;
+        left: -16px;
+        right: -16px;
+        top: calc(50% - 28px);
+        transform: translateY(-50%);
+        height: 2px;
+        background: linear-gradient(90deg, var(--purple), var(--red));
+        opacity: 0.36;
+      }
+      .flow-dot {
+        position: absolute;
+        top: calc(50% - 28px);
+        left: -12px;
+        transform: translateY(-50%);
+        width: 11px;
+        height: 11px;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        background: var(--red);
+        box-shadow: 0 0 9px rgba(196, 18, 48, 0.65);
+        animation: dataFlow 2.2s ease-in-out infinite;
+      }
+      .insight-card {
+        padding: 16px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--purple), #3d347b);
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .insight-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 16px 36px rgba(43, 37, 96, 0.35);
+      }
+      .insight-kicker {
+        font: 500 9px 'JetBrains Mono';
+        letter-spacing: 0.11em;
+        color: rgba(255, 255, 255, 0.65);
+      }
+      .insight-value {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        margin-top: 9px;
+      }
+      .insight-value strong {
+        font: 700 38px/1 'Space Grotesk';
+      }
+      .insight-value span {
+        padding-bottom: 3px;
+        font: 500 11px/1.3 'Inter';
+      }
+      .mini-chart {
+        height: 91px;
+        display: flex;
+        align-items: end;
+        gap: 7px;
+        margin-top: 20px;
+        padding: 0 5px;
+        border-bottom: 1px solid var(--line);
+      }
+      .mini-chart i {
+        flex: 1;
+        height: var(--h);
+        border-radius: 5px 5px 0 0;
+        background: #ddd7e4;
+        transform-origin: bottom;
+      }
+      .mini-chart i:nth-last-child(-n + 2) {
+        background: var(--red);
+      }
+      .chart-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        color: var(--sub);
+        font: 8px 'JetBrains Mono';
+      }
+      .decision-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px;
+        padding: 9px 11px;
+        border-radius: 9px;
+        background: #edf8f2;
+        color: var(--green);
+        font: 600 9px 'JetBrains Mono';
+      }
+      .decision-pill:before {
+        content: '✓';
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--green);
+        color: #fff;
+        display: grid;
+        place-items: center;
+      }
+      @keyframes processPulse {
+        50% {
+          transform: scale(1.06);
+          opacity: 0.35;
+        }
+      }
+      @keyframes dataFlow {
+        0% {
+          left: -12px;
+          opacity: 0;
+        }
+        12%,
+        88% {
+          opacity: 1;
+        }
+        100% {
+          left: calc(100% - 1px);
+          opacity: 0;
+        }
+      }
+      @media (max-width: 900px) {
+        #data-information .data-panel {
+          min-height: 350px;
+        }
+        .data-lab {
+          grid-template-columns: 1fr 80px 1fr;
+        }
+        .lab-stage {
+          min-height: 260px;
+          padding: 16px;
+        }
+        .data-event:nth-child(3) {
+          display: none;
+        }
+        .processor {
+          height: 220px;
+        }
+        .flow-line {
+          top: calc(50% - 28px);
+        }
+        .flow-dot {
+          top: calc(50% - 28px);
+        }
+      }
+      /* Slide 05 · Operating Loop Animation */
+      .loop-svg {
+        width: 100%;
+        max-width: 440px;
+        margin: 0 auto;
+        filter: drop-shadow(0 14px 28px rgba(43, 37, 96, 0.06));
+      }
+      .loop-node {
+        transition: 0.3s;
+        cursor: pointer;
+      }
+      .loop-node:hover rect {
+        filter: drop-shadow(0 6px 16px rgba(196, 18, 48, 0.25));
+      }
+      .loop-node.hot:hover rect {
+        filter: drop-shadow(0 8px 22px rgba(196, 18, 48, 0.4));
+      }
+      .loop-path-bg {
+        stroke: var(--line);
+        stroke-width: 3;
+        fill: none;
+        stroke-linecap: round;
+      }
+      .loop-path-active {
+        stroke: var(--red);
+        stroke-width: 2.5;
+        fill: none;
+        stroke-linecap: round;
+        stroke-dasharray: 6 8;
+        animation: dashMove 1.4s linear infinite;
+      }
+      .loop-fb-active {
+        stroke: var(--purple);
+        stroke-width: 2.5;
+        fill: none;
+        stroke-linecap: round;
+        stroke-dasharray: 6 8;
+        animation: dashMoveReverse 2s linear infinite;
+      }
+      @keyframes dashMove {
+        to {
+          stroke-dashoffset: -28;
+        }
+      }
+      @keyframes dashMoveReverse {
+        to {
+          stroke-dashoffset: 28;
+        }
+      }
+      /* Slide 06 · Interactive Pyramid Animation */
+      .pyramid-panel {
+        padding: 30px 24px 22px;
+      }
+      .pyramid-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        margin-top: 10px;
+      }
+      .pyramid-level {
+        position: relative;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        border-radius: 14px;
+        color: #fff;
+        cursor: pointer;
+        transition:
+          transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+          box-shadow 0.3s,
+          border-color 0.3s;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 8px 24px rgba(43, 37, 96, 0.09);
+      }
+      .pyramid-level:before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), transparent 70%);
+        opacity: 0;
+        transition: 0.3s;
+        pointer-events: none;
+      }
+      .pyramid-level:hover:before {
+        opacity: 1;
+      }
+      .pyramid-level:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 16px 36px rgba(43, 37, 96, 0.22);
+      }
+      .pyramid-level.p-top {
+        width: 76%;
+        background: linear-gradient(135deg, var(--red) 0%, #d81b60 100%);
+        box-shadow: 0 8px 25px rgba(196, 18, 48, 0.28);
+      }
+      .pyramid-level.p-mid {
+        width: 88%;
+        background: linear-gradient(135deg, var(--purple) 0%, #4338ca 100%);
+        box-shadow: 0 8px 25px rgba(43, 37, 96, 0.22);
+      }
+      .pyramid-level.p-ops {
+        width: 100%;
+        background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+        box-shadow: 0 8px 25px rgba(30, 41, 59, 0.2);
+      }
+      .p-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .p-icon-wrap {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        backdrop-filter: blur(4px);
+      }
+      .p-icon-wrap svg {
+        width: 20px;
+        height: 20px;
+        stroke: #fff;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .p-info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .p-title-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .p-name {
+        font: 700 14px 'Space Grotesk';
+        letter-spacing: -0.01em;
+      }
+      .p-decision-tag {
+        font: 600 9px 'JetBrains Mono';
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        letter-spacing: 0.02em;
+      }
+      .p-target {
+        font: 500 10.5px 'JetBrains Mono';
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .p-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .p-badge {
+        font: 700 12px 'JetBrains Mono';
+        letter-spacing: 0.06em;
+        padding: 5px 10px;
+        border-radius: 8px;
+        background: #fff;
+        color: var(--ink);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+      }
+      .p-top .p-badge {
+        color: var(--red);
+      }
+      .p-mid .p-badge {
+        color: var(--purple);
+      }
+      .p-ops .p-badge {
+        color: #1e293b;
+      }
+      .p-sub-badge {
+        font: 500 8.5px 'JetBrains Mono';
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .pyramid-axis-box {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 12px;
+        margin-top: 10px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--line);
+        box-shadow: 0 4px 14px rgba(43, 37, 96, 0.03);
+      }
+      .axis-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .axis-arrow {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        flex-shrink: 0;
+        font-weight: bold;
+      }
+      .axis-up .axis-arrow {
+        background: rgba(196, 18, 48, 0.12);
+        color: var(--red);
+      }
+      .axis-down .axis-arrow {
+        background: rgba(43, 37, 96, 0.12);
+        color: var(--purple);
+      }
+      .axis-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .axis-text b {
+        font: 700 9.5px 'JetBrains Mono';
+        color: var(--ink);
+        letter-spacing: 0.02em;
+      }
+      .axis-text span {
+        font: 400 9.5px 'Inter';
+        color: var(--sub);
+      }
+      .axis-divider {
+        width: 1px;
+        height: 28px;
+        background: var(--line);
+      }
+      /* Slide 07 · Interactive Tooltip System Cards */
+      .syscard-wrap {
+        position: relative;
+      }
+      .syscard {
+        position: relative;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px 18px;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: pointer;
+        overflow: visible;
+      }
+      .syscard:hover {
+        border-color: var(--red);
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px rgba(196, 18, 48, 0.12);
+        background: linear-gradient(145deg, #fff, #fff8f9);
+      }
+      .syscard .full-name {
+        display: block;
+        font: 600 10px 'JetBrains Mono';
+        color: var(--purple);
+        margin: 2px 0 6px;
+        letter-spacing: 0.02em;
+      }
+      .syscard-tooltip {
+        position: absolute;
+        bottom: calc(100% + 12px);
+        left: 50%;
+        transform: translateX(-50%) translateY(8px);
+        width: 260px;
+        background: rgba(23, 21, 26, 0.96);
+        backdrop-filter: blur(10px);
+        color: #fff;
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-size: 11px;
+        line-height: 1.5;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: all 0.25s ease-out;
+        z-index: 99;
+      }
+      .syscard-tooltip:after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: rgba(23, 21, 26, 0.96);
+      }
+      .syscard-wrap:hover .syscard-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+      }
+      .tooltip-title {
+        color: var(--red);
+        font: 700 11px 'JetBrains Mono';
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .tooltip-ex {
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.75);
+      }
+      .tooltip-ex b {
+        color: #fff;
+      }
+      /* Slide 09 · Maintenance Mix Visualization */
+      .maint-svg {
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+        filter: drop-shadow(0 14px 28px rgba(43, 37, 96, 0.06));
+      }
+      .maint-node {
+        transition:
+          transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+          filter 0.3s;
+        cursor: pointer;
+      }
+      .maint-node:hover {
+        transform: scale(1.06);
+      }
+      .maint-node:hover rect {
+        stroke: var(--red);
+        stroke-width: 2.2;
+      }
+      .maint-center {
+        transform-origin: 260px 160px;
+        cursor: pointer;
+      }
+      .maint-center:hover circle {
+        filter: drop-shadow(0 10px 25px rgba(196, 18, 48, 0.45));
+      }
+      .maint-orbit-dash {
+        stroke: var(--line);
+        stroke-width: 1.5;
+        stroke-dasharray: 5 6;
+        fill: none;
+      }
+      .maint-flow-dash {
+        stroke: var(--red);
+        stroke-width: 2.2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-dasharray: 6 8;
+        animation: dashMove 1.6s linear infinite;
+      }
+      .maint-pulse-ring {
+        animation: maintRing 2.4s ease-out infinite;
+        transform-origin: 260px 160px;
+      }
+      /* Slide 10 · What vs How Interactive Visual */
+      .wh-container {
+        display: grid;
+        grid-template-columns: 1fr 64px 1fr;
+        gap: 20px;
+        align-items: stretch;
+        margin-top: 35px;
+      }
+      .wh-card {
+        position: relative;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 32px 28px;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 10px 30px rgba(43, 37, 96, 0.04);
+        overflow: hidden;
+        cursor: pointer;
+      }
+      .wh-card:hover {
+        transform: translateY(-8px) scale(1.015);
+        box-shadow: 0 22px 50px rgba(43, 37, 96, 0.14);
+      }
+      .wh-card.wh-what {
+        border-top: 5px solid var(--red);
+      }
+      .wh-card.wh-how {
+        border-top: 5px solid var(--purple);
+      }
+      .wh-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font: 700 11px 'JetBrains Mono';
+        letter-spacing: 0.08em;
+        margin-bottom: 14px;
+        transition: transform 0.25s ease;
+      }
+      .wh-card:hover .wh-badge {
+        transform: translateY(-2px);
+      }
+      .wh-what .wh-badge {
+        background: var(--panel2);
+        color: var(--red);
+      }
+      .wh-how .wh-badge {
+        background: #f2eff5;
+        color: var(--purple);
+      }
+      .wh-title {
+        font: 700 clamp(32px, 3.8vw, 48px) 'Space Grotesk';
+        line-height: 1.05;
+        margin-bottom: 10px;
+        transition: transform 0.25s ease;
+      }
+      .wh-card:hover .wh-title {
+        transform: translateX(4px);
+      }
+      .wh-what .wh-title {
+        color: var(--red);
+      }
+      .wh-how .wh-title {
+        color: var(--purple);
+      }
+      .wh-desc {
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--sub);
+        margin-bottom: 20px;
+      }
+      .wh-sublist {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        border-top: 1px solid var(--line);
+        padding-top: 16px;
+      }
+      .wh-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font: 500 12px 'JetBrains Mono';
+        color: var(--ink);
+        background: var(--panel);
+        padding: 9px 14px;
+        border-radius: 10px;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: default;
+      }
+      .wh-item:hover {
+        transform: translateX(6px);
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      }
+      .wh-item i {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        transition: transform 0.25s ease;
+      }
+      .wh-item:hover i {
+        transform: scale(1.6);
+      }
+      .wh-what .wh-item i {
+        background: var(--red);
+      }
+      .wh-how .wh-item i {
+        background: var(--purple);
+      }
+      .wh-vs {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .wh-vs-circle {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid var(--line);
+        display: grid;
+        place-items: center;
+        font: 700 18px 'Space Grotesk';
+        color: var(--red);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        transition: 0.3s;
+      }
+      .wh-container:hover .wh-vs-circle {
+        border-color: var(--red);
+        transform: scale(1.1) rotate(15deg);
+      }
+      .wh-vs-label {
+        font: 600 9px 'JetBrains Mono';
+        color: var(--sub);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      @media (max-width: 800px) {
+        .wh-container {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        .wh-vs {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress"></div>
+    <div class="brand">PTTKHT <b>·</b> SESSION 02</div>
+    <div class="counter"><b id="cur">01</b> / <span id="total">15</span></div>
+    <nav class="navdots" id="dots" aria-label="Điều hướng slide"></nav>
+    <div class="navbtns">
+      <button id="prev" aria-label="Slide trước">‹</button
+      ><button id="next" aria-label="Slide sau">›</button>
+    </div>
+    <main>
+      <section class="slide" id="hero">
+        <div class="hero-layout">
+          <div class="hero-copy">
+            <div class="hero-session"><i></i>Session 02 · PTTKHT</div>
+            <h1 class="title">
+              <span class="hero-line">Hệ thống</span
+              ><span class="hero-line">thông tin,</span
+              ><span class="hero-line hero-accent">SDLC &amp; UML</span>
+            </h1>
+            <p class="lead">
+              Từ cách tổ chức biến dữ liệu thành quyết định, đến quy trình xây dựng phần
+              mềm và ngôn ngữ mô hình hóa giải pháp.
+            </p>
+            <div class="hero-stats">
+              <div class="hero-stat"><b>05</b>chủ đề</div>
+              <div class="hero-stat"><b>15</b>slide</div>
+              <div class="hero-stat"><b>01</b>tổng thể</div>
+            </div>
+          </div>
+          <div class="hero-visual" aria-label="Bốn trụ cột của bài học">
+            <div class="hero-orbit"></div>
+            <svg class="hero-map" viewBox="0 0 620 520" role="img">
+              <!-- Concentric Background Rings -->
+              <circle class="hero-bg-ring" cx="310" cy="260" r="230" stroke="rgba(196,18,48,0.06)" stroke-width="1" fill="none" />
+              <circle class="hero-bg-ring" cx="310" cy="260" r="170" stroke="rgba(43,37,96,0.08)" stroke-width="1" stroke-dasharray="4 6" fill="none" />
+              <circle class="hero-bg-ring" cx="310" cy="260" r="105" stroke="rgba(196,18,48,0.12)" stroke-width="1" stroke-dasharray="3 5" fill="none" />
+
+              <!-- Connecting Links from Core (310, 260) to 4 Pillar Cards -->
+              <path
+                id="heroPath1"
+                class="hero-link"
+                d="M310 260 C230 250, 160 210, 140 148"
+              />
+              <path
+                id="heroPath2"
+                class="hero-link"
+                d="M310 260 C390 250, 460 210, 480 148"
+              />
+              <path
+                id="heroPath3"
+                class="hero-link"
+                d="M310 260 C230 270, 160 310, 140 372"
+              />
+              <path
+                id="heroPath4"
+                class="hero-link"
+                d="M310 260 C390 270, 460 310, 480 372"
+              />
+
+              <!-- Center Core Rings & Circle -->
+              <circle class="hero-core-ring" cx="310" cy="260" r="76" />
+              <circle class="hero-core-ring hero-ring-inner" cx="310" cy="260" r="58" />
+              <circle class="hero-core" cx="310" cy="260" r="46" />
+              <text x="310" y="254" text-anchor="middle" class="svgtxt white" font-weight="700" font-size="13">
+                PHÂN TÍCH
+              </text>
+              <text x="310" y="272" text-anchor="middle" class="svgsub" fill="rgba(255,255,255,0.85)" font-size="10" font-weight="500">
+                &amp; THIẾT KẾ
+              </text>
+
+              <!-- 4 Symmetrical Pillar Cards (190x96) -->
+              <!-- 01 Top Left -->
+              <g class="hero-card" data-go="2">
+                <rect x="45" y="52" width="190" height="96" rx="16" />
+                <text x="65" y="78" class="card-kicker">01 · FOUNDATION</text>
+                <text x="65" y="106" class="card-title">HTTT</text>
+                <text x="65" y="128" class="card-sub">Dữ liệu → Quyết định</text>
+              </g>
+
+              <!-- 02 Top Right -->
+              <g class="hero-card" data-go="6">
+                <rect x="385" y="52" width="190" height="96" rx="16" />
+                <text x="405" y="78" class="card-kicker">02 · LIFECYCLE</text>
+                <text x="405" y="106" class="card-title">SDLC</text>
+                <text x="405" y="128" class="card-sub">Ý tưởng → Vận hành</text>
+              </g>
+
+              <!-- 03 Bottom Left -->
+              <g class="hero-card" data-go="9">
+                <rect x="45" y="372" width="190" height="96" rx="16" />
+                <text x="65" y="398" class="card-kicker">03 · APPROACH</text>
+                <text x="65" y="426" class="card-title">Mô hình</text>
+                <text x="65" y="448" class="card-sub">Waterfall · Spiral · Agile</text>
+              </g>
+
+              <!-- 04 Bottom Right -->
+              <g class="hero-card" data-go="12">
+                <rect x="385" y="372" width="190" height="96" rx="16" />
+                <text x="405" y="398" class="card-kicker">04 · BLUEPRINT</text>
+                <text x="405" y="426" class="card-title">UML</text>
+                <text x="405" y="448" class="card-sub">Ngôn ngữ mô hình hóa</text>
+              </g>
+
+              <!-- Data Pulse Packets -->
+              <circle id="packet1" class="hero-packet" r="4.5" />
+              <circle id="packet2" class="hero-packet" r="4.5" />
+              <circle id="packet3" class="hero-packet" r="4.5" />
+              <circle id="packet4" class="hero-packet" r="4.5" />
+            </svg>
+          </div>
+        </div>
+        <div class="scroll-cue"><i></i>Cuộn để bắt đầu</div>
+      </section>
+
+      <section class="slide" id="roadmap">
+        <div class="eyebrow">Bản đồ bài học</div>
+        <h2 class="section-title">
+          Đi từ hệ thống đến <span class="accent">bản thiết kế</span>
+        </h2>
+        <p class="lead">
+          Mỗi phần trả lời một câu hỏi cốt lõi trong quá trình phát triển hệ thống.
+        </p>
+        <div class="roadmap">
+          <div class="roadmap-fill" id="roadFill"></div>
+          <div class="step" data-go="2">
+            <div class="dot"></div>
+            <b>01 · HTTT</b><span>Hệ thống vận hành thế nào?</span>
+          </div>
+          <div class="step" data-go="5">
+            <div class="dot"></div>
+            <b>02 · Phân loại</b><span>Ai dùng thông tin nào?</span>
+          </div>
+          <div class="step" data-go="7">
+            <div class="dot"></div>
+            <b>03 · SDLC</b><span>Xây dựng theo bước nào?</span>
+          </div>
+          <div class="step" data-go="9">
+            <div class="dot"></div>
+            <b>04 · Mô hình</b><span>Tổ chức các bước ra sao?</span>
+          </div>
+          <div class="step" data-go="11">
+            <div class="dot"></div>
+            <b>05 · UML</b><span>Mô tả giải pháp bằng gì?</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="system-anatomy">
+        <div class="anatomy-head">
+          <div>
+            <div class="eyebrow">01 · Tổng quan HTTT</div>
+            <h2 class="section-title">
+              Một hệ thống không chỉ là <span class="accent">các bộ phận.</span>
+            </h2>
+            <p class="lead">
+              Đó là năm yếu tố cùng vận hành — được liên kết bởi tương tác và dẫn hướng
+              bởi một mục tiêu chung.
+            </p>
+          </div>
+          <div class="anatomy-mark">
+            <strong>05</strong><span>đặc điểm<br />cốt lõi</span>
+          </div>
+        </div>
+        <div class="anatomy-track">
+          <div class="anatomy-rail"><i></i></div>
+          <article class="anatomy-card">
+            <span class="card-no">01 / CẤU TẠO</span>
+            <div class="anatomy-icon">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+              </svg>
+            </div>
+            <h3>Thành phần</h3>
+            <p>Các phần tử tạo nên cấu trúc và năng lực của hệ thống.</p>
+          </article>
+          <article class="anatomy-card">
+            <span class="card-no">02 / LIÊN KẾT</span>
+            <div class="anatomy-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M19 8l-4-4m4 4l-4 4m4-4H5"></path>
+                <path d="M5 16l4 4m-4-4l4-4m-4 4h14"></path>
+              </svg>
+            </div>
+            <h3>Tương tác</h3>
+            <p>Các thành phần trao đổi và tác động lẫn nhau.</p>
+          </article>
+          <article class="anatomy-card">
+            <span class="card-no">03 / PHẠM VI</span>
+            <div class="anatomy-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 9V5a1 1 0 0 1 1-1h4"></path>
+                <path d="M20 9V5a1 1 0 0 0-1-1h-4"></path>
+                <path d="M4 15v4a1 1 0 0 0 1 1h4"></path>
+                <path d="M20 15v4a1 1 0 0 1-1 1h-4"></path>
+                <rect x="8" y="8" width="8" height="8" rx="1"></rect>
+              </svg>
+            </div>
+            <h3>Ranh giới</h3>
+            <p>Xác định điều gì thuộc và không thuộc hệ thống.</p>
+          </article>
+          <article class="anatomy-card">
+            <span class="card-no">04 / BỐI CẢNH</span>
+            <div class="anatomy-icon">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M2 12h20"></path>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            <h3>Môi trường</h3>
+            <p>Các yếu tố bên ngoài tạo ảnh hưởng và ràng buộc.</p>
+          </article>
+          <article class="anatomy-card goal">
+            <span class="card-no">05 / ĐÍCH ĐẾN</span>
+            <div class="anatomy-icon">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
+              </svg>
+            </div>
+            <h3>Mục tiêu chung</h3>
+            <p>Lý do tồn tại và tiêu chí cuối cùng để đo hiệu quả.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide" id="data-information">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow">01 · Tổng quan HTTT</div>
+            <h2 class="section-title">
+              Dữ liệu chưa phải là <span class="accent">thông tin</span>
+            </h2>
+            <p class="lead">
+              Dữ liệu là các sự kiện thô. Khi được xử lý và đặt trong ngữ cảnh, dữ liệu
+              trở thành thông tin có ý nghĩa.
+            </p>
+            <div class="quote">
+              Thông tin tốt phải giúp người dùng hiểu tình huống và ra quyết định tốt hơn.
+            </div>
+            <div class="chips">
+              <span class="chip">Thu thập</span><span class="chip">Xử lý</span
+              ><span class="chip">Ngữ cảnh</span><span class="chip">Quyết định</span>
+            </div>
+          </div>
+          <div class="panel data-panel">
+            <span class="tag">live data lab</span>
+            <div class="data-lab">
+              <div class="lab-stage raw-stage">
+                <div class="lab-label">DỮ LIỆU THÔ <i></i></div>
+                <div class="data-events">
+                  <div class="data-event">
+                    <span class="event-icon">#</span
+                    ><span><b>Đơn hàng</b><br /><small>SKU-A7 · Q.1</small></span
+                    ><em>125</em>
+                  </div>
+                  <div class="data-event">
+                    <span class="event-icon">₫</span
+                    ><span><b>Doanh thu</b><br /><small>09:42 hôm nay</small></span
+                    ><em>320K</em>
+                  </div>
+                  <div class="data-event">
+                    <span class="event-icon">↗</span
+                    ><span><b>Lượt mua</b><br /><small>7 ngày gần nhất</small></span
+                    ><em>+24</em>
+                  </div>
+                </div>
+              </div>
+              <div class="processor">
+                <div class="flow-line"></div>
+                <div class="flow-dot"></div>
+                <div class="processor-core">⚙</div>
+                <div class="process-step">
+                  <span>01</span> LÀM SẠCH<br /><span>02</span> TỔNG HỢP<br /><span
+                    >03</span
+                  >
+                  NGỮ CẢNH
+                </div>
+              </div>
+              <div class="lab-stage insight-stage">
+                <div class="lab-label">THÔNG TIN <i></i></div>
+                <div class="insight-card">
+                  <div class="insight-kicker">INSIGHT · TUẦN NÀY</div>
+                  <div class="insight-value">
+                    <strong>+18%</strong><span>tăng trưởng<br />doanh số</span>
+                  </div>
+                </div>
+                <div class="mini-chart">
+                  <i style="--h: 28%"></i><i style="--h: 39%"></i><i style="--h: 35%"></i
+                  ><i style="--h: 52%"></i><i style="--h: 61%"></i><i style="--h: 78%"></i
+                  ><i style="--h: 92%"></i>
+                </div>
+                <div class="chart-meta"><span>T2</span><span>CN</span></div>
+                <div class="decision-pill">Sẵn sàng hỗ trợ quyết định</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow">01 · Tổng quan HTTT</div>
+            <h2 class="section-title">
+              HTTT vận hành theo một <span class="accent">chu trình</span>
+            </h2>
+            <ul class="topic-list">
+              <li>
+                <span class="idx">IN</span>
+                <div>
+                  <h3>Thu thập đầu vào</h3>
+                  <p>Giao dịch, sự kiện, biểu mẫu, cảm biến.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">01</span>
+                <div>
+                  <h3>Xử lý</h3>
+                  <p>Kiểm tra, tính toán, phân loại và tổng hợp.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">OUT</span>
+                <div>
+                  <h3>Cung cấp đầu ra</h3>
+                  <p>Báo cáo, cảnh báo, dashboard, quyết định.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">↺</span>
+                <div>
+                  <h3>Phản hồi</h3>
+                  <p>Đầu ra quay lại điều chỉnh quá trình.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="panel">
+            <span class="tag">operating loop · interactive</span>
+            <svg class="loop-svg" viewBox="0 0 460 270">
+              <defs>
+                <filter id="glowRed" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="3.5" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
+              <!-- Flow Paths -->
+              <path id="loopPath1" d="M110 115 H165" class="loop-path-bg" />
+              <path d="M110 115 H165" class="loop-path-active" />
+
+              <path id="loopPath2" d="M295 115 H350" class="loop-path-bg" />
+              <path d="M295 115 H350" class="loop-path-active" />
+
+              <!-- Feedback Return Curve -->
+              <path
+                id="loopPathFb"
+                d="M405 165 C405 245, 55 245, 55 165"
+                class="loop-path-bg"
+              />
+              <path d="M405 165 C405 245, 55 245, 55 165" class="loop-fb-active" />
+
+              <!-- Input Node -->
+              <g class="loop-node" transform="translate(10, 65)">
+                <rect
+                  width="100"
+                  height="100"
+                  rx="16"
+                  fill="#ffffff"
+                  stroke="#ded5d8"
+                  stroke-width="1.8"
+                />
+                <rect x="35" y="12" width="30" height="30" rx="8" fill="#f2eff5" />
+                <text x="50" y="32" text-anchor="middle" font-size="16">📥</text>
+                <text
+                  x="50"
+                  y="60"
+                  text-anchor="middle"
+                  class="svgtxt"
+                  font-size="12"
+                  font-weight="700"
+                >
+                  INPUT
+                </text>
+                <text x="50" y="78" text-anchor="middle" class="svgsub" font-size="10">
+                  Dữ liệu thô
+                </text>
+              </g>
+
+              <!-- Process Node (Pulsing Center) -->
+              <circle
+                cx="230"
+                cy="115"
+                r="58"
+                fill="rgba(196,18,48,0.08)"
+                class="loop-pulse-ring"
+              />
+              <g class="loop-node hot" transform="translate(165, 55)">
+                <rect
+                  width="130"
+                  height="120"
+                  rx="20"
+                  fill="var(--red)"
+                  filter="drop-shadow(0 12px 28px rgba(196,18,48,0.32))"
+                />
+                <text x="65" y="38" text-anchor="middle" font-size="22">⚙️</text>
+                <text
+                  x="65"
+                  y="66"
+                  text-anchor="middle"
+                  class="svgtxt white"
+                  font-size="14"
+                  font-weight="700"
+                >
+                  XỬ LÝ
+                </text>
+                <text
+                  x="65"
+                  y="86"
+                  text-anchor="middle"
+                  fill="rgba(255,255,255,0.95)"
+                  font-family="Inter"
+                  font-size="10"
+                  font-weight="500"
+                >
+                  Quy tắc &amp; Thuật toán
+                </text>
+                <text
+                  x="65"
+                  y="102"
+                  text-anchor="middle"
+                  fill="rgba(255,255,255,0.75)"
+                  font-family="Inter"
+                  font-size="9"
+                >
+                  Tính toán · Tổng hợp
+                </text>
+              </g>
+
+              <!-- Output Node -->
+              <g class="loop-node" transform="translate(350, 65)">
+                <rect
+                  width="100"
+                  height="100"
+                  rx="16"
+                  fill="#ffffff"
+                  stroke="#ded5d8"
+                  stroke-width="1.8"
+                />
+                <rect x="35" y="12" width="30" height="30" rx="8" fill="#fbeeef" />
+                <text x="50" y="32" text-anchor="middle" font-size="16">📊</text>
+                <text
+                  x="50"
+                  y="60"
+                  text-anchor="middle"
+                  class="svgtxt"
+                  font-size="12"
+                  font-weight="700"
+                >
+                  OUTPUT
+                </text>
+                <text x="50" y="78" text-anchor="middle" class="svgsub" font-size="10">
+                  Thông tin hữu ích
+                </text>
+              </g>
+
+              <!-- Animated Flying Packets -->
+              <circle id="loopP1" r="5" fill="#2b2560" filter="url(#glowRed)" />
+              <circle id="loopP2" r="5" fill="#c41230" filter="url(#glowRed)" />
+              <circle id="loopPFb" r="5" fill="#2b2560" filter="url(#glowRed)" />
+
+              <!-- Feedback Label Badge -->
+              <g transform="translate(165, 218)">
+                <rect
+                  x="0"
+                  y="-14"
+                  width="130"
+                  height="28"
+                  rx="14"
+                  fill="#ffffff"
+                  stroke="#ded5d8"
+                  stroke-width="1.2"
+                  filter="drop-shadow(0 4px 10px rgba(0,0,0,0.06))"
+                />
+                <text
+                  x="65"
+                  y="4"
+                  text-anchor="middle"
+                  fill="#2b2560"
+                  font-family="JetBrains Mono"
+                  font-size="11"
+                  font-weight="600"
+                >
+                  ↺ PHẢN HỒI
+                </text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="slide-management">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow">02 · Phân loại HTTT</div>
+            <h2 class="section-title">
+              Thông tin thay đổi theo <span class="accent">cấp quản lý</span>
+            </h2>
+            <ul class="topic-list">
+              <li>
+                <span class="idx">TOP</span>
+                <div>
+                  <h3>Chiến lược (Executive)</h3>
+                  <p>Tầm nhìn dài hạn, tổng hợp cao, nhiều nguồn dữ liệu bên ngoài.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">MID</span>
+                <div>
+                  <h3>Chiến thuật (Management)</h3>
+                  <p>Lập kế hoạch, kiểm soát ngân sách và phân tích hiệu suất theo kỳ.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">OPS</span>
+                <div>
+                  <h3>Tác nghiệp (Operational)</h3>
+                  <p>Xử lý giao dịch hằng ngày, chi tiết cao, cập nhật thời gian thực.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="panel pyramid-panel">
+            <span class="tag">MÔ HÌNH KIM TỰ THÁP QUẢN LÝ · ANTHONY'S TRIANGLE</span>
+            <div class="pyramid-container">
+              <!-- Level 1: Strategic -->
+              <div class="pyramid-level p-top">
+                <div class="p-left">
+                  <div class="p-icon-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"></path>
+                    </svg>
+                  </div>
+                  <div class="p-info">
+                    <div class="p-title-row">
+                      <div class="p-name">Cấp Chiến lược (Executive)</div>
+                      <span class="p-decision-tag">Phi cấu trúc · 3-5 năm</span>
+                    </div>
+                    <div class="p-target">Giám đốc (CEO/C-Level) · Hội đồng quản trị</div>
+                  </div>
+                </div>
+                <div class="p-right">
+                  <div class="p-badge">EIS / ESS</div>
+                  <span class="p-sub-badge">BI Dashboard</span>
+                </div>
+              </div>
+
+              <!-- Level 2: Tactical -->
+              <div class="pyramid-level p-mid">
+                <div class="p-left">
+                  <div class="p-icon-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                      <circle cx="12" cy="4" r="2" fill="currentColor"></circle>
+                    </svg>
+                  </div>
+                  <div class="p-info">
+                    <div class="p-title-row">
+                      <div class="p-name">Cấp Chiến thuật (Tactical)</div>
+                      <span class="p-decision-tag">Bán cấu trúc · Tháng/Quý</span>
+                    </div>
+                    <div class="p-target">Trưởng phòng · Quản lý trung cấp · Giám sát</div>
+                  </div>
+                </div>
+                <div class="p-right">
+                  <div class="p-badge">MIS / DSS</div>
+                  <span class="p-sub-badge">Báo cáo &amp; KPI</span>
+                </div>
+              </div>
+
+              <!-- Level 3: Operational -->
+              <div class="pyramid-level p-ops">
+                <div class="p-left">
+                  <div class="p-icon-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <rect x="2" y="4" width="20" height="16" rx="3"></rect>
+                      <path d="M6 12h4m-2-2v4m6-2h4"></path>
+                    </svg>
+                  </div>
+                  <div class="p-info">
+                    <div class="p-title-row">
+                      <div class="p-name">Cấp Tác nghiệp (Operational)</div>
+                      <span class="p-decision-tag">Có cấu trúc · Thời gian thực</span>
+                    </div>
+                    <div class="p-target">Nhân viên trực tiếp · Thu ngân · Kế toán · Kho</div>
+                  </div>
+                </div>
+                <div class="p-right">
+                  <div class="p-badge">TPS</div>
+                  <span class="p-sub-badge">Giao dịch hằng ngày</span>
+                </div>
+              </div>
+
+              <!-- Information Dimensions Comparison Axis -->
+              <div class="pyramid-axis-box">
+                <div class="axis-item axis-up">
+                  <div class="axis-arrow">▲</div>
+                  <div class="axis-text">
+                    <b>MỨC ĐỘ TỔNG HỢP VĨ MÔ</b>
+                    <span>Dự báo tương lai · Dữ liệu ngoại vi &amp; toàn cục</span>
+                  </div>
+                </div>
+                <div class="axis-divider"></div>
+                <div class="axis-item axis-down">
+                  <div class="axis-arrow">▼</div>
+                  <div class="axis-text">
+                    <b>ĐỘ CHI TIẾT &amp; GIAO DỊCH THỰC</b>
+                    <span>Xác thực ngay · Dữ liệu nội bộ cụ thể, chính xác</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow">02 · Phân loại HTTT</div>
+            <h2 class="section-title">
+              Bốn hệ thống — <span class="accent">bốn vai trò</span>
+            </h2>
+            <p class="lead">
+              Từ ghi nhận giao dịch hằng ngày đến hỗ trợ lãnh đạo ra quyết định chiến
+              lược.
+            </p>
+            <div class="quote">
+              <b>ERP (Enterprise Resource Planning):</b> Nền tảng tích hợp toàn bộ dữ liệu
+              và quy trình nghiệp vụ xuyên suốt các phòng ban.
+            </div>
+            <div class="chips">
+              <span class="chip">SAP ERP</span><span class="chip">Oracle Cloud</span
+              ><span class="chip">Microsoft Dynamics</span><span class="chip">Odoo</span>
+            </div>
+          </div>
+          <div class="panel">
+            <span class="tag">information systems · hover card</span>
+            <div class="cards4">
+              <!-- TPS Card -->
+              <div class="syscard-wrap">
+                <div class="syscard">
+                  <b>TPS</b>
+                  <span class="full-name">Transaction Processing System</span>
+                  <span>Xử lý &amp; ghi nhận giao dịch hằng ngày</span>
+                </div>
+                <div class="syscard-tooltip">
+                  <div class="tooltip-title">⚡ TPS · Hệ thống xử lý giao dịch</div>
+                  Thu thập, lưu trữ và xử lý các nghiệp vụ tác nghiệp thường nhật ở cấp cơ
+                  sở với độ chính xác và tính toàn vẹn cao.
+                  <div class="tooltip-ex">
+                    <b>Ví dụ:</b> POS bán lẻ, ATM, quét mã vạch kho, đặt vé máy bay.
+                  </div>
+                </div>
+              </div>
+
+              <!-- MIS Card -->
+              <div class="syscard-wrap">
+                <div class="syscard">
+                  <b>MIS</b>
+                  <span class="full-name">Management Information System</span>
+                  <span>Báo cáo quản lý định kỳ &amp; tổng hợp</span>
+                </div>
+                <div class="syscard-tooltip">
+                  <div class="tooltip-title">📊 MIS · Hệ thống thông tin quản lý</div>
+                  Tổng hợp dữ liệu từ TPS để lập các báo cáo định kỳ (tuần/tháng/quý) giúp
+                  quản lý cấp trung theo dõi và kiểm soát hoạt động.
+                  <div class="tooltip-ex">
+                    <b>Ví dụ:</b> Báo cáo doanh thu tháng, kiểm kê hàng tồn, bảng lương
+                    nhân viên.
+                  </div>
+                </div>
+              </div>
+
+              <!-- DSS Card -->
+              <div class="syscard-wrap">
+                <div class="syscard">
+                  <b>DSS</b>
+                  <span class="full-name">Decision Support System</span>
+                  <span>Mô hình hóa &amp; hỗ trợ ra quyết định</span>
+                </div>
+                <div class="syscard-tooltip">
+                  <div class="tooltip-title">🎯 DSS · Hệ thống hỗ trợ ra quyết định</div>
+                  Sử dụng dữ liệu kết hợp các mô hình phân tích, kịch bản "What-If" để hỗ
+                  trợ giải quyết vấn đề bán cấu trúc hoặc phi cấu trúc.
+                  <div class="tooltip-ex">
+                    <b>Ví dụ:</b> Định giá sản phẩm mới, dự báo rủi ro tín dụng, lập kế
+                    hoạch tuyến xe.
+                  </div>
+                </div>
+              </div>
+
+              <!-- EIS Card -->
+              <div class="syscard-wrap">
+                <div class="syscard">
+                  <b>EIS</b>
+                  <span class="full-name">Executive Information System</span>
+                  <span>Tổng quan điều hành cấp chiến lược</span>
+                </div>
+                <div class="syscard-tooltip">
+                  <div class="tooltip-title">👑 EIS · Hệ thống thông tin điều hành</div>
+                  Cung cấp dashboard trực quan cấp cao (KPIs, xu hướng thị trường) giúp
+                  ban lãnh đạo cấp cao nắm bắt toàn cảnh doanh nghiệp tức thì.
+                  <div class="tooltip-ex">
+                    <b>Ví dụ:</b> Dashboard KPI toàn công ty, phân tích đối thủ &amp; thị
+                    phần, cảnh báo khủng hoảng.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">03 · SDLC · Software Development Life Cycle</div>
+        <h2 class="section-title">
+          Vòng đời phát triển <span class="accent">phần mềm</span> <span style="font-size: 0.58em; color: var(--sub); font-weight: 500;">(SDLC)</span>
+        </h2>
+        <p class="lead">
+          Một quy trình có cấu trúc (Structured Process), đi từ ý tưởng ban đầu (Inception) đến khi hệ thống ngừng sử dụng (Retirement / Decommission).
+        </p>
+        <div class="flow5" style="margin-top: 40px">
+          <div class="phase">
+            <strong>01</strong>
+            <span class="en-title">Planning</span>
+            <b>Lập kế hoạch</b>
+            <small>Feasibility Study<br />Mục tiêu &amp; Khả thi</small>
+          </div>
+          <div class="phase">
+            <strong>02</strong>
+            <span class="en-title">Analysis</span>
+            <b>Phân tích yêu cầu</b>
+            <small>Requirements Elicitation<br />Nghiệp vụ &amp; Hệ thống</small>
+          </div>
+          <div class="phase">
+            <strong>03</strong>
+            <span class="en-title">Design</span>
+            <b>Thiết kế hệ thống</b>
+            <small>Architecture &amp; DB<br />Kiến trúc &amp; Mô hình</small>
+          </div>
+          <div class="phase">
+            <strong>04</strong>
+            <span class="en-title">Implementation</span>
+            <b>Triển khai</b>
+            <small>Coding &amp; Testing<br />Xây dựng &amp; Kiểm thử</small>
+          </div>
+          <div class="phase">
+            <strong>05</strong>
+            <span class="en-title">Maintenance</span>
+            <b>Vận hành &amp; Bảo trì</b>
+            <small>Operations &amp; Patching<br />Vận hành &amp; Cải tiến</small>
+          </div>
+        </div>
+        <div class="chips center" style="margin-top: 32px">
+          <span class="chip">Risk Reduction · Giảm rủi ro</span>
+          <span class="chip">Cost &amp; Budget Control · Kiểm soát chi phí</span>
+          <span class="chip">Quality Assurance (QA) · Đảm bảo chất lượng</span>
+          <span class="chip">On-time Delivery · Đúng tiến độ</span>
+        </div>
+      </section>
+
+      <section class="slide" id="slide-maintenance">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow">03 · SDLC</div>
+            <h2 class="section-title">
+              Bảo trì không chỉ là <span class="accent">sửa lỗi</span>
+            </h2>
+            <ul class="topic-list">
+              <li>
+                <span class="idx">C</span>
+                <div>
+                  <h3>Corrective · Sửa chữa</h3>
+                  <p>
+                    Khắc phục lỗi phát sinh, vá lỗ hổng bảo mật sau khi đưa vào vận hành.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">A</span>
+                <div>
+                  <h3>Adaptive · Thích nghi</h3>
+                  <p>
+                    Điều chỉnh tương thích với hệ điều hành mới, luật quy định hoặc API
+                    mới.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">P</span>
+                <div>
+                  <h3>Perfective · Hoàn thiện</h3>
+                  <p>Tối ưu tốc độ tải, nâng cấp UI/UX và mở rộng thêm tính năng mới.</p>
+                </div>
+              </li>
+            </ul>
+            <div class="quote">
+              <b>Nguyên tắc:</b> Xây hệ thống quản lý bán hàng cần đi đủ 5 bước SDLC,
+              không nhảy cóc thẳng vào viết code.
+            </div>
+          </div>
+          <div class="panel">
+            <span class="tag">maintenance ecosystem</span>
+            <svg class="maint-svg" viewBox="0 0 520 320">
+              <defs>
+                <filter id="maintGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3.5" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
+              <!-- Orbit Dashes Ring -->
+              <circle cx="260" cy="160" r="115" class="maint-orbit-dash" />
+
+              <!-- Link Lines with Animated Dash -->
+              <line x1="260" y1="160" x2="260" y2="68" class="loop-path-bg" />
+              <line
+                id="maintLineC"
+                x1="260"
+                y1="160"
+                x2="260"
+                y2="68"
+                class="maint-flow-dash"
+              />
+
+              <line x1="260" y1="160" x2="380" y2="235" class="loop-path-bg" />
+              <line
+                id="maintLineA"
+                x1="260"
+                y1="160"
+                x2="380"
+                y2="235"
+                class="maint-flow-dash"
+              />
+
+              <line x1="260" y1="160" x2="140" y2="235" class="loop-path-bg" />
+              <line
+                id="maintLineP"
+                x1="260"
+                y1="160"
+                x2="140"
+                y2="235"
+                class="maint-flow-dash"
+              />
+
+              <!-- Center Hub (Bảo trì) -->
+              <circle
+                cx="260"
+                cy="160"
+                r="58"
+                fill="rgba(196,18,48,0.08)"
+                class="maint-pulse-ring"
+              />
+              <g class="maint-center">
+                <circle
+                  cx="260"
+                  cy="160"
+                  r="50"
+                  fill="var(--red)"
+                  filter="drop-shadow(0 10px 24px rgba(196,18,48,0.35))"
+                />
+                <text
+                  x="260"
+                  y="155"
+                  text-anchor="middle"
+                  fill="#fff"
+                  font-family="Space Grotesk"
+                  font-size="14"
+                  font-weight="700"
+                  letter-spacing="1"
+                >
+                  BẢO TRÌ
+                </text>
+                <text
+                  x="260"
+                  y="173"
+                  text-anchor="middle"
+                  fill="rgba(255,255,255,0.85)"
+                  font-family="Inter"
+                  font-size="9.5"
+                >
+                  Vận hành liên tục
+                </text>
+              </g>
+
+              <!-- Satellite Node 1: Corrective (Top Center) -->
+              <g class="maint-node" transform="translate(165, 8)">
+                <rect
+                  width="190"
+                  height="64"
+                  rx="14"
+                  fill="#ffffff"
+                  stroke="#ded5d8"
+                  stroke-width="1.8"
+                  filter="drop-shadow(0 6px 16px rgba(0,0,0,0.06))"
+                />
+                <rect x="12" y="15" width="34" height="34" rx="9" fill="#fbe9e9" />
+                <text
+                  x="29"
+                  y="37"
+                  text-anchor="middle"
+                  fill="var(--red)"
+                  font-family="JetBrains Mono"
+                  font-size="15"
+                  font-weight="700"
+                >
+                  C
+                </text>
+                <text
+                  x="56"
+                  y="30"
+                  fill="var(--red)"
+                  font-family="Space Grotesk"
+                  font-size="13"
+                  font-weight="700"
+                >
+                  SỬA CHỮA
+                </text>
+                <text x="56" y="47" fill="var(--sub)" font-family="Inter" font-size="10">
+                  Vá lỗi phần mềm &amp; bảo mật
+                </text>
+              </g>
+
+              <!-- Satellite Node 2: Adaptive (Bottom-Right) -->
+              <g class="maint-node" transform="translate(295, 210)">
+                <rect
+                  width="190"
+                  height="64"
+                  rx="14"
+                  fill="#ffffff"
+                  stroke="#ded5d8"
+                  stroke-width="1.8"
+                  filter="drop-shadow(0 6px 16px rgba(0,0,0,0.06))"
+                />
+                <rect x="12" y="15" width="34" height="34" rx="9" fill="#f2eff5" />
+                <text
+                  x="29"
+                  y="37"
+                  text-anchor="middle"
+                  fill="var(--purple)"
+                  font-family="JetBrains Mono"
+                  font-size="15"
+                  font-weight="700"
+                >
+                  A
+                </text>
+                <text
+                  x="56"
+                  y="30"
+                  fill="var(--purple)"
+                  font-family="Space Grotesk"
+                  font-size="13"
+                  font-weight="700"
+                >
+                  THÍCH NGHI
+                </text>
+                <text x="56" y="47" fill="var(--sub)" font-family="Inter" font-size="10">
+                  Đổi HĐH, Cloud, Luật mới
+                </text>
+              </g>
+
+              <!-- Satellite Node 3: Perfective (Bottom-Left) -->
+              <g class="maint-node" transform="translate(35, 210)">
+                <rect
+                  width="190"
+                  height="64"
+                  rx="14"
+                  fill="#ffffff"
+                  stroke="#ded5d8"
+                  stroke-width="1.8"
+                  filter="drop-shadow(0 6px 16px rgba(0,0,0,0.06))"
+                />
+                <rect x="12" y="15" width="34" height="34" rx="9" fill="#edf8f2" />
+                <text
+                  x="29"
+                  y="37"
+                  text-anchor="middle"
+                  fill="#18764a"
+                  font-family="JetBrains Mono"
+                  font-size="15"
+                  font-weight="700"
+                >
+                  P
+                </text>
+                <text
+                  x="56"
+                  y="30"
+                  fill="#18764a"
+                  font-family="Space Grotesk"
+                  font-size="13"
+                  font-weight="700"
+                >
+                  HOÀN THIỆN
+                </text>
+                <text x="56" y="47" fill="var(--sub)" font-family="Inter" font-size="10">
+                  Tối ưu tốc độ tải &amp; UI/UX
+                </text>
+              </g>
+
+              <!-- Flying Signal Packets -->
+              <circle id="maintP1" r="5" fill="var(--red)" filter="url(#maintGlow)" />
+              <circle id="maintP2" r="5" fill="var(--purple)" filter="url(#maintGlow)" />
+              <circle id="maintP3" r="5" fill="#18764a" filter="url(#maintGlow)" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="slide-wh">
+        <div class="eyebrow">04 · Mô hình phát triển</div>
+        <h2 class="section-title">
+          SDLC là <span class="accent">WHAT</span> · Mô hình là
+          <span class="accent">HOW</span>
+        </h2>
+        <p class="lead">
+          Hai khái niệm thường bị nhầm lẫn: Một bên định nghĩa <b>nội dung công việc</b>,
+          một bên định nghĩa <b>cách thức thực hiện</b>.
+        </p>
+
+        <div class="wh-container">
+          <!-- Card WHAT: SDLC -->
+          <div class="wh-card wh-what">
+            <div class="wh-badge">KHUNG VÒNG ĐỜI</div>
+            <div class="wh-title">WHAT</div>
+            <div class="wh-desc">
+              <b>SDLC</b> xác định <i>những nhóm việc bắt buộc phải làm</i> trong suốt
+              vòng đời của hệ thống.
+            </div>
+            <div class="wh-sublist">
+              <div class="wh-item"><i></i>1. Lập kế hoạch &amp; Đánh giá khả thi</div>
+              <div class="wh-item"><i></i>2. Phân tích yêu cầu nghiệp vụ</div>
+              <div class="wh-item"><i></i>3. Thiết kế kiến trúc &amp; mô hình</div>
+              <div class="wh-item"><i></i>4. Lập trình &amp; Kiểm thử chất lượng</div>
+              <div class="wh-item"><i></i>5. Triển khai &amp; Bảo trì vận hành</div>
+            </div>
+          </div>
+
+          <!-- Center VS Divider -->
+          <div class="wh-vs">
+            <div class="wh-vs-circle">≠</div>
+            <div class="wh-vs-label">KHÁC BIỆT</div>
+          </div>
+
+          <!-- Card HOW: Development Models -->
+          <div class="wh-card wh-how">
+            <div class="wh-badge">PHƯƠNG PHÁP TRIỂN KHAI</div>
+            <div class="wh-title">HOW</div>
+            <div class="wh-desc">
+              <b>Mô hình phát triển</b> xác định
+              <i>cách sắp xếp, thứ tự lặp lại và cách thức quản trị</i> các nhóm việc đó.
+            </div>
+            <div class="wh-sublist">
+              <div class="wh-item">
+                <i></i>Waterfall: Làm tuần tự, một chiều, tài liệu chặt chẽ
+              </div>
+              <div class="wh-item">
+                <i></i>Spiral: Lặp xoắn ốc, tập trung quản trị rủi ro
+              </div>
+              <div class="wh-item">
+                <i></i>Agile/Scrum: Chia nhỏ theo Sprint 2-4 tuần, nhận phản hồi liên tục
+              </div>
+              <div class="wh-item">
+                <i></i>V-Model: Song hành giữa phát triển và kiểm thử
+              </div>
+              <div class="wh-item">
+                <i></i>RAD / Prototype: Tạo nhanh bản mẫu để thẩm định
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">04 · Mô hình phát triển</div>
+        <h2 class="section-title">
+          Chọn cách làm theo <span class="accent">bối cảnh</span>
+        </h2>
+        <div class="model-grid" style="margin-top: 38px">
+          <div class="model">
+            <b>Waterfall</b>
+            <div class="mini-viz">
+              <div class="water">
+                <i style="--i: 0"></i><i style="--i: 1"></i><i style="--i: 2"></i
+                ><i style="--i: 3"></i><i style="--i: 4"></i>
+              </div>
+            </div>
+            <p>Tuần tự, dễ quản lý; phù hợp khi yêu cầu ổn định và rõ ràng.</p>
+          </div>
+          <div class="model">
+            <b>Spiral</b>
+            <div class="mini-viz"><div class="spiral"></div></div>
+            <p>Lặp theo vòng, nhấn mạnh đánh giá rủi ro; hợp với dự án lớn, phức tạp.</p>
+          </div>
+          <div class="model">
+            <b>Agile / Scrum</b>
+            <div class="mini-viz">
+              <div class="sprints"><i></i><i></i><i></i></div>
+            </div>
+            <p>
+              Phát triển theo sprint, nhận phản hồi nhanh; hợp khi yêu cầu thường thay
+              đổi.
+            </p>
+          </div>
+        </div>
+        <div class="quote">
+          Yêu cầu hay đổi, cần phản hồi nhanh → chọn Agile/Scrum thay vì Waterfall.
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow">05 · Tổng quan UML</div>
+            <h2 class="section-title">
+              UML là ngôn ngữ <span class="accent">mô hình hóa</span>
+            </h2>
+            <p class="lead">
+              <b>Unified Modeling Language</b> cung cấp một bộ ký hiệu thống nhất để các
+              bên cùng mô tả và hiểu hệ thống.
+            </p>
+            <div class="quote">
+              <b>UML không phải quy trình.</b> UML là công cụ có thể dùng trong SDLC,
+              Waterfall hoặc Agile.
+            </div>
+          </div>
+          <div class="panel">
+            <span class="tag">shared blueprint</span
+            ><svg viewBox="0 0 360 260">
+              <rect
+                x="38"
+                y="36"
+                width="284"
+                height="188"
+                rx="12"
+                fill="#fff"
+                stroke="#2b2560"
+                stroke-width="2"
+              />
+              <path d="M38 79H322M135 79V224" stroke="#d9d0d3" stroke-width="1.5" />
+              <circle cx="86" cy="131" r="17" class="svgbox hot" />
+              <path
+                d="M86 148V187M62 165H110M86 187L66 211M86 187L106 211"
+                class="svglink"
+              />
+              <rect x="170" y="105" width="115" height="36" rx="7" class="svgbox" />
+              <rect x="170" y="163" width="115" height="36" rx="7" class="svgbox" />
+              <path d="M228 141V163" class="svglink" />
+              <text x="228" y="128" text-anchor="middle" class="svgtxt">HỆ THỐNG</text>
+              <text x="228" y="186" text-anchor="middle" class="svgtxt">THÀNH PHẦN</text>
+              <text x="180" y="63" text-anchor="middle" class="svgtxt">
+                UML BLUEPRINT
+              </text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow">05 · Tổng quan UML</div>
+            <h2 class="section-title">
+              Hai nhóm biểu đồ <span class="accent">UML</span>
+            </h2>
+            <ul class="topic-list">
+              <li>
+                <span class="idx">S</span>
+                <div>
+                  <h3>Structural diagrams</h3>
+                  <p>Mô tả cấu trúc tĩnh: hệ thống gồm những gì và liên kết ra sao.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">B</span>
+                <div>
+                  <h3>Behavioral diagrams</h3>
+                  <p>Mô tả hành vi động: hệ thống hoạt động và tương tác thế nào.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="panel">
+            <span class="tag">uml taxonomy</span>
+            <div class="uml-groups">
+              <div class="uml-group">
+                <b>Cấu trúc</b>
+                <ul>
+                  <li>Class</li>
+                  <li>Component</li>
+                  <li>Deployment</li>
+                  <li>Package</li>
+                </ul>
+              </div>
+              <div class="uml-group">
+                <b>Hành vi</b>
+                <ul>
+                  <li>Use Case</li>
+                  <li>Activity</li>
+                  <li>Sequence</li>
+                  <li>State Machine</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">05 · Tổng quan UML</div>
+        <h2 class="section-title">Ba biểu đồ <span class="accent">thiết yếu</span></h2>
+        <div class="three" style="margin-top: 40px">
+          <!-- 1. Use Case Diagram Card -->
+          <div class="diagram-card">
+            <svg viewBox="0 0 190 110">
+              <!-- System Boundary Box -->
+              <rect x="74" y="8" width="106" height="94" rx="8" fill="#fcfbfc" stroke="#ded5d8" stroke-width="1.2" stroke-dasharray="3 3" />
+              <text x="82" y="22" font-family="JetBrains Mono" font-size="7.5" fill="#706b73" font-weight="600">System</text>
+
+              <!-- Actor Stick Figure (Centered) -->
+              <g transform="translate(8, 12)">
+                <circle cx="24" cy="14" r="8" fill="#c41230" />
+                <line x1="24" y1="22" x2="24" y2="48" stroke="#c41230" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="8" y1="32" x2="40" y2="32" stroke="#c41230" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="24" y1="48" x2="12" y2="70" stroke="#c41230" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="24" y1="48" x2="36" y2="70" stroke="#c41230" stroke-width="2.2" stroke-linecap="round" />
+                <text x="24" y="82" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" fill="#242127" font-weight="700">User</text>
+              </g>
+
+              <!-- Association Lines -->
+              <line x1="48" y1="44" x2="88" y2="44" stroke="#c41230" stroke-width="1.8" stroke-linecap="round" />
+              <line x1="48" y1="44" x2="94" y2="76" stroke="#c41230" stroke-width="1.4" stroke-dasharray="3 3" stroke-linecap="round" opacity="0.65" />
+
+              <!-- Use Case Ellipse 1 -->
+              <g transform="translate(88, 30)">
+                <ellipse cx="42" cy="14" rx="40" ry="14" fill="#ffffff" stroke="#c41230" stroke-width="1.8" filter="drop-shadow(0 2px 6px rgba(196,18,48,0.12))" />
+                <text x="42" y="18" text-anchor="middle" font-family="Space Grotesk" font-size="9" font-weight="700" fill="#17151a">Place Order</text>
+              </g>
+
+              <!-- Use Case Ellipse 2 -->
+              <g transform="translate(94, 63)">
+                <ellipse cx="36" cy="13" rx="34" ry="12" fill="#ffffff" stroke="#2b2560" stroke-width="1.4" />
+                <text x="36" y="16.5" text-anchor="middle" font-family="Space Grotesk" font-size="8.5" font-weight="600" fill="#2b2560">&lt;&lt;extend&gt;&gt;</text>
+              </g>
+            </svg>
+            <b>Use Case</b>
+            <p>Ai sử dụng hệ thống và để làm gì?</p>
+          </div>
+
+          <!-- 2. Class Diagram Card -->
+          <div class="diagram-card">
+            <svg viewBox="0 0 190 110">
+              <!-- Class 1: Customer -->
+              <g transform="translate(8, 12)">
+                <rect width="76" height="84" rx="6" fill="#ffffff" stroke="#2b2560" stroke-width="1.5" />
+                <rect width="76" height="22" rx="6 6 0 0" fill="#2b2560" />
+                <text x="38" y="15" text-anchor="middle" font-family="Space Grotesk" font-size="9.5" font-weight="700" fill="#ffffff">Customer</text>
+                <text x="7" y="36" font-family="JetBrains Mono" font-size="7.5" fill="#17151a">+ id: int</text>
+                <text x="7" y="48" font-family="JetBrains Mono" font-size="7.5" fill="#17151a">+ name: str</text>
+                <line x1="0" y1="56" x2="76" y2="56" stroke="#e9e2e4" stroke-width="1" />
+                <text x="7" y="70" font-family="JetBrains Mono" font-size="7.5" fill="#706b73">+ register()</text>
+              </g>
+
+              <!-- Association Line with Multiplicity -->
+              <line x1="84" y1="50" x2="106" y2="50" stroke="#2b2560" stroke-width="1.8" />
+              <text x="88" y="44" font-family="JetBrains Mono" font-size="7.5" font-weight="600" fill="#706b73">1</text>
+              <text x="100" y="44" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="#c41230">*</text>
+
+              <!-- Class 2: Order -->
+              <g transform="translate(106, 12)">
+                <rect width="76" height="84" rx="6" fill="#ffffff" stroke="#c41230" stroke-width="1.8" filter="drop-shadow(0 4px 10px rgba(196,18,48,0.12))" />
+                <rect width="76" height="22" rx="6 6 0 0" fill="#c41230" />
+                <text x="38" y="15" text-anchor="middle" font-family="Space Grotesk" font-size="9.5" font-weight="700" fill="#ffffff">Order</text>
+                <text x="7" y="36" font-family="JetBrains Mono" font-size="7.5" fill="#17151a">+ orderId: int</text>
+                <text x="7" y="48" font-family="JetBrains Mono" font-size="7.5" fill="#17151a">+ total: float</text>
+                <line x1="0" y1="56" x2="76" y2="56" stroke="#e9e2e4" stroke-width="1" />
+                <text x="7" y="70" font-family="JetBrains Mono" font-size="7.5" fill="#c41230" font-weight="600">+ checkout()</text>
+              </g>
+            </svg>
+            <b>Class</b>
+            <p>Dữ liệu và cấu trúc miền nghiệp vụ ra sao?</p>
+          </div>
+
+          <!-- 3. Sequence Diagram Card -->
+          <div class="diagram-card">
+            <svg viewBox="0 0 190 110">
+              <!-- Object 1 -->
+              <rect x="14" y="8" width="54" height="22" rx="5" fill="#2b2560" />
+              <text x="41" y="22" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" font-weight="700" fill="#ffffff">:Client</text>
+              <line x1="41" y1="30" x2="41" y2="102" stroke="#ded5d8" stroke-width="1.5" stroke-dasharray="3 3" />
+              <rect x="37" y="42" width="8" height="52" rx="2" fill="#f2eff5" stroke="#2b2560" stroke-width="1" />
+
+              <!-- Object 2 -->
+              <rect x="122" y="8" width="54" height="22" rx="5" fill="#c41230" />
+              <text x="149" y="22" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" font-weight="700" fill="#ffffff">:Server</text>
+              <line x1="149" y1="30" x2="149" y2="102" stroke="#ded5d8" stroke-width="1.5" stroke-dasharray="3 3" />
+              <rect x="145" y="48" width="8" height="40" rx="2" fill="#fbeeef" stroke="#c41230" stroke-width="1" />
+
+              <!-- Synchronous Call (Arrow right) -->
+              <line x1="45" y1="50" x2="143" y2="50" stroke="#c41230" stroke-width="1.8" stroke-linecap="round" />
+              <polygon points="143,50 136,46 136,54" fill="#c41230" />
+              <text x="95" y="45" text-anchor="middle" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="#c41230">1: login(usr, pwd)</text>
+
+              <!-- Reply Return (Dashed arrow left) -->
+              <line x1="145" y1="80" x2="47" y2="80" stroke="#2b2560" stroke-width="1.5" stroke-dasharray="3 3" stroke-linecap="round" />
+              <polygon points="47,80 54,76 54,84" fill="#2b2560" />
+              <text x="95" y="75" text-anchor="middle" font-family="JetBrains Mono" font-size="8" font-weight="700" fill="#2b2560">2: return authToken</text>
+            </svg>
+            <b>Sequence</b>
+            <p>Các đối tượng trao đổi thông điệp theo thời gian thế nào?</p>
+          </div>
+        </div>
+        <div class="quote">
+          Kiến trúc sư cần bản vẽ trước khi xây nhà → lập trình viên cần UML trước khi
+          code.
+        </div>
+      </section>
+
+      <section class="slide" id="outro">
+        <div class="eyebrow">Tổng kết Session 02</div>
+        <h2 class="title">
+          Từ dữ liệu đến<br /><span class="accent">một hệ thống có thiết kế</span>
+        </h2>
+        <div class="takeaways">
+          <div class="takeaway">
+            <span class="num">01</span>
+            <h3>Hiểu hệ thống</h3>
+            <p>Xác định thành phần, luồng thông tin, người dùng và mục tiêu.</p>
+          </div>
+          <div class="takeaway">
+            <span class="num">02</span>
+            <h3>Đi đúng vòng đời</h3>
+            <p>Dùng SDLC để giảm rủi ro, kiểm soát chi phí và chất lượng.</p>
+          </div>
+          <div class="takeaway">
+            <span class="num">03</span>
+            <h3>Vẽ trước khi xây</h3>
+            <p>Dùng UML tạo ngôn ngữ chung giữa nghiệp vụ và kỹ thuật.</p>
+          </div>
+        </div>
+        <div class="final-loop">
+          <span>HTTT</span><i>→</i><span>SDLC</span><i>→</i><span>MÔ HÌNH</span><i>→</i
+          ><span>UML</span>
+        </div>
+        <p class="kicker">Dùng phím ← →, ↑ ↓ hoặc cuộn chuột để điều hướng</p>
+      </section>
+    </main>
+    <script>
+      const slides = [...document.querySelectorAll('.slide')],
+        dots = document.getElementById('dots');
+      let current = 0,
+        lastWheel = 0;
+      document.getElementById('total').textContent = String(slides.length).padStart(
+        2,
+        '0',
+      );
+      slides.forEach((s, i) => {
+        s.id = s.id || `slide-${i}`;
+        const a = document.createElement('a');
+        a.href = `#${s.id}`;
+        a.dataset.i = i;
+        a.setAttribute('aria-label', `Tới slide ${i + 1}`);
+        if (!i) a.classList.add('active');
+        dots.appendChild(a);
+      });
+      function goTo(i) {
+        current = Math.max(0, Math.min(slides.length - 1, i));
+        slides[current].scrollIntoView({ behavior: 'smooth' });
+      }
+      document.getElementById('prev').onclick = () => goTo(current - 1);
+      document.getElementById('next').onclick = () => goTo(current + 1);
+      document
+        .querySelectorAll('[data-go]')
+        .forEach((x) => (x.onclick = () => goTo(+x.dataset.go)));
+      window.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) {
+          e.preventDefault();
+          goTo(current + 1);
+        }
+        if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+          e.preventDefault();
+          goTo(current - 1);
+        }
+        if (e.key === 'Home') goTo(0);
+        if (e.key === 'End') goTo(slides.length - 1);
+      });
+      window.addEventListener(
+        'wheel',
+        (e) => {
+          const now = Date.now();
+          if (now - lastWheel < 700 || Math.abs(e.deltaY) < 12) {
+            e.preventDefault();
+            return;
+          }
+          e.preventDefault();
+          lastWheel = now;
+          goTo(current + (e.deltaY > 0 ? 1 : -1));
+        },
+        { passive: false },
+      );
+      if (window.gsap && window.ScrollTrigger) {
+        gsap.registerPlugin(ScrollTrigger);
+        ScrollTrigger.create({
+          trigger: document.body,
+          start: 'top top',
+          end: 'bottom bottom',
+          onUpdate: (self) =>
+            (document.getElementById('progress').style.width = `${self.progress * 100}%`),
+        });
+        slides.forEach((s, i) =>
+          ScrollTrigger.create({
+            trigger: s,
+            start: 'top center',
+            end: 'bottom center',
+            onToggle: (self) => {
+              if (self.isActive) {
+                current = i;
+                document.getElementById('cur').textContent = String(i + 1).padStart(
+                  2,
+                  '0',
+                );
+                document
+                  .querySelectorAll('.navdots a')
+                  .forEach((d) => d.classList.toggle('active', +d.dataset.i === i));
+              }
+            },
+          }),
+        );
+        document.querySelectorAll('.topic-list').forEach((list) =>
+          ScrollTrigger.create({
+            trigger: list,
+            start: 'top 82%',
+            once: true,
+            onEnter: () =>
+              gsap.to(list.children, {
+                opacity: 1,
+                x: 0,
+                stagger: 0.1,
+                duration: 0.5,
+                ease: 'power2.out',
+              }),
+          }),
+        );
+        const heroTl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+        heroTl
+          .from('.hero-session', { opacity: 0, y: -10, duration: 0.45 })
+          .from(
+            '.hero-line',
+            {
+              opacity: 0,
+              y: 34,
+              rotateX: -12,
+              transformOrigin: '50% 100%',
+              stagger: 0.11,
+              duration: 0.7,
+            },
+            '-=.15',
+          )
+          .from('#hero .lead', { opacity: 0, y: 16, duration: 0.55 }, '-=.35')
+          .from(
+            '.hero-stat',
+            { opacity: 0, y: 12, stagger: 0.1, duration: 0.45 },
+            '-=.25',
+          )
+          .from('.hero-orbit', { opacity: 0, scale: 0.72, duration: 0.75 }, '-=.75')
+          .from(
+            '.hero-core-ring,.hero-core,#hero .hero-map>text',
+            {
+              opacity: 0,
+              scale: 0.55,
+              transformOrigin: '310px 260px',
+              stagger: 0.07,
+              duration: 0.55,
+            },
+            '-=.45',
+          )
+          .from(
+            '.hero-link',
+            { strokeDashoffset: 170, opacity: 0, stagger: 0.08, duration: 0.65 },
+            '-=.32',
+          )
+          .from(
+            '.hero-card',
+            {
+              opacity: 0,
+              scale: 0.88,
+              transformOrigin: 'center center',
+              stagger: 0.1,
+              duration: 0.55,
+              ease: 'back.out(1.35)',
+            },
+            '-=.35',
+          )
+          .from('.scroll-cue', { opacity: 0, y: 8, duration: 0.4 }, '-=.05');
+        gsap.to('.hero-core-ring', {
+          scale: 1.1,
+          opacity: 0.05,
+          transformOrigin: '310px 260px',
+          duration: 1.7,
+          yoyo: true,
+          repeat: -1,
+          ease: 'sine.inOut',
+        });
+        gsap.to('.hero-ring-inner', {
+          scale: 0.9,
+          opacity: 0.25,
+          transformOrigin: '310px 260px',
+          duration: 1.35,
+          yoyo: true,
+          repeat: -1,
+          ease: 'sine.inOut',
+        });
+        gsap.to('.hero-orbit', { rotation: 360, duration: 38, repeat: -1, ease: 'none' });
+        function movePacket(dot, path, duration, delay = 0) {
+          const p = document.querySelector(path),
+            d = document.querySelector(dot);
+          if (!p || !d) return;
+          const proxy = { t: 0 };
+          gsap.to(proxy, {
+            t: 1,
+            duration,
+            delay,
+            repeat: -1,
+            repeatDelay: 0.35,
+            ease: 'power1.inOut',
+            onUpdate: () => {
+              const pt = p.getPointAtLength(p.getTotalLength() * proxy.t);
+              gsap.set(d, {
+                attr: { cx: pt.x, cy: pt.y },
+                opacity: proxy.t < 0.05 || proxy.t > 0.95 ? 0 : 1,
+              });
+            },
+          });
+        }
+        movePacket('#packet1', '#heroPath1', 2.2, 0.2);
+        movePacket('#packet2', '#heroPath2', 2.4, 0.8);
+        movePacket('#packet3', '#heroPath3', 2.3, 1.3);
+        movePacket('#packet4', '#heroPath4', 2.5, 1.8);
+        movePacket('#loopP1', '#loopPath1', 1.6, 0.2);
+        movePacket('#loopP2', '#loopPath2', 1.6, 0.9);
+        movePacket('#loopPFb', '#loopPathFb', 2.4, 1.4);
+        movePacket('#maintP1', '#maintLineC', 1.8, 0.2);
+        movePacket('#maintP2', '#maintLineA', 1.8, 0.8);
+        movePacket('#maintP3', '#maintLineP', 1.8, 1.4);
+        ScrollTrigger.create({
+          trigger: '#slide-wh',
+          start: 'top 80%',
+          once: true,
+          onEnter: () => {
+            gsap.fromTo(
+              '.wh-card',
+              { opacity: 0, y: 25 },
+              { opacity: 1, y: 0, stagger: 0.15, duration: 0.6, ease: 'back.out(1.3)' },
+            );
+            gsap.fromTo(
+              '.wh-vs-circle',
+              { scale: 0, rotation: -90 },
+              { scale: 1, rotation: 0, duration: 0.5, delay: 0.2, ease: 'back.out(1.6)' },
+            );
+          },
+        });
+        ScrollTrigger.create({
+          trigger: '#slide-maintenance',
+          start: 'top 80%',
+          once: true,
+          onEnter: () => {
+            gsap.fromTo(
+              '.maint-node',
+              { opacity: 0, scale: 0.75 },
+              {
+                opacity: 1,
+                scale: 1,
+                stagger: 0.12,
+                duration: 0.5,
+                ease: 'back.out(1.4)',
+              },
+            );
+            gsap.fromTo(
+              '.maint-center',
+              { scale: 0.6, rotation: -45 },
+              { scale: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.5)' },
+            );
+          },
+        });
+        ScrollTrigger.create({
+          trigger: '#slide-management',
+          start: 'top 80%',
+          once: true,
+          onEnter: () => {
+            gsap.fromTo(
+              '.pyramid-level',
+              { opacity: 0, y: 20, scale: 0.92 },
+              {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                stagger: 0.12,
+                duration: 0.5,
+                ease: 'back.out(1.4)',
+              },
+            );
+          },
+        });
+        ScrollTrigger.create({
+          trigger: '#data-information',
+          start: 'top 78%',
+          once: true,
+          onEnter: () => {
+            const tl = gsap.timeline();
+            tl.fromTo(
+              '#data-information .data-event',
+              { x: -14 },
+              { x: 0, stagger: 0.1, duration: 0.45, ease: 'power2.out' },
+            )
+              .fromTo(
+                '#data-information .processor-core',
+                { scale: 0.78, rotation: -35 },
+                { scale: 1, rotation: 0, duration: 0.55, ease: 'back.out(1.5)' },
+                '-=.25',
+              )
+              .fromTo(
+                '#data-information .insight-card',
+                { y: 14 },
+                { y: 0, duration: 0.45, ease: 'power2.out' },
+                '-=.22',
+              )
+              .fromTo(
+                '#data-information .mini-chart i',
+                { scaleY: 0.12 },
+                { scaleY: 1, stagger: 0.07, duration: 0.48, ease: 'power2.out' },
+                '-=.28',
+              );
+          },
+        });
+        ScrollTrigger.create({
+          trigger: '#system-anatomy',
+          start: 'top 80%',
+          once: true,
+          onEnter: () => {
+            gsap.fromTo(
+              '.anatomy-card',
+              { y: 18 },
+              {
+                y: 0,
+                stagger: 0.08,
+                duration: 0.45,
+                ease: 'power2.out',
+                clearProps: 'transform',
+              },
+            );
+          },
+        });
+        ScrollTrigger.create({
+          trigger: '#roadmap',
+          start: 'top 70%',
+          once: true,
+          onEnter: () => {
+            gsap.to('#roadFill', { width: '84%', duration: 1.6, ease: 'power1.inOut' });
+            document
+              .querySelectorAll('.step')
+              .forEach((s, i) =>
+                gsap.delayedCall(0.2 + i * 0.18, () => s.classList.add('active')),
+              );
+          },
+        });
+        document.querySelectorAll('.panel,.model,.diagram-card,.takeaway').forEach((el) =>
+          ScrollTrigger.create({
+            trigger: el,
+            start: 'top 88%',
+            once: true,
+            onEnter: () =>
+              gsap.fromTo(
+                el,
+                { opacity: 0, y: 18 },
+                { opacity: 1, y: 0, duration: 0.55, ease: 'power2.out' },
+              ),
+          }),
+        );
+      } else {
+        document.querySelectorAll('.topic-list li').forEach((x) => {
+          x.style.opacity = 1;
+          x.style.transform = 'none';
+        });
+      }
+    </script>
+  </body>
+</html>

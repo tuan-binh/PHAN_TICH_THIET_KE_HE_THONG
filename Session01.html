@@ -1,0 +1,1791 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Bài giảng Session 01 — Định hướng môn học Phân tích và Thiết kế Hệ thống"
+    />
+    <title>Session 01 — Định hướng Phân tích & Thiết kế Hệ thống</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+      html {
+        scrollbar-width: none; /* Firefox */
+      }
+
+      body {
+        -ms-overflow-style: none; /* IE và Edge cũ */
+      }
+
+      body::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+      }
+
+      :root {
+        --bg: #fff;
+        --ink: #171719;
+        --text: #222226;
+        --sub: #716d73;
+        --line: #e8e2e1;
+        --panel: #f7f4f3;
+        --panel2: #fce9e7;
+        --red: #c52121;
+        --red2: #8e1111;
+        --amber: #bd7508;
+        --green: #207a4e;
+        --shadow: 0 22px 65px rgba(67, 29, 25, 0.09);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, system-ui, sans-serif;
+        overflow-x: hidden;
+      }
+      button {
+        font: inherit;
+      }
+      a {
+        color: inherit;
+      }
+      .display {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+      ::selection {
+        background: var(--red);
+        color: #fff;
+      }
+      #progress {
+        position: fixed;
+        inset: 0 auto auto 0;
+        height: 3px;
+        width: 0;
+        background: var(--red);
+        z-index: 100;
+      }
+      .brand {
+        position: fixed;
+        left: 25px;
+        top: 22px;
+        z-index: 80;
+        color: var(--sub);
+        font:
+          600 10px 'JetBrains Mono',
+          monospace;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .brand b {
+        color: var(--red);
+      }
+      .counter {
+        position: fixed;
+        left: 25px;
+        bottom: 22px;
+        z-index: 80;
+        color: var(--sub);
+        font:
+          500 11px 'JetBrains Mono',
+          monospace;
+      }
+      .counter b {
+        color: var(--red);
+      }
+      .navdots {
+        position: fixed;
+        right: 22px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 80;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .navdots button {
+        width: 7px;
+        height: 7px;
+        border: 0;
+        border-radius: 50%;
+        background: var(--line);
+        cursor: pointer;
+        padding: 0;
+        transition: 0.25s;
+      }
+      .navdots button:hover,
+      .navdots button.active {
+        background: var(--red);
+        transform: scale(1.35);
+      }
+      .navdots button.active {
+        box-shadow: 0 0 0 4px rgba(197, 33, 33, 0.12);
+      }
+      .navbtns {
+        position: fixed;
+        right: 20px;
+        bottom: 18px;
+        display: flex;
+        gap: 8px;
+        z-index: 80;
+      }
+      .navbtns button {
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        background: #fff;
+        cursor: pointer;
+        color: var(--ink);
+        transition: 0.2s;
+      }
+      .navbtns button:hover {
+        border-color: var(--red);
+        color: var(--red);
+        transform: translateY(-2px);
+      }
+      .slide {
+        min-height: 100vh;
+        width: 100%;
+        padding: 9vh 9vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid var(--line);
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+      .slide::after {
+        content: attr(data-mark);
+        position: absolute;
+        right: 6vw;
+        bottom: -5vh;
+        font:
+          700 min(26vw, 350px) 'Space Grotesk',
+          sans-serif;
+        color: #f8f5f4;
+        z-index: -1;
+        line-height: 1;
+      }
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+        color: var(--red);
+        font:
+          600 11px 'JetBrains Mono',
+          monospace;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .eyebrow::before {
+        content: '';
+        width: 23px;
+        height: 1px;
+        background: currentColor;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        color: var(--ink);
+      }
+      h2 {
+        font-size: clamp(30px, 4.3vw, 58px);
+        line-height: 1.08;
+        letter-spacing: -0.035em;
+      }
+      .lead {
+        font-size: clamp(16px, 1.5vw, 20px);
+        line-height: 1.65;
+        color: var(--sub);
+      }
+      .accent {
+        color: var(--red);
+      }
+      .hero {
+        align-items: center;
+        text-align: center;
+        background: radial-gradient(circle at 50% 68%, var(--panel2), transparent 34%);
+      }
+      .hero h1 {
+        font-size: clamp(44px, 7.2vw, 96px);
+        line-height: 0.95;
+        letter-spacing: -0.06em;
+        max-width: 1050px;
+      }
+      .hero .lead {
+        max-width: 720px;
+        margin: 25px auto 0;
+      }
+      .hero-art {
+        width: min(820px, 88vw);
+        height: 230px;
+        margin-top: 25px;
+      }
+      .hero-meta {
+        display: flex;
+        gap: 42px;
+        margin-top: 8px;
+        color: var(--sub);
+        font:
+          500 11px 'JetBrains Mono',
+          monospace;
+      }
+      .hero-meta strong {
+        display: block;
+        font:
+          700 24px 'Space Grotesk',
+          sans-serif;
+        color: var(--ink);
+        margin-bottom: 2px;
+      }
+      .scroll-hint {
+        position: absolute;
+        bottom: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: var(--sub);
+        font:
+          500 10px 'JetBrains Mono',
+          monospace;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .scroll-hint::after {
+        content: '';
+        display: block;
+        width: 1px;
+        height: 25px;
+        background: var(--red);
+        margin: 9px auto 0;
+        animation: pulse 1.5s infinite;
+      }
+      @keyframes pulse {
+        50% {
+          transform: scaleY(0.45);
+          opacity: 0.35;
+        }
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+        gap: 7vw;
+        align-items: center;
+      }
+      .copy {
+        max-width: 670px;
+      }
+      .copy .lead {
+        margin-top: 20px;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px;
+        min-height: 155px;
+        box-shadow: 0 5px 20px rgba(40, 20, 18, 0.025);
+        transition: 0.3s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(197, 33, 33, 0.35);
+        box-shadow: var(--shadow);
+      }
+      .card .num {
+        color: var(--red);
+        font:
+          600 11px 'JetBrains Mono',
+          monospace;
+      }
+      .card h3 {
+        font-size: 18px;
+        margin: 20px 0 7px;
+      }
+      .card p {
+        font-size: 13px;
+        color: var(--sub);
+        line-height: 1.5;
+      }
+      .roadmap-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 30px;
+        margin-bottom: 34px;
+      }
+      .roadmap-head h2 {
+        max-width: 780px;
+      }
+      .roadmap-head .lead {
+        max-width: 360px;
+        font-size: 14px;
+      }
+      .roadmap {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        position: relative;
+      }
+      .roadmap::before {
+        content: '';
+        position: absolute;
+        top: 31px;
+        left: 7%;
+        right: 7%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--red), var(--amber), var(--red));
+        z-index: 0;
+      }
+      .road-phase {
+        position: relative;
+        z-index: 1;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 17px 16px 18px;
+        min-height: 255px;
+        transition: 0.3s;
+      }
+      .road-phase:hover {
+        transform: translateY(-5px);
+        border-color: rgba(197, 33, 33, 0.4);
+        box-shadow: var(--shadow);
+      }
+      .road-phase .pin {
+        width: 29px;
+        height: 29px;
+        border: 5px solid #fff;
+        border-radius: 50%;
+        background: var(--red);
+        box-shadow: 0 0 0 1px var(--red);
+        margin: 0 auto 23px;
+      }
+      .road-phase:nth-child(even) .pin {
+        background: var(--amber);
+        box-shadow: 0 0 0 1px var(--amber);
+      }
+      .road-phase .range {
+        color: var(--red);
+        font:
+          600 10px 'JetBrains Mono',
+          monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .road-phase h3 {
+        font-size: 17px;
+        margin: 10px 0 12px;
+      }
+      .road-phase p {
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--sub);
+      }
+      .session-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 15px;
+      }
+      .session-tags span {
+        padding: 4px 7px;
+        border-radius: 6px;
+        background: var(--panel);
+        color: var(--sub);
+        font:
+          500 9px 'JetBrains Mono',
+          monospace;
+      }
+      .road-milestones {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+        color: var(--sub);
+        font:
+          500 10px 'JetBrains Mono',
+          monospace;
+      }
+      .road-milestones span {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 7px 11px;
+        background: #fff;
+      }
+      .road-milestones .major {
+        border-color: var(--red);
+        color: var(--red);
+        background: var(--panel2);
+      }
+      .problem {
+        background: var(--ink);
+        color: #fff;
+      }
+      .problem h2,
+      .problem h3 {
+        color: #fff;
+      }
+      .problem .lead {
+        color: #aaa7aa;
+      }
+      .problem::after {
+        color: #202023;
+      }
+      .split {
+        display: grid;
+        grid-template-columns: 1fr 82px 1fr;
+        gap: 28px;
+        align-items: stretch;
+        margin-top: 44px;
+      }
+      .persona {
+        border: 1px solid #353438;
+        border-radius: 18px;
+        padding: 30px;
+        background: #1d1d20;
+        position: relative;
+        min-height: 280px;
+      }
+      .persona.good {
+        background: #fff;
+        color: var(--text);
+        border-color: #fff;
+      }
+      .persona.good h3 {
+        color: var(--ink);
+      }
+      .persona .tag {
+        display: inline-block;
+        border-radius: 99px;
+        padding: 7px 11px;
+        background: #29292d;
+        color: #aaa7aa;
+        font:
+          500 10px 'JetBrains Mono',
+          monospace;
+        text-transform: uppercase;
+      }
+      .persona.good .tag {
+        background: var(--panel2);
+        color: var(--red);
+      }
+      .persona h3 {
+        font-size: clamp(22px, 2.3vw, 32px);
+        margin: 24px 0 18px;
+      }
+      .persona ul {
+        list-style: none;
+        display: grid;
+        gap: 12px;
+      }
+      .persona li {
+        font-size: 14px;
+        color: #aaa7aa;
+        padding-left: 20px;
+        position: relative;
+        line-height: 1.5;
+      }
+      .persona li::before {
+        content: '×';
+        position: absolute;
+        left: 0;
+        color: #e26565;
+      }
+      .persona.good li {
+        color: var(--sub);
+      }
+      .persona.good li::before {
+        content: '✓';
+        color: var(--green);
+      }
+      .arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--red);
+        font-size: 44px;
+      }
+      .process {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-top: 48px;
+        position: relative;
+      }
+      .process::before {
+        content: '';
+        position: absolute;
+        top: 29px;
+        left: 7%;
+        right: 7%;
+        height: 1px;
+        background: var(--line);
+      }
+      .step {
+        text-align: center;
+        position: relative;
+      }
+      .step i {
+        width: 58px;
+        height: 58px;
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 18px;
+        color: var(--red);
+        font:
+          600 12px 'JetBrains Mono',
+          monospace;
+        position: relative;
+        z-index: 1;
+        transition: 0.3s;
+      }
+      .step:hover i {
+        background: var(--red);
+        color: #fff;
+        transform: scale(1.1);
+        box-shadow: 0 0 0 8px var(--panel2);
+      }
+      .step h3 {
+        font-size: 16px;
+      }
+      .step p {
+        font-size: 12px;
+        color: var(--sub);
+        margin-top: 7px;
+        line-height: 1.45;
+      }
+      .quote {
+        font-size: clamp(28px, 4.1vw, 56px);
+        line-height: 1.15;
+        letter-spacing: -0.04em;
+        max-width: 1000px;
+      }
+      .quote::before {
+        content: '“';
+        display: block;
+        color: var(--red);
+        font-size: 90px;
+        line-height: 0.55;
+        margin-bottom: 24px;
+      }
+      .source-note {
+        margin-top: 28px;
+        color: var(--sub);
+        font:
+          500 11px 'JetBrains Mono',
+          monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+      .career-map {
+        position: relative;
+        min-height: 470px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        overflow: hidden;
+      }
+      .career-map svg {
+        width: 100%;
+        height: 100%;
+      }
+      .career-copy .lead {
+        max-width: 530px;
+      }
+      .role-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 30px;
+      }
+      .role {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      .role b {
+        width: 44px;
+        height: 32px;
+        display: grid;
+        place-items: center;
+        border-radius: 9px;
+        background: var(--panel2);
+        font:
+          600 11px 'JetBrains Mono',
+          monospace;
+        color: var(--red);
+        text-align: center;
+        line-height: 1;
+      }
+      .role span {
+        font-weight: 600;
+      }
+      .role small {
+        color: var(--sub);
+        white-space: nowrap;
+      }
+      .continuum {
+        display: grid;
+        grid-template-columns: 1fr 1.08fr 1fr;
+        gap: 24px;
+        margin-top: 54px;
+        align-items: stretch;
+      }
+      .course-node {
+        padding: 30px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        min-height: 210px;
+        position: relative;
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(50, 25, 22, 0.035);
+        transition:
+          transform 0.3s,
+          box-shadow 0.3s,
+          border-color 0.3s;
+      }
+      .course-node:hover {
+        transform: translateY(-5px);
+        border-color: rgba(197, 33, 33, 0.28);
+        box-shadow: 0 16px 38px rgba(50, 25, 22, 0.08);
+      }
+      .course-node.active {
+        background: var(--red);
+        border-color: var(--red);
+        color: #fff;
+        transform: translateY(-9px);
+        box-shadow: 0 18px 45px rgba(197, 33, 33, 0.2);
+      }
+      .course-node.active:hover {
+        transform: translateY(-13px);
+        box-shadow: 0 22px 52px rgba(197, 33, 33, 0.25);
+      }
+      .course-node .kicker {
+        font:
+          600 10px 'JetBrains Mono',
+          monospace;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--sub);
+      }
+      .course-node.active .kicker {
+        color: #ffd8d5;
+      }
+      .course-node h3 {
+        font-size: 22px;
+        margin: 24px 0 12px;
+      }
+      .course-node.active h3 {
+        color: #fff;
+      }
+      .course-node p {
+        font-size: 13px;
+        color: var(--sub);
+        line-height: 1.55;
+      }
+      .course-node.active p {
+        color: #ffe5e2;
+      }
+      .objectives {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-top: 44px;
+      }
+      .objective {
+        padding: 25px;
+        border-top: 2px solid var(--red);
+        background: var(--panel);
+        min-height: 210px;
+      }
+      .objective b {
+        color: var(--red);
+        font:
+          600 11px 'JetBrains Mono',
+          monospace;
+      }
+      .objective h3 {
+        font-size: 19px;
+        margin: 24px 0 10px;
+      }
+      .objective p {
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--sub);
+      }
+      .case {
+        background: linear-gradient(120deg, #fff 0 59%, var(--panel) 59%);
+      }
+      .brief {
+        margin-top: 30px;
+        border-left: 3px solid var(--red);
+        padding: 10px 0 10px 22px;
+        max-width: 660px;
+      }
+      .brief p {
+        font-size: 17px;
+        line-height: 1.6;
+      }
+      .questions {
+        display: grid;
+        gap: 12px;
+      }
+      .question {
+        padding: 18px 20px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        transition: 0.25s;
+      }
+      .question:hover {
+        transform: translateX(8px);
+        border-color: var(--red);
+      }
+      .question b {
+        color: var(--red);
+        font:
+          600 11px 'JetBrains Mono',
+          monospace;
+      }
+      .question p {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .checklist {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 13px;
+        margin-top: 40px;
+      }
+      .check {
+        display: flex;
+        gap: 14px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+      }
+      .check i {
+        font-style: normal;
+        color: var(--green);
+        font-weight: 700;
+      }
+      .check h3 {
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+      .check p {
+        font-size: 12px;
+        color: var(--sub);
+        line-height: 1.45;
+      }
+      .exit {
+        align-items: center;
+        text-align: center;
+      }
+      .exit h2 {
+        max-width: 920px;
+        font-size: clamp(38px, 6vw, 78px);
+      }
+      .exit .lead {
+        max-width: 680px;
+        margin: 24px auto 35px;
+      }
+      .cta {
+        display: inline-flex;
+        gap: 10px;
+        align-items: center;
+        border: 1px solid var(--red);
+        color: var(--red);
+        padding: 12px 18px;
+        border-radius: 999px;
+        font:
+          600 11px 'JetBrains Mono',
+          monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      /* Hover language — subtle, consistent, and presentation-safe */
+      .card,
+      .road-phase,
+      .persona,
+      .role,
+      .objective,
+      .question,
+      .check,
+      .brief,
+      .cta,
+      .road-milestones span,
+      .hero-meta > div {
+        will-change: transform;
+      }
+      .card h3,
+      .card .num,
+      .road-phase h3,
+      .road-phase .pin,
+      .role b,
+      .role span,
+      .role small,
+      .objective h3,
+      .objective b,
+      .check i,
+      .check h3,
+      .cta {
+        transition: all 0.28s cubic-bezier(0.2, 0.75, 0.25, 1);
+      }
+      .persona,
+      .role,
+      .objective,
+      .check,
+      .brief,
+      .cta,
+      .road-milestones span,
+      .hero-meta > div {
+        transition:
+          transform 0.28s cubic-bezier(0.2, 0.75, 0.25, 1),
+          box-shadow 0.28s,
+          border-color 0.28s,
+          background-color 0.28s,
+          color 0.28s;
+      }
+      .objective,
+      .check {
+        position: relative;
+        overflow: hidden;
+      }
+      .objective::after,
+      .check::after {
+        content: '';
+        position: absolute;
+        inset: auto 0 0;
+        height: 3px;
+        background: var(--red);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.32s ease;
+      }
+      .check::after {
+        background: var(--green);
+      }
+      .hero-node {
+        cursor: default;
+      }
+      .hero-node rect,
+      .hero-node circle {
+        transition:
+          filter 0.3s ease,
+          stroke-width 0.3s ease;
+      }
+      .question b {
+        display: inline-block;
+        transition: transform 0.25s ease;
+      }
+      @media (hover: hover) {
+        .hero-node:hover rect,
+        .hero-node:hover circle {
+          filter: drop-shadow(0 9px 8px rgba(54, 22, 20, 0.14));
+          stroke-width: 2.5;
+        }
+        .card:hover h3 {
+          color: var(--red);
+          transform: translateX(4px);
+        }
+        .card:hover .num {
+          letter-spacing: 0.06em;
+        }
+        .road-phase:hover .pin {
+          transform: scale(1.18);
+          box-shadow: 0 0 0 7px var(--panel2);
+        }
+        .road-phase:hover h3 {
+          color: var(--red);
+        }
+        .road-milestones span:hover {
+          transform: translateY(-3px);
+          border-color: var(--red);
+          color: var(--red);
+          box-shadow: 0 8px 18px rgba(197, 33, 33, 0.1);
+        }
+        .persona:hover {
+          transform: translateY(-6px);
+          border-color: #59585d;
+          box-shadow: 0 18px 42px rgba(0, 0, 0, 0.2);
+        }
+        .persona.good:hover {
+          border-color: var(--red);
+          box-shadow: 0 18px 42px rgba(197, 33, 33, 0.13);
+        }
+        .step:hover h3 {
+          color: var(--red);
+        }
+        .role:hover {
+          transform: translateX(8px);
+          background: var(--panel);
+          border-color: transparent;
+          border-radius: 10px;
+        }
+        .role:hover b {
+          background: var(--red);
+          color: #fff;
+        }
+        .role:hover span {
+          color: var(--red);
+        }
+        .role:hover small {
+          color: var(--ink);
+        }
+        .objective:hover {
+          transform: translateY(-7px);
+          background: #fff;
+          box-shadow: var(--shadow);
+        }
+        .objective:hover::after,
+        .check:hover::after {
+          transform: scaleX(1);
+        }
+        .objective:hover h3 {
+          color: var(--red);
+        }
+        .objective:hover b {
+          letter-spacing: 0.05em;
+        }
+        .question:hover b {
+          transform: scale(1.15);
+        }
+        .check:hover {
+          transform: translateY(-5px);
+          border-color: rgba(32, 122, 78, 0.35);
+          box-shadow: 0 14px 32px rgba(32, 122, 78, 0.09);
+        }
+        .check:hover i {
+          transform: scale(1.3) rotate(-8deg);
+        }
+        .check:hover h3 {
+          color: var(--green);
+        }
+        .brief:hover {
+          transform: translateX(8px);
+          background: linear-gradient(90deg, var(--panel2), transparent);
+          border-color: var(--red2);
+        }
+        .hero-meta > div:hover {
+          transform: translateY(-4px);
+        }
+        .cta:hover {
+          transform: translateY(-4px);
+          background: var(--red);
+          color: #fff;
+          box-shadow: 0 12px 28px rgba(197, 33, 33, 0.22);
+        }
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(22px);
+      }
+      @media (max-width: 900px) {
+        .slide {
+          padding: 10vh 8vw;
+        }
+        .grid2 {
+          grid-template-columns: 1fr;
+          gap: 32px;
+        }
+        .career-map {
+          min-height: 330px;
+        }
+        .process {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .process::before {
+          display: none;
+        }
+        .roadmap-head {
+          display: block;
+        }
+        .roadmap-head .lead {
+          margin-top: 14px;
+        }
+        .roadmap {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .roadmap::before {
+          display: none;
+        }
+        .split {
+          grid-template-columns: 1fr;
+        }
+        .arrow {
+          transform: rotate(90deg);
+        }
+        .objectives {
+          grid-template-columns: 1fr;
+        }
+        .continuum {
+          grid-template-columns: 1fr;
+          gap: 14px;
+        }
+        .course-node {
+          min-height: auto;
+          border-radius: 14px;
+        }
+        .course-node.active,
+        .course-node.active:hover {
+          transform: none;
+        }
+        .navdots,
+        .navbtns,
+        .counter,
+        .brand {
+          display: none;
+        }
+        .hero-art {
+          height: 180px;
+        }
+        .cards {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 560px) {
+        html {
+          scroll-snap-type: none;
+        }
+        .slide {
+          padding: 82px 24px;
+          min-height: 100svh;
+        }
+        .cards,
+        .checklist,
+        .process,
+        .roadmap {
+          grid-template-columns: 1fr;
+        }
+        .hero h1 {
+          font-size: 43px;
+        }
+        .hero-meta {
+          gap: 20px;
+        }
+        .role small {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        .scroll-hint::after {
+          animation: none;
+        }
+        .reveal {
+          opacity: 1;
+          transform: none;
+        }
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress"></div>
+    <div class="brand">PTTKHT <b>·</b> Session 01</div>
+    <div class="counter"><b id="current">01</b> / <span id="total">12</span></div>
+    <nav class="navdots" id="navdots" aria-label="Điều hướng slide"></nav>
+    <div class="navbtns">
+      <button id="prev" aria-label="Slide trước">↑</button
+      ><button id="next" aria-label="Slide sau">↓</button>
+    </div>
+
+    <main id="deck">
+      <section class="slide hero" data-title="Mở đầu" data-mark="01">
+        <div class="eyebrow reveal">Session 01 · Định hướng môn học</div>
+        <h1 class="reveal">
+          Phân tích &amp;<br /><span class="accent">Thiết kế Hệ thống</span>
+        </h1>
+        <p class="lead reveal">
+          Trước khi viết đúng code, hãy chắc rằng chúng ta đang giải đúng vấn đề.
+        </p>
+        <svg
+          class="hero-art reveal"
+          viewBox="0 0 820 230"
+          role="img"
+          aria-label="Từ vấn đề kinh doanh đến giải pháp hệ thống"
+        >
+          <defs>
+            <marker
+              id="arrowRed"
+              markerWidth="8"
+              markerHeight="8"
+              refX="7"
+              refY="4"
+              orient="auto"
+            >
+              <path d="M0,0 L8,4 L0,8Z" fill="#c52121" />
+            </marker>
+          </defs>
+          <g class="hero-flow" fill="none" stroke="#e1d7d5" stroke-width="2">
+            <path d="M160 115H350" />
+            <path d="M470 115H660" />
+          </g>
+          <g class="hero-node">
+            <rect
+              x="45"
+              y="73"
+              width="160"
+              height="84"
+              rx="15"
+              fill="#fff"
+              stroke="#d8cdcb"
+            />
+            <text
+              x="125"
+              y="108"
+              text-anchor="middle"
+              font-family="JetBrains Mono"
+              font-size="11"
+              fill="#716d73"
+            >
+              BUSINESS
+            </text>
+            <text
+              x="125"
+              y="131"
+              text-anchor="middle"
+              font-family="Space Grotesk"
+              font-size="17"
+              font-weight="700"
+            >
+              Vấn đề
+            </text>
+          </g>
+          <g class="hero-node">
+            <circle cx="410" cy="115" r="61" fill="#c52121" />
+            <text
+              x="410"
+              y="110"
+              text-anchor="middle"
+              font-family="JetBrains Mono"
+              font-size="10"
+              fill="#ffd9d6"
+            >
+              ANALYZE
+            </text>
+            <text
+              x="410"
+              y="133"
+              text-anchor="middle"
+              font-family="Space Grotesk"
+              font-size="17"
+              font-weight="700"
+              fill="#fff"
+            >
+              Hiểu đúng
+            </text>
+          </g>
+          <g class="hero-node">
+            <rect
+              x="615"
+              y="73"
+              width="160"
+              height="84"
+              rx="15"
+              fill="#fff"
+              stroke="#c52121"
+            />
+            <text
+              x="695"
+              y="108"
+              text-anchor="middle"
+              font-family="JetBrains Mono"
+              font-size="11"
+              fill="#c52121"
+            >
+              SYSTEM
+            </text>
+            <text
+              x="695"
+              y="131"
+              text-anchor="middle"
+              font-family="Space Grotesk"
+              font-size="17"
+              font-weight="700"
+            >
+              Giải pháp
+            </text>
+          </g>
+          <circle class="packet" cx="212" cy="115" r="5" fill="#c52121" />
+        </svg>
+        <div class="hero-meta reveal">
+          <div><strong>01</strong>buổi định hướng</div>
+          <div><strong>03</strong>năng lực cốt lõi</div>
+          <div><strong>04</strong>hướng nghề nghiệp</div>
+        </div>
+        <div class="scroll-hint">Cuộn để bắt đầu</div>
+      </section>
+
+      <section class="slide" data-title="Bức tranh lớn" data-mark="02">
+        <div class="grid2">
+          <div class="copy">
+            <div class="eyebrow reveal">Bức tranh lớn</div>
+            <h2 class="reveal">
+              Môn học này thực sự nói về <span class="accent">điều gì?</span>
+            </h2>
+            <p class="lead reveal">
+              Không chỉ là học cách vẽ sơ đồ. Đây là quá trình biến một nhu cầu còn mơ hồ
+              thành giải pháp có cấu trúc, có thể xây dựng và kiểm chứng.
+            </p>
+          </div>
+          <div class="cards">
+            <article class="card reveal">
+              <span class="num">01 / DISCOVER</span>
+              <h3>Hiểu bối cảnh</h3>
+              <p>Hệ thống đang phục vụ ai, vận hành ở đâu và đang gặp vấn đề gì?</p>
+            </article>
+            <article class="card reveal">
+              <span class="num">02 / ANALYZE</span>
+              <h3>Làm rõ yêu cầu</h3>
+              <p>Tách điều người dùng nói khỏi điều họ thực sự cần.</p>
+            </article>
+            <article class="card reveal">
+              <span class="num">03 / MODEL</span>
+              <h3>Mô hình hóa</h3>
+              <p>Dùng mô hình để cùng nhìn, cùng hiểu và cùng phản biện.</p>
+            </article>
+            <article class="card reveal">
+              <span class="num">04 / DESIGN</span>
+              <h3>Thiết kế giải pháp</h3>
+              <p>Chuyển yêu cầu thành cấu trúc dữ liệu, giao diện và kiến trúc.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Lộ trình môn học" data-mark="03">
+        <div class="roadmap-head">
+          <div>
+            <div class="eyebrow reveal">
+              Lộ trình toàn môn · 20 sessions + thi cuối môn
+            </div>
+            <h2 class="reveal">
+              Từ yêu cầu mơ hồ đến <span class="accent">hồ sơ thiết kế hoàn chỉnh</span>
+            </h2>
+          </div>
+          <p class="lead reveal">
+            Lý thuyết đi cùng thực hành; sau mỗi chặng là một mốc tổng hợp để biến kiến
+            thức thành năng lực.
+          </p>
+        </div>
+        <div class="roadmap">
+          <article class="road-phase reveal">
+            <div class="pin"></div>
+            <span class="range">S01—S04</span>
+            <h3>Nền tảng &amp; Khảo sát</h3>
+            <p>
+              Định hướng, tổng quan hệ thống, SDLC, stakeholder và kỹ thuật thu thập yêu
+              cầu.
+            </p>
+            <div class="session-tags">
+              <span>S01 Định hướng</span><span>S02 Tổng quan</span
+              ><span>S03 Khảo sát</span><span>S04 Thực hành</span>
+            </div>
+          </article>
+          <article class="road-phase reveal">
+            <div class="pin"></div>
+            <span class="range">S05—S06</span>
+            <h3>Quy trình &amp; Use Case</h3>
+            <p>Mô hình hóa luồng nghiệp vụ; xác định Actor, Use Case và viết đặc tả.</p>
+            <div class="session-tags">
+              <span>Activity</span><span>Use Case</span><span>Practice</span>
+            </div>
+          </article>
+          <article class="road-phase reveal">
+            <div class="pin"></div>
+            <span class="range">S07—S12</span>
+            <h3>Thiết kế tương tác</h3>
+            <p>
+              Class Diagram, Sequence Diagram, các buổi thực hành, Mini Project và
+              Hackathon.
+            </p>
+            <div class="session-tags">
+              <span>Class</span><span>Sequence</span><span>Mini Project</span
+              ><span>Hackathon</span>
+            </div>
+          </article>
+          <article class="road-phase reveal">
+            <div class="pin"></div>
+            <span class="range">S13—S16</span>
+            <h3>UI/UX &amp; Dữ liệu</h3>
+            <p>
+              Chuyển Use Case thành giao diện; thiết kế ERD, chuẩn hóa và mapping từ
+              Class.
+            </p>
+            <div class="session-tags">
+              <span>UI/UX</span><span>Wireframe</span><span>ERD</span
+              ><span>Practice</span>
+            </div>
+          </article>
+          <article class="road-phase reveal">
+            <div class="pin"></div>
+            <span class="range">S17—S20</span>
+            <h3>Kiến trúc &amp; SRS</h3>
+            <p>
+              Kiến trúc 3 tầng, tài liệu SRS, Mini Project tổng hợp và ôn tập cuối môn.
+            </p>
+            <div class="session-tags">
+              <span>Architecture</span><span>SRS</span><span>Mini Project</span
+              ><span>Review</span>
+            </div>
+          </article>
+        </div>
+        <div class="road-milestones reveal">
+          <span class="major">◆ Mini Project ×3</span
+          ><span class="major">⚡ Hackathon</span><span>Thực hành xen kẽ</span
+          ><span class="major">✓ Thi thực hành cuối môn</span>
+        </div>
+      </section>
+
+      <section class="slide problem" data-title="Tại sao cần học" data-mark="04">
+        <div class="eyebrow reveal">Tại sao cần học?</div>
+        <h2 class="reveal">
+          Code chạy được chưa chắc đã là <span class="accent">sản phẩm đúng.</span>
+        </h2>
+        <div class="split">
+          <article class="persona reveal">
+            <span class="tag">Chỉ tập trung vào code</span>
+            <h3>“Khách nói gì, tôi làm nấy.”</h3>
+            <ul>
+              <li>Không kiểm chứng vấn đề gốc</li>
+              <li>Hiểu sai yêu cầu nghiệp vụ</li>
+              <li>Sửa đi sửa lại, chi phí tăng</li>
+              <li>Sản phẩm khó mở rộng</li>
+            </ul>
+          </article>
+          <div class="arrow reveal">→</div>
+          <article class="persona good reveal">
+            <span class="tag">Tư duy hệ thống</span>
+            <h3>“Vấn đề nào cần được giải?”</h3>
+            <ul>
+              <li>Đặt câu hỏi trước khi xây</li>
+              <li>Kết nối người dùng và kỹ thuật</li>
+              <li>Mô hình hóa để giảm mơ hồ</li>
+              <li>Ra quyết định có căn cứ</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Dòng chảy phân tích" data-mark="05">
+        <div class="eyebrow reveal">Tư duy xuyên suốt</div>
+        <h2 class="reveal">
+          Từ lời kể của khách hàng đến <span class="accent">một hệ thống khả thi</span>
+        </h2>
+        <div class="process">
+          <div class="step reveal">
+            <i>01</i>
+            <h3>Lắng nghe</h3>
+            <p>Thu thập dữ kiện và góc nhìn.</p>
+          </div>
+          <div class="step reveal">
+            <i>02</i>
+            <h3>Đặt câu hỏi</h3>
+            <p>Làm rõ mục tiêu và ràng buộc.</p>
+          </div>
+          <div class="step reveal">
+            <i>03</i>
+            <h3>Phân tích</h3>
+            <p>Tìm nguyên nhân và ưu tiên.</p>
+          </div>
+          <div class="step reveal">
+            <i>04</i>
+            <h3>Mô hình hóa</h3>
+            <p>Biểu diễn quy trình và cấu trúc.</p>
+          </div>
+          <div class="step reveal">
+            <i>05</i>
+            <h3>Thiết kế</h3>
+            <p>Đề xuất giải pháp nhất quán.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Tư duy Problem Solver" data-mark="06">
+        <div class="eyebrow reveal">Mindset shift</div>
+        <div class="quote display reveal">
+          Đừng bắt đầu bằng “dùng công nghệ nào?”. Hãy bắt đầu bằng “ai đang gặp vấn đề gì
+          — và thành công trông như thế nào?”.
+        </div>
+        <p class="source-note reveal">Từ thợ gõ code → người giải quyết vấn đề</p>
+      </section>
+
+      <section class="slide" data-title="Lộ trình nghề nghiệp" data-mark="07">
+        <div class="grid2">
+          <div class="career-copy">
+            <div class="eyebrow reveal">Lộ trình nghề nghiệp</div>
+            <h2 class="reveal">
+              Một nền tảng, <span class="accent">nhiều hướng đi</span>
+            </h2>
+            <p class="lead reveal">
+              Năng lực phân tích hệ thống nằm ở giao điểm của nghiệp vụ, trải nghiệm người
+              dùng và công nghệ.
+            </p>
+            <div class="role-list">
+              <div class="role reveal">
+                <b>BA</b><span>Business Analyst</span
+                ><small>nghiệp vụ &amp; yêu cầu</small>
+              </div>
+              <div class="role reveal">
+                <b>SA</b><span>System Analyst</span
+                ><small>logic &amp; mô hình hệ thống</small>
+              </div>
+              <div class="role reveal">
+                <b>PO</b><span>Product Owner</span><small>giá trị &amp; ưu tiên</small>
+              </div>
+              <div class="role reveal">
+                <b>UX</b><span>UI/UX Designer</span
+                ><small>hành vi &amp; trải nghiệm</small>
+              </div>
+            </div>
+          </div>
+          <div class="career-map reveal">
+            <svg viewBox="0 0 500 470" aria-label="Bản đồ nghề nghiệp">
+              <g stroke="#d9cfcd" stroke-width="1.5">
+                <line x1="250" y1="235" x2="112" y2="105" />
+                <line x1="250" y1="235" x2="388" y2="105" />
+                <line x1="250" y1="235" x2="112" y2="365" />
+                <line x1="250" y1="235" x2="388" y2="365" />
+              </g>
+              <circle cx="250" cy="235" r="78" fill="#c52121" />
+              <text
+                x="250"
+                y="228"
+                text-anchor="middle"
+                fill="#ffd8d5"
+                font-family="JetBrains Mono"
+                font-size="10"
+              >
+                CORE SKILL
+              </text>
+              <text
+                x="250"
+                y="254"
+                text-anchor="middle"
+                fill="#fff"
+                font-family="Space Grotesk"
+                font-size="20"
+                font-weight="700"
+              >
+                Phân tích
+              </text>
+              <g
+                font-family="Space Grotesk"
+                font-weight="700"
+                font-size="18"
+                text-anchor="middle"
+              >
+                <circle cx="112" cy="105" r="57" fill="#fff" stroke="#d9cfcd" />
+                <text x="112" y="112">BA</text>
+                <circle cx="388" cy="105" r="57" fill="#fff" stroke="#d9cfcd" />
+                <text x="388" y="112">SA</text>
+                <circle cx="112" cy="365" r="57" fill="#fff" stroke="#d9cfcd" />
+                <text x="112" y="372">PO</text>
+                <circle cx="388" cy="365" r="57" fill="#fff" stroke="#d9cfcd" />
+                <text x="388" y="372">UI/UX</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Vị trí trong chương trình" data-mark="08">
+        <div class="eyebrow reveal">Vị trí trong chương trình</div>
+        <h2 class="reveal">
+          Môn học là <span class="accent">cây cầu</span> giữa dữ liệu và cách làm sản phẩm
+        </h2>
+        <div class="continuum">
+          <article class="course-node reveal">
+            <span class="kicker">Nền tảng đã có</span>
+            <h3>Database</h3>
+            <p>Hiểu dữ liệu, bảng, quan hệ và cách lưu trữ thông tin.</p>
+          </article>
+          <article class="course-node active reveal">
+            <span class="kicker">Bạn đang ở đây</span>
+            <h3>Phân tích &amp; Thiết kế Hệ thống</h3>
+            <p>Hiểu bài toán, mô hình hóa yêu cầu và thiết kế giải pháp tổng thể.</p>
+          </article>
+          <article class="course-node reveal">
+            <span class="kicker">Bước tiếp theo</span>
+            <h3>Agile / Scrum</h3>
+            <p>Tổ chức đội nhóm, chia nhỏ giá trị và phát triển sản phẩm lặp.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Mục tiêu đầu ra" data-mark="09">
+        <div class="eyebrow reveal">Sau môn học</div>
+        <h2 class="reveal">Ba năng lực cần <span class="accent">mang theo</span></h2>
+        <div class="objectives">
+          <article class="objective reveal">
+            <b>01 / UNDERSTAND</b>
+            <h3>Hiểu đúng bài toán</h3>
+            <p>
+              Xác định stakeholder, bối cảnh, nhu cầu, chức năng và ràng buộc quan trọng.
+            </p>
+          </article>
+          <article class="objective reveal">
+            <b>02 / COMMUNICATE</b>
+            <h3>Giao tiếp bằng mô hình</h3>
+            <p>
+              Dùng Activity, Use Case, Class, Sequence, ERD và wireframe để loại bỏ mơ hồ.
+            </p>
+          </article>
+          <article class="objective reveal">
+            <b>03 / DESIGN</b>
+            <h3>Thiết kế có lý do</h3>
+            <p>
+              Kết nối yêu cầu với dữ liệu, giao diện, kiến trúc và tài liệu SRS nhất quán.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide case" data-title="Tình huống mở đầu" data-mark="10">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow reveal">Tình huống mở đầu</div>
+            <h2 class="reveal">
+              “Hãy làm cho tôi một <span class="accent">ứng dụng đặt lịch</span>.”
+            </h2>
+            <div class="brief reveal">
+              <p>
+                Đây chưa phải là một yêu cầu đủ tốt để lập trình. Nó mới chỉ là điểm bắt
+                đầu của cuộc điều tra.
+              </p>
+            </div>
+          </div>
+          <div class="questions">
+            <div class="question reveal">
+              <b>01</b>
+              <p>Ai là người đặt lịch? Ai là người xác nhận?</p>
+            </div>
+            <div class="question reveal">
+              <b>02</b>
+              <p>Vấn đề hiện tại của họ là gì?</p>
+            </div>
+            <div class="question reveal">
+              <b>03</b>
+              <p>Một lịch hẹn đi qua những trạng thái nào?</p>
+            </div>
+            <div class="question reveal">
+              <b>04</b>
+              <p>Điều gì xảy ra khi trùng lịch hoặc hủy lịch?</p>
+            </div>
+            <div class="question reveal">
+              <b>05</b>
+              <p>Đo thành công bằng chỉ số nào?</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Cam kết học tập" data-mark="11">
+        <div class="eyebrow reveal">Cách học hiệu quả</div>
+        <h2 class="reveal">
+          Mỗi buổi học, hãy chủ động làm <span class="accent">bốn việc</span>
+        </h2>
+        <div class="checklist">
+          <article class="check reveal">
+            <i>✓</i>
+            <div>
+              <h3>Hỏi “tại sao?”</h3>
+              <p>Không chấp nhận yêu cầu chỉ vì nó được nói ra.</p>
+            </div>
+          </article>
+          <article class="check reveal">
+            <i>✓</i>
+            <div>
+              <h3>Vẽ trước khi code</h3>
+              <p>Dùng mô hình để phát hiện lỗ hổng sớm.</p>
+            </div>
+          </article>
+          <article class="check reveal">
+            <i>✓</i>
+            <div>
+              <h3>Giải thích cho người khác</h3>
+              <p>Một thiết kế tốt phải truyền đạt được.</p>
+            </div>
+          </article>
+          <article class="check reveal">
+            <i>✓</i>
+            <div>
+              <h3>Kiểm chứng bằng tình huống</h3>
+              <p>Luôn thử giải pháp với dữ liệu và ngoại lệ thực tế.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide exit" data-title="Kết thúc" data-mark="12">
+        <div class="eyebrow reveal">Kết thúc Session 01</div>
+        <h2 class="reveal">
+          Bắt đầu bằng <span class="accent">vấn đề.</span><br />Kết thúc bằng
+          <span class="accent">giá trị.</span>
+        </h2>
+        <p class="lead reveal">
+          Câu hỏi mang theo: “Trước khi xây hệ thống, tôi còn cần hiểu điều gì?”
+        </p>
+        <div class="cta reveal">Session tiếp theo · Tổng quát PTTKHT →</div>
+      </section>
+    </main>
+
+    <script>
+      (() => {
+        const slides = [...document.querySelectorAll('.slide')],
+          dots = document.getElementById('navdots');
+        const current = document.getElementById('current');
+        document.getElementById('total').textContent = String(slides.length).padStart(
+          2,
+          '0',
+        );
+        let index = 0,
+          wheelLock = false;
+        slides.forEach((slide, i) => {
+          slide.id = `slide-${i + 1}`;
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.title = slide.dataset.title;
+          b.setAttribute('aria-label', `Đến slide ${i + 1}: ${slide.dataset.title}`);
+          b.addEventListener('click', () => go(i));
+          dots.appendChild(b);
+        });
+        const dotList = [...dots.children];
+        function setActive(i) {
+          index = i;
+          current.textContent = String(i + 1).padStart(2, '0');
+          dotList.forEach((d, n) => d.classList.toggle('active', n === i));
+        }
+        function go(i) {
+          i = Math.max(0, Math.min(slides.length - 1, i));
+          slides[i].scrollIntoView({
+            behavior: matchMedia('(prefers-reduced-motion: reduce)').matches
+              ? 'auto'
+              : 'smooth',
+          });
+        }
+        document.getElementById('prev').addEventListener('click', () => go(index - 1));
+        document.getElementById('next').addEventListener('click', () => go(index + 1));
+        addEventListener('keydown', (e) => {
+          if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) {
+            e.preventDefault();
+            go(index + 1);
+          }
+          if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) {
+            e.preventDefault();
+            go(index - 1);
+          }
+          if (e.key === 'Home') go(0);
+          if (e.key === 'End') go(slides.length - 1);
+        });
+        addEventListener(
+          'wheel',
+          (e) => {
+            if (innerWidth < 700 || Math.abs(e.deltaY) < 12 || wheelLock) return;
+            e.preventDefault();
+            wheelLock = true;
+            go(index + (e.deltaY > 0 ? 1 : -1));
+            setTimeout(() => (wheelLock = false), 750);
+          },
+          { passive: false },
+        );
+        const observer = new IntersectionObserver(
+          (entries) =>
+            entries.forEach((e) => {
+              if (e.isIntersecting && e.intersectionRatio > 0.55)
+                setActive(slides.indexOf(e.target));
+            }),
+          { threshold: [0.55] },
+        );
+        slides.forEach((s) => observer.observe(s));
+        setActive(0);
+        addEventListener(
+          'scroll',
+          () => {
+            const max = document.documentElement.scrollHeight - innerHeight;
+            document.getElementById('progress').style.width =
+              `${max ? (scrollY / max) * 100 : 0}%`;
+          },
+          { passive: true },
+        );
+
+        if (window.gsap && window.ScrollTrigger) {
+          gsap.registerPlugin(ScrollTrigger);
+          slides.forEach((slide) => {
+            const items = slide.querySelectorAll('.reveal');
+            gsap.to(items, {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              stagger: 0.09,
+              ease: 'power2.out',
+              scrollTrigger: { trigger: slide, start: 'top 68%', once: true },
+            });
+          });
+          gsap.to('.packet', {
+            attr: { cx: 605 },
+            duration: 2.2,
+            repeat: -1,
+            ease: 'power1.inOut',
+          });
+          gsap.from('.hero-node', {
+            opacity: 0,
+            scale: 0.8,
+            transformOrigin: 'center',
+            duration: 0.8,
+            stagger: 0.16,
+            ease: 'back.out(1.4)',
+          });
+        } else
+          document.querySelectorAll('.reveal').forEach((el) => {
+            el.style.opacity = 1;
+            el.style.transform = 'none';
+          });
+      })();
+    </script>
+  </body>
+</html>
