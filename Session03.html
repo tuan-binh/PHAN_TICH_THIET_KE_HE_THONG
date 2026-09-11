@@ -1,0 +1,3911 @@
+<!doctype html>
+<html lang="vi" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Session 03 — Khảo sát & Thu thập thông tin | PTTKHT</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- GSAP Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+      /* ==========================================================================
+         DESIGN SYSTEM & CSS VARIABLES
+         ========================================================================== */
+      :root[data-theme="dark"] {
+        --bg: #090a0f;
+        --bg-alt: #111420;
+        --card-bg: rgba(21, 25, 40, 0.65);
+        --card-border: rgba(255, 255, 255, 0.08);
+        --card-hover-border: rgba(255, 46, 85, 0.5);
+        --ink: #f0f2f8;
+        --sub: #949eb5;
+        --line: rgba(255, 255, 255, 0.08);
+        --panel: rgba(255, 255, 255, 0.03);
+
+        --accent: #ff2e55;
+        --accent-glow: rgba(255, 46, 85, 0.25);
+        --accent-soft: rgba(255, 46, 85, 0.12);
+        --blue-accent: #3b82f6;
+        --purple-accent: #8b5cf6;
+        --green-accent: #10b981;
+        --gold-accent: #f59e0b;
+
+        --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+        --glass-backdrop: blur(16px);
+      }
+
+      :root[data-theme="light"] {
+        --bg: #f8fafc;
+        --bg-alt: #ffffff;
+        --card-bg: rgba(255, 255, 255, 0.85);
+        --card-border: rgba(226, 232, 240, 0.9);
+        --card-hover-border: rgba(225, 29, 72, 0.4);
+        --ink: #0f172a;
+        --sub: #64748b;
+        --line: #e2e8f0;
+        --panel: #f1f5f9;
+
+        --accent: #e11d48;
+        --accent-glow: rgba(225, 29, 72, 0.15);
+        --accent-soft: #ffe4e6;
+        --blue-accent: #2563eb;
+        --purple-accent: #7c3aed;
+        --green-accent: #059669;
+        --gold-accent: #d97706;
+
+        --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.04);
+        --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.08);
+        --glass-backdrop: blur(12px);
+      }
+
+      /* RESET & BASE */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: var(--bg);
+        color: var(--ink);
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
+      }
+
+      body {
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      .display {
+        font-family: "Space Grotesk", sans-serif;
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      /* PROGRESS BAR */
+      #progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        width: 0%;
+        background: linear-gradient(90deg, var(--accent), var(--purple-accent));
+        z-index: 1000;
+        box-shadow: 0 0 12px var(--accent-glow);
+        transition: width 0.2s ease-out;
+      }
+
+      /* FIXED HEADER NAVIGATION BAR */
+      .top-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        padding: 0 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 100;
+        background: rgba(9, 10, 15, 0.4);
+        backdrop-filter: var(--glass-backdrop);
+        border-bottom: 1px solid var(--line);
+      }
+      :root[data-theme="light"] .top-bar {
+        background: rgba(248, 250, 252, 0.7);
+      }
+
+      .brand {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--sub);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .brand-badge {
+        background: var(--accent-soft);
+        color: var(--accent);
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-weight: 800;
+      }
+
+      .top-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .menu-btn,
+      .theme-btn {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        color: var(--ink);
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+      }
+      .menu-btn:hover,
+      .theme-btn:hover {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+        color: var(--accent);
+      }
+
+      /* NAVIGATION DOTS & CONTROLS */
+      .navdots {
+        position: fixed;
+        right: 24px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 90;
+      }
+      .navdots button {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        border: 0;
+        background: var(--sub);
+        opacity: 0.35;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .navdots button.active {
+        opacity: 1;
+        height: 24px;
+        border-radius: 12px;
+        background: var(--accent);
+        box-shadow: 0 0 12px var(--accent-glow);
+      }
+
+      .slide-counter {
+        position: fixed;
+        left: 28px;
+        bottom: 24px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        color: var(--sub);
+        z-index: 90;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        padding: 6px 12px;
+        border-radius: 20px;
+        backdrop-filter: var(--glass-backdrop);
+      }
+      .slide-counter b {
+        color: var(--accent);
+      }
+
+      .bottom-nav {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        display: flex;
+        gap: 8px;
+        z-index: 90;
+      }
+      .bottom-nav button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid var(--card-border);
+        background: var(--card-bg);
+        color: var(--ink);
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: var(--glass-backdrop);
+        transition: all 0.2s ease;
+      }
+      .bottom-nav button:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        transform: scale(1.05);
+      }
+
+      /* DRAWER SLIDE MENU */
+      .drawer-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .drawer-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .drawer {
+        position: fixed;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: min(380px, 85vw);
+        background: var(--bg-alt);
+        border-left: 1px solid var(--line);
+        z-index: 1000;
+        padding: 32px 24px;
+        transform: translateX(100%);
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow-y: auto;
+      }
+      .drawer-overlay.open .drawer {
+        transform: translateX(0);
+      }
+      .drawer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      .drawer-header h3 {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .close-drawer {
+        background: none;
+        border: none;
+        color: var(--sub);
+        font-size: 20px;
+        cursor: pointer;
+      }
+      .drawer-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        list-style: none;
+      }
+      .drawer-item {
+        padding: 12px 16px;
+        border-radius: 10px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.2s ease;
+      }
+      .drawer-item:hover,
+      .drawer-item.active {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+      .drawer-item span {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        opacity: 0.7;
+      }
+
+      /* SLIDE LAYOUT SYSTEM */
+      main {
+        width: 100%;
+      }
+
+      .slide {
+        min-height: 100vh;
+        width: 100%;
+        padding: 85px 6vw 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        border-bottom: 1px solid var(--line);
+        overflow: hidden;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        margin-bottom: 12px;
+      }
+      .eyebrow::before {
+        content: "";
+        width: 16px;
+        height: 2px;
+        background: var(--accent);
+        border-radius: 2px;
+      }
+
+      h2.section-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(28px, 3.5vw, 46px);
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin-bottom: 12px;
+      }
+      h2.section-title .accent {
+        color: var(--accent);
+      }
+      h2.section-title .accent-purple {
+        color: var(--purple-accent);
+      }
+      h2.section-title .accent-blue {
+        color: var(--blue-accent);
+      }
+
+      .section-desc {
+        font-size: clamp(14px, 1.2vw, 17px);
+        color: var(--sub);
+        max-width: 720px;
+        line-height: 1.6;
+        margin-bottom: 28px;
+      }
+
+      /* CARDS & GLASS PANELS */
+      .glass-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 24px;
+        backdrop-filter: var(--glass-backdrop);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        position: relative;
+      }
+      .glass-card:hover {
+        border-color: var(--card-hover-border);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        align-items: center;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+
+      .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+      }
+
+      /* HERO SLIDE (SLIDE 1) */
+      #hero {
+        text-align: center;
+        align-items: center;
+        background: radial-gradient(
+          circle at 50% 40%,
+          rgba(255, 46, 85, 0.08) 0%,
+          transparent 60%
+        );
+      }
+      #hero h1 {
+        font-size: clamp(36px, 5.5vw, 68px);
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+        max-width: 920px;
+        margin: 12px 0 16px;
+      }
+      #hero h1 span.gradient-text {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--purple-accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hero-badges {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        margin-top: 24px;
+      }
+      .hero-badge {
+        padding: 8px 16px;
+        border-radius: 30px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--sub);
+      }
+      .hero-badge b {
+        color: var(--accent);
+        margin-right: 4px;
+      }
+
+      /* SVG WORKFLOW MAP */
+      .svg-container {
+        width: min(940px, 100%);
+        margin: 20px auto 0;
+      }
+
+      /* OBJECTIVES SLIDE (SLIDE 2) - LIVELY & VIBRANT */
+      .slide-badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 10px;
+        background: rgba(255, 46, 85, 0.1);
+        border: 1px solid rgba(255, 46, 85, 0.25);
+        border-radius: 20px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--accent);
+        font-weight: 600;
+        margin-left: 10px;
+        vertical-align: middle;
+      }
+      .slide-badge-pill .pulse-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 8px var(--accent);
+        animation: pulseDot 1.6s infinite ease-in-out;
+      }
+      @keyframes pulseDot {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.4);
+          opacity: 0.5;
+        }
+      }
+
+      .obj-card-v2 {
+        position: relative;
+        padding: 24px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border-radius: 18px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        backdrop-filter: var(--glass-backdrop);
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+      }
+      .obj-card-v2::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--card-accent, var(--accent));
+        opacity: 0.85;
+        transition:
+          height 0.3s ease,
+          opacity 0.3s ease;
+      }
+      .obj-card-v2::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at top right,
+          var(--card-glow, rgba(255, 46, 85, 0.15)),
+          transparent 70%
+        );
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s ease;
+      }
+      .obj-card-v2:hover {
+        transform: translateY(-8px);
+        border-color: var(--card-accent, var(--accent));
+        box-shadow: 0 16px 36px -10px var(--card-glow, rgba(0, 0, 0, 0.5));
+      }
+      .obj-card-v2:hover::before {
+        height: 5px;
+        opacity: 1;
+      }
+      .obj-card-v2:hover::after {
+        opacity: 1;
+      }
+
+      .obj-card-v2[data-theme-card="teal"] {
+        --card-accent: #06b6d4;
+        --card-glow: rgba(6, 182, 212, 0.25);
+        --card-bg-soft: rgba(6, 182, 212, 0.12);
+      }
+      .obj-card-v2[data-theme-card="purple"] {
+        --card-accent: #a855f7;
+        --card-glow: rgba(168, 85, 247, 0.25);
+        --card-bg-soft: rgba(168, 85, 247, 0.12);
+      }
+      .obj-card-v2[data-theme-card="amber"] {
+        --card-accent: #f59e0b;
+        --card-glow: rgba(245, 158, 11, 0.25);
+        --card-bg-soft: rgba(245, 158, 11, 0.12);
+      }
+      .obj-card-v2[data-theme-card="rose"] {
+        --card-accent: #ff2e55;
+        --card-glow: rgba(255, 46, 85, 0.25);
+        --card-bg-soft: rgba(255, 46, 85, 0.12);
+      }
+
+      .obj-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .obj-icon-wrap {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--card-bg-soft);
+        border: 1px solid var(--card-accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--card-accent);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .obj-card-v2:hover .obj-icon-wrap {
+        transform: scale(1.15) rotate(4deg);
+      }
+      .obj-num-badge {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--card-accent);
+        background: var(--card-bg-soft);
+        border: 1px solid var(--card-accent);
+        padding: 3px 9px;
+        border-radius: 6px;
+      }
+
+      .obj-card-v2 h3 {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .obj-card-v2 p {
+        font-size: 13px;
+        color: var(--sub);
+        line-height: 1.55;
+      }
+
+      .obj-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 2px;
+      }
+      .obj-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        color: var(--sub);
+      }
+
+      .obj-outcome {
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px dashed var(--line);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--card-accent);
+      }
+
+      .obj-summary-banner {
+        margin-top: 24px;
+        padding: 14px 20px;
+        border-radius: 14px;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 46, 85, 0.08) 0%,
+          rgba(139, 92, 246, 0.08) 50%,
+          rgba(6, 182, 212, 0.08) 100%
+        );
+        border: 1px solid var(--card-border);
+        backdrop-filter: var(--glass-backdrop);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .obj-summary-text {
+        font-size: 13.5px;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .obj-summary-text b {
+        color: var(--accent);
+      }
+      .obj-summary-stats {
+        display: flex;
+        gap: 14px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--sub);
+      }
+      .obj-summary-stats span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .obj-summary-stats b {
+        color: var(--ink);
+      }
+
+      /* ROADMAP STEPS (SLIDE 3) - LIVELY PIPELINE FLOW */
+      .roadmap-grid-v2 {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-top: 18px;
+        position: relative;
+      }
+      .pipeline-card {
+        position: relative;
+        padding: 20px 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 230px;
+        border-radius: 16px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        backdrop-filter: var(--glass-backdrop);
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+      }
+      .pipeline-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--step-accent, var(--accent));
+        opacity: 0.9;
+        transition: height 0.3s ease;
+      }
+      .pipeline-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at top right,
+          var(--step-glow, rgba(255, 46, 85, 0.12)),
+          transparent 70%
+        );
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .pipeline-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        border-color: var(--step-accent, var(--accent));
+        box-shadow: 0 16px 32px -8px var(--step-glow, rgba(0, 0, 0, 0.5));
+      }
+      .pipeline-card:hover::before {
+        height: 5px;
+      }
+      .pipeline-card:hover::after {
+        opacity: 1;
+      }
+
+      .pipeline-card[data-step="1"] {
+        --step-accent: #06b6d4;
+        --step-glow: rgba(6, 182, 212, 0.3);
+        --step-bg-soft: rgba(6, 182, 212, 0.12);
+      }
+      .pipeline-card[data-step="2"] {
+        --step-accent: #a855f7;
+        --step-glow: rgba(168, 85, 247, 0.3);
+        --step-bg-soft: rgba(168, 85, 247, 0.12);
+      }
+      .pipeline-card[data-step="3"] {
+        --step-accent: #3b82f6;
+        --step-glow: rgba(59, 130, 246, 0.3);
+        --step-bg-soft: rgba(59, 130, 246, 0.12);
+      }
+      .pipeline-card[data-step="4"] {
+        --step-accent: #f59e0b;
+        --step-glow: rgba(245, 158, 11, 0.3);
+        --step-bg-soft: rgba(245, 158, 11, 0.12);
+      }
+      .pipeline-card[data-step="5"] {
+        --step-accent: #ff2e55;
+        --step-glow: rgba(255, 46, 85, 0.35);
+        --step-bg-soft: rgba(255, 46, 85, 0.15);
+      }
+
+      .pipeline-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .pipeline-badge {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--step-accent);
+        background: var(--step-bg-soft);
+        border: 1px solid var(--step-accent);
+        padding: 2px 7px;
+        border-radius: 5px;
+        letter-spacing: 0.05em;
+      }
+      .pipeline-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: var(--step-bg-soft);
+        border: 1px solid var(--step-accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--step-accent);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .pipeline-card:hover .pipeline-icon {
+        transform: scale(1.15) rotate(6deg);
+      }
+
+      .pipeline-card h4 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 6px;
+        line-height: 1.3;
+      }
+      .pipeline-card p {
+        font-size: 12px;
+        color: var(--sub);
+        line-height: 1.45;
+        margin-bottom: 10px;
+      }
+
+      .pipeline-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10.5px;
+        font-weight: 700;
+        color: var(--step-accent);
+        background: var(--step-bg-soft);
+        border: 1px solid var(--step-accent);
+        padding: 4px 8px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        width: fit-content;
+      }
+
+      .pipeline-track-bar {
+        margin-top: 20px;
+        padding: 12px 20px;
+        border-radius: 12px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .pipeline-track-flow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--sub);
+        flex-wrap: wrap;
+      }
+      .pipeline-track-flow b {
+        color: var(--ink);
+      }
+      .pipeline-track-flow .flow-arrow {
+        color: var(--accent);
+        font-weight: 800;
+      }
+
+      /* ENVIRONMENT / AS-IS vs TO-BE (SLIDES 4 & 5) */
+      .analogy-box {
+        padding: 16px 20px;
+        border-left: 3px solid var(--accent);
+        background: var(--accent-soft);
+        border-radius: 0 12px 12px 0;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-top: 16px;
+      }
+
+      .qa-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .qa-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 16px;
+        border-radius: 12px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+      }
+      .qa-badge {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--accent);
+        background: var(--card-bg);
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--card-border);
+      }
+      .qa-content h4 {
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+      .qa-content p {
+        font-size: 12px;
+        color: var(--sub);
+      }
+
+      /* AS-IS / TO-BE COMPARISON */
+      .compare-container {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 20px;
+        align-items: stretch;
+      }
+      .compare-card {
+        padding: 28px;
+      }
+      .compare-card.to-be {
+        background: rgba(255, 46, 85, 0.04);
+        border-color: rgba(255, 46, 85, 0.3);
+      }
+      .compare-card h3 {
+        font-size: 22px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .compare-card ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .compare-card li {
+        font-size: 13.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--ink);
+      }
+      .compare-card li::before {
+        content: "•";
+        color: var(--accent);
+        font-size: 18px;
+      }
+      .compare-arrow {
+        align-self: center;
+        font-size: 28px;
+        color: var(--accent);
+        font-weight: bold;
+      }
+
+      /* STAKEHOLDER SLIDE 6 - VIBRANT & INTERACTIVE GALAXY */
+      .stakeholder-groups-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 14px;
+      }
+      .sh-group-card {
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        backdrop-filter: var(--glass-backdrop);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      .sh-group-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--sh-accent, var(--accent));
+      }
+      .sh-group-card:hover {
+        transform: translateX(6px);
+        border-color: var(--sh-accent, var(--accent));
+        box-shadow: 0 8px 24px -6px var(--sh-glow, rgba(0, 0, 0, 0.4));
+      }
+      .sh-group-card[data-type="internal"] {
+        --sh-accent: #8b5cf6;
+        --sh-glow: rgba(139, 92, 246, 0.3);
+        --sh-bg-soft: rgba(139, 92, 246, 0.12);
+      }
+      .sh-group-card[data-type="external"] {
+        --sh-accent: #06b6d4;
+        --sh-glow: rgba(6, 182, 212, 0.3);
+        --sh-bg-soft: rgba(6, 182, 212, 0.12);
+      }
+      .sh-group-card[data-type="regulatory"] {
+        --sh-accent: #f59e0b;
+        --sh-glow: rgba(245, 158, 11, 0.3);
+        --sh-bg-soft: rgba(245, 158, 11, 0.12);
+      }
+
+      .sh-group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+      .sh-group-title {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .sh-group-badge {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--sh-accent);
+        background: var(--sh-bg-soft);
+        border: 1px solid var(--sh-accent);
+        padding: 2px 7px;
+        border-radius: 5px;
+      }
+      .sh-group-desc {
+        font-size: 12.5px;
+        color: var(--sub);
+        line-height: 1.45;
+      }
+      .sh-group-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 6px;
+      }
+      .sh-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 9.5px;
+        font-weight: 600;
+        color: var(--sub);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      /* ORBIT GALAXY RADAR (RIGHT SIDE) */
+      .stakeholder-radar-panel {
+        position: relative;
+        padding: 24px 20px;
+        border-radius: 20px;
+        background: radial-gradient(
+          circle at center,
+          rgba(255, 46, 85, 0.08) 0%,
+          rgba(21, 25, 40, 0.7) 70%
+        );
+        border: 1px solid var(--card-border);
+        backdrop-filter: var(--glass-backdrop);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 380px;
+      }
+      .radar-svg-wrap {
+        width: 100%;
+        max-width: 450px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .radar-node {
+        cursor: default;
+      }
+      .radar-center-pulse {
+        animation: radarCenterPulse 2.5s infinite ease-out;
+        transform-origin: 240px 240px;
+      }
+      @keyframes radarCenterPulse {
+        0% {
+          r: 68px;
+          opacity: 0.9;
+        }
+        100% {
+          r: 115px;
+          opacity: 0;
+        }
+      }
+
+      /* STAKEHOLDER MATRIX & HUB (SLIDE 7 GRAND MATRIX) */
+      .matrix-board-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        max-width: 1180px;
+        margin: 10px auto 0;
+      }
+      .matrix-axis-header {
+        display: grid;
+        grid-template-columns: 80px 1fr 1fr;
+        gap: 16px;
+        align-items: center;
+      }
+      .matrix-axis-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--sub);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+        padding: 8px 14px;
+        border-radius: 8px;
+      }
+      .matrix-main-layout {
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        gap: 16px;
+      }
+      .matrix-y-axis {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .matrix-y-label {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--sub);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        padding: 12px 6px;
+        line-height: 1.4;
+      }
+      .matrix-grid-2x2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .matrix-quadrant-card {
+        padding: 24px 26px;
+        border-radius: 16px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 14px;
+        min-height: 200px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .matrix-quadrant-card:hover {
+        transform: translateY(-4px);
+      }
+      .matrix-quadrant-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+      }
+
+      /* Quadrant 1: Key Player (High Power - High Interest) */
+      .matrix-quadrant-card[data-quad="key-player"] {
+        background: linear-gradient(
+          145deg,
+          rgba(255, 46, 85, 0.12) 0%,
+          rgba(25, 20, 30, 0.75) 100%
+        );
+        border-color: rgba(255, 46, 85, 0.45);
+        box-shadow: 0 10px 30px -10px rgba(255, 46, 85, 0.25);
+      }
+      .matrix-quadrant-card[data-quad="key-player"]::before {
+        background: linear-gradient(90deg, #ff2e55, #ff6b8b);
+      }
+      .matrix-quadrant-card[data-quad="key-player"] .quad-badge {
+        background: rgba(255, 46, 85, 0.2);
+        color: #ff2e55;
+        border: 1px solid rgba(255, 46, 85, 0.4);
+      }
+
+      /* Quadrant 2: Keep Satisfied (High Power - Low Interest) */
+      .matrix-quadrant-card[data-quad="satisfy"] {
+        background: linear-gradient(
+          145deg,
+          rgba(139, 92, 246, 0.08) 0%,
+          rgba(20, 20, 32, 0.65) 100%
+        );
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+      .matrix-quadrant-card[data-quad="satisfy"]::before {
+        background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+      }
+      .matrix-quadrant-card[data-quad="satisfy"] .quad-badge {
+        background: rgba(139, 92, 246, 0.15);
+        color: #a78bfa;
+        border: 1px solid rgba(139, 92, 246, 0.3);
+      }
+
+      /* Quadrant 3: Keep Informed (Low Power - High Interest) */
+      .matrix-quadrant-card[data-quad="informed"] {
+        background: linear-gradient(
+          145deg,
+          rgba(6, 182, 212, 0.08) 0%,
+          rgba(18, 26, 34, 0.65) 100%
+        );
+        border-color: rgba(6, 182, 212, 0.3);
+      }
+      .matrix-quadrant-card[data-quad="informed"]::before {
+        background: linear-gradient(90deg, #06b6d4, #22d3ee);
+      }
+      .matrix-quadrant-card[data-quad="informed"] .quad-badge {
+        background: rgba(6, 182, 212, 0.15);
+        color: #22d3ee;
+        border: 1px solid rgba(6, 182, 212, 0.3);
+      }
+
+      /* Quadrant 4: Monitor (Low Power - Low Interest) */
+      .matrix-quadrant-card[data-quad="monitor"] {
+        background: linear-gradient(
+          145deg,
+          rgba(100, 116, 139, 0.08) 0%,
+          rgba(20, 22, 28, 0.65) 100%
+        );
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+      .matrix-quadrant-card[data-quad="monitor"]::before {
+        background: linear-gradient(90deg, #64748b, #94a3b8);
+      }
+      .matrix-quadrant-card[data-quad="monitor"] .quad-badge {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--sub);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+
+      .quad-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+      .quad-title-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .quad-icon {
+        font-size: 24px;
+        line-height: 1;
+      }
+      .quad-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .quad-badge {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .quad-action {
+        font-size: 13.5px;
+        line-height: 1.55;
+        color: rgba(243, 244, 246, 0.9);
+      }
+      .quad-roles-box {
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 10px;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .quad-roles-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10.5px;
+        font-weight: 700;
+        color: var(--sub);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .quad-roles-list {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .quad-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .quad-tag {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--sub);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .matrix-summary-pill {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 12px 20px;
+        background: rgba(255, 46, 85, 0.06);
+        border: 1px solid rgba(255, 46, 85, 0.2);
+        border-radius: 12px;
+        font-size: 13px;
+        color: var(--sub);
+      }
+
+      /* 4 TECHNIQUES (SLIDE 8) */
+      .tech-card {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .tech-icon {
+        font-size: 24px;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .tech-card h3 {
+        font-size: 18px;
+      }
+      .tech-card p {
+        font-size: 13px;
+        color: var(--sub);
+        line-height: 1.5;
+      }
+      .tech-pill {
+        margin-top: auto;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--accent);
+        text-transform: uppercase;
+      }
+
+      /* FR VS NFR (SLIDE 9 INTERACTIVE COMPARISON) */
+      .fr-nfr-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        width: 100%;
+        max-width: 1180px;
+        margin: 10px auto 0;
+      }
+      .req-pillar-card {
+        padding: 26px 28px;
+        border-radius: 18px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+          box-shadow 0.3s ease;
+      }
+      .req-pillar-card:hover {
+        transform: translateY(-4px);
+      }
+      .req-pillar-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+      }
+
+      /* FR Theme (Red/Coral Accent) */
+      .req-pillar-card.fr-card {
+        background: linear-gradient(
+          160deg,
+          rgba(255, 46, 85, 0.08) 0%,
+          rgba(20, 20, 28, 0.85) 100%
+        );
+        border-color: rgba(255, 46, 85, 0.35);
+        box-shadow: 0 12px 30px -10px rgba(255, 46, 85, 0.15);
+      }
+      .req-pillar-card.fr-card::before {
+        background: linear-gradient(90deg, #ff2e55, #ff6b8b);
+      }
+
+      /* NFR Theme (Purple/Indigo Accent) */
+      .req-pillar-card.nfr-card {
+        background: linear-gradient(
+          160deg,
+          rgba(139, 92, 246, 0.09) 0%,
+          rgba(20, 20, 32, 0.85) 100%
+        );
+        border-color: rgba(139, 92, 246, 0.35);
+        box-shadow: 0 12px 30px -10px rgba(139, 92, 246, 0.15);
+      }
+      .req-pillar-card.nfr-card::before {
+        background: linear-gradient(90deg, #8b5cf6, #c084fc);
+      }
+
+      .req-pillar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .req-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .req-icon-box {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+      }
+      .fr-card .req-icon-box {
+        background: rgba(255, 46, 85, 0.15);
+        border: 1px solid rgba(255, 46, 85, 0.35);
+      }
+      .nfr-card .req-icon-box {
+        background: rgba(139, 92, 246, 0.15);
+        border: 1px solid rgba(139, 92, 246, 0.35);
+      }
+      .req-heading-text h3 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .req-heading-text span {
+        font-size: 12px;
+        color: var(--sub);
+        font-family: "JetBrains Mono", monospace;
+      }
+      .req-badge {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 6px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .fr-card .req-badge {
+        background: rgba(255, 46, 85, 0.2);
+        color: #ff4d6d;
+        border: 1px solid rgba(255, 46, 85, 0.4);
+      }
+      .nfr-card .req-badge {
+        background: rgba(139, 92, 246, 0.2);
+        color: #c084fc;
+        border: 1px solid rgba(139, 92, 246, 0.4);
+      }
+
+      .req-core-question {
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .fr-card .req-core-question {
+        background: rgba(255, 46, 85, 0.08);
+        border-left: 3px solid var(--accent);
+        color: #ffa5b5;
+      }
+      .nfr-card .req-core-question {
+        background: rgba(139, 92, 246, 0.08);
+        border-left: 3px solid var(--purple-accent);
+        color: #d8b4fe;
+      }
+
+      .req-sub-items {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .req-sub-item {
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 10px;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .req-sub-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .req-sub-desc {
+        font-size: 11.5px;
+        color: var(--sub);
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .req-example-box {
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .req-example-title {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--sub);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .req-chips-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .req-chip {
+        font-size: 12px;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-weight: 500;
+      }
+      .fr-card .req-chip {
+        background: rgba(255, 46, 85, 0.12);
+        color: #fca5a5;
+        border: 1px solid rgba(255, 46, 85, 0.25);
+      }
+      .nfr-card .req-chip {
+        background: rgba(139, 92, 246, 0.12);
+        color: #d8b4fe;
+        border: 1px solid rgba(139, 92, 246, 0.25);
+      }
+
+      .fr-nfr-formula-footer {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        font-size: 13px;
+        color: var(--sub);
+      }
+
+      /* USER STORY (SLIDE 10) */
+      .formula-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin: 24px 0;
+      }
+      .formula-pill {
+        padding: 16px 24px;
+        border-radius: 14px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .formula-pill em {
+        color: var(--accent);
+        font-style: normal;
+      }
+      .formula-plus {
+        font-size: 22px;
+        color: var(--sub);
+        font-weight: 800;
+      }
+
+      .story-demo {
+        padding: 24px 32px;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 46, 85, 0.15),
+          rgba(139, 92, 246, 0.15)
+        );
+        border: 1px solid var(--card-hover-border);
+        border-radius: 16px;
+        font-size: clamp(16px, 1.8vw, 22px);
+        line-height: 1.5;
+        text-align: center;
+        max-width: 840px;
+        margin: 0 auto 28px;
+      }
+      .story-demo b {
+        color: var(--accent);
+      }
+
+      /* QUIZ (SLIDE 11 INTERACTIVE ARENA) */
+      .quiz-container {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 24px;
+        align-items: stretch;
+        width: 100%;
+        max-width: 1180px;
+        margin: 10px auto 0;
+      }
+      .quiz-case-card {
+        padding: 26px 28px;
+        border-radius: 18px;
+        background: linear-gradient(
+          145deg,
+          rgba(255, 46, 85, 0.06) 0%,
+          rgba(20, 20, 28, 0.85) 100%
+        );
+        border: 1px solid rgba(255, 46, 85, 0.25);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 16px;
+        position: relative;
+        overflow: hidden;
+      }
+      .quiz-case-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #ff2e55, #f59e0b);
+      }
+      .quiz-case-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .quiz-tag-live {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        text-transform: uppercase;
+      }
+      .quiz-tag-live::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ef4444;
+        box-shadow: 0 0 8px #ef4444;
+        animation: pulseRed 1.5s infinite;
+      }
+      @keyframes pulseRed {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(0.8);
+        }
+      }
+      .quiz-case-body {
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 18px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .quiz-statement {
+        font-size: 14.5px;
+        line-height: 1.6;
+        color: var(--ink);
+      }
+      .quiz-statement em {
+        color: #67e8f9;
+        font-style: italic;
+        background: rgba(6, 182, 212, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+      .quiz-metric-alert {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px dashed rgba(245, 158, 11, 0.35);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 13px;
+        color: #fbbf24;
+      }
+      .quiz-metric-badge {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 15px;
+        font-weight: 800;
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+        padding: 4px 10px;
+        border-radius: 6px;
+        white-space: nowrap;
+      }
+      .quiz-question-callout {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* Options Area */
+      .quiz-options-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .quiz-opt-btn {
+        padding: 16px 18px;
+        border-radius: 14px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        color: var(--ink);
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        position: relative;
+        overflow: hidden;
+      }
+      .quiz-opt-key {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--sub);
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+      }
+      .quiz-opt-btn:hover {
+        border-color: rgba(255, 46, 85, 0.4);
+        background: rgba(255, 46, 85, 0.05);
+        transform: translateX(6px);
+      }
+      .quiz-opt-btn:hover .quiz-opt-key {
+        background: var(--accent);
+        color: #ffffff;
+        border-color: var(--accent);
+      }
+      .quiz-opt-btn.correct {
+        background: rgba(16, 185, 129, 0.12) !important;
+        border-color: rgba(16, 185, 129, 0.5) !important;
+        color: #34d399 !important;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+      }
+      .quiz-opt-btn.correct .quiz-opt-key {
+        background: #10b981 !important;
+        color: #000000 !important;
+        border-color: #10b981 !important;
+      }
+      .quiz-opt-btn.wrong {
+        background: rgba(239, 68, 68, 0.12) !important;
+        border-color: rgba(239, 68, 68, 0.5) !important;
+        color: #f87171 !important;
+      }
+      .quiz-opt-btn.wrong .quiz-opt-key {
+        background: #ef4444 !important;
+        color: #ffffff !important;
+        border-color: #ef4444 !important;
+      }
+
+      .quiz-feedback-box {
+        padding: 14px 18px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 13px;
+        line-height: 1.5;
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+      }
+
+      /* OUTRO (SLIDE 12) */
+      #outro {
+        text-align: center;
+        align-items: center;
+      }
+      .takeaways-flex {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 800px;
+        margin: 28px 0;
+      }
+      /* QA ITEMS HOVER (SLIDE 4) */
+      .qa-item {
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+      }
+      .qa-item:hover {
+        transform: translateX(8px);
+        border-color: var(--card-hover-border);
+        background: rgba(255, 46, 85, 0.04);
+        box-shadow: 0 8px 24px -6px rgba(255, 46, 85, 0.15);
+      }
+      .qa-item:hover .qa-badge {
+        background: var(--accent);
+        color: #ffffff;
+        border-color: var(--accent);
+        transform: scale(1.08);
+      }
+      .qa-badge {
+        transition: all 0.25s ease;
+      }
+
+      /* AS-IS / TO-BE HOVER (SLIDE 5) */
+      .compare-card {
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      .compare-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.5);
+      }
+      .compare-card.as-is:hover {
+        border-color: rgba(239, 68, 68, 0.4);
+        box-shadow: 0 16px 36px -10px rgba(239, 68, 68, 0.2);
+      }
+      .compare-card.to-be:hover {
+        border-color: rgba(16, 185, 129, 0.5);
+        box-shadow: 0 16px 36px -10px rgba(16, 185, 129, 0.25);
+      }
+      .compare-card li {
+        transition:
+          transform 0.2s ease,
+          color 0.2s ease;
+      }
+      .compare-card li:hover {
+        transform: translateX(6px);
+        color: #ffffff;
+      }
+
+      /* 4 TECHNIQUES CARDS HOVER (SLIDE 8) */
+      .tech-card {
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+      .tech-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--accent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .tech-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--accent);
+        box-shadow: 0 16px 36px -8px rgba(255, 46, 85, 0.25);
+      }
+      .tech-card:hover::before {
+        opacity: 1;
+      }
+      .tech-card:hover .tech-icon {
+        transform: scale(1.15) rotate(6deg);
+        background: var(--accent);
+        color: #ffffff;
+      }
+      .tech-icon {
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .tech-pill {
+        transition: all 0.25s ease;
+      }
+      .tech-card:hover .tech-pill {
+        letter-spacing: 0.08em;
+        color: #ffffff;
+      }
+
+      /* USER STORY HOVER (SLIDE 10) */
+      .formula-pill {
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: pointer;
+      }
+      .formula-pill:hover {
+        transform: translateY(-5px) scale(1.05);
+        border-color: var(--accent);
+        background: rgba(255, 46, 85, 0.1);
+        box-shadow: 0 10px 24px -6px rgba(255, 46, 85, 0.3);
+      }
+      .story-demo {
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .story-demo:hover {
+        transform: scale(1.02);
+        box-shadow: 0 16px 40px -10px rgba(255, 46, 85, 0.25);
+        border-color: var(--accent);
+      }
+
+      /* TAKEAWAY CHIPS HOVER (OUTRO SLIDE 12) */
+      .takeaway-chip {
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: pointer;
+      }
+      .takeaway-chip:hover {
+        transform: translateY(-4px) scale(1.08);
+        border-color: var(--accent);
+        background: rgba(255, 46, 85, 0.15);
+        color: #ffffff;
+        box-shadow: 0 8px 20px -4px rgba(255, 46, 85, 0.35);
+      }
+
+      /* REQ SUB ITEM HOVER (SLIDE 9) */
+      .req-sub-item {
+        transition: all 0.2s ease;
+      }
+      .req-sub-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.18);
+        transform: translateX(4px);
+      }
+      .req-chip {
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .req-chip:hover {
+        transform: scale(1.06);
+        filter: brightness(1.2);
+      }
+      .quad-tag {
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .quad-tag:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        transform: translateY(-2px);
+      }
+
+      /* GSAP REVEAL ANIMATIONS */
+      .reveal {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      /* RESPONSIVE MEDIA QUERIES */
+      @media (max-width: 900px) {
+        .slide {
+          padding: 90px 5vw 70px;
+        }
+        .grid-2,
+        .quiz-container,
+        .fr-grid,
+        .compare-container {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+        .grid-3,
+        .grid-4 {
+          grid-template-columns: 1fr 1fr;
+        }
+        .roadmap-grid,
+        .roadmap-grid-v2 {
+          grid-template-columns: 1fr 1fr;
+        }
+        .compare-arrow {
+          transform: rotate(90deg);
+          justify-self: center;
+        }
+        .navdots {
+          display: none;
+        }
+      }
+      @media (max-width: 540px) {
+        .grid-3,
+        .grid-4,
+        .roadmap-grid-v2 {
+          grid-template-columns: 1fr;
+        }
+        .hero-badges {
+          flex-direction: column;
+          align-items: center;
+        }
+        .matrix-grid {
+          grid-template-columns: 60px 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- TOP PROGRESS BAR -->
+    <div id="progress"></div>
+
+    <!-- FIXED TOP HEADER -->
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-badge">PTTKHT</span>
+        <span>Session 03 · Khảo sát &amp; Thu thập thông tin</span>
+      </div>
+      <div class="top-controls">
+        <button class="theme-btn" id="themeToggle" aria-label="Chuyển chế độ giao diện">
+          <span id="themeIcon">🌙</span> <span id="themeText">Giao diện</span>
+        </button>
+        <button class="menu-btn" id="menuToggle" aria-label="Mở danh sách slide">
+          ☰ <span>Mục lục</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- SLIDE COUNTER & BOTTOM NAVIGATION -->
+    <div class="slide-counter">
+      <b id="curSlide">01</b> / <span id="totalSlides">12</span>
+    </div>
+
+    <nav class="navdots" id="navDots" aria-label="Điều hướng slide"></nav>
+
+    <div class="bottom-nav">
+      <button id="prevBtn" aria-label="Slide trước">‹</button>
+      <button id="nextBtn" aria-label="Slide sau">›</button>
+    </div>
+
+    <!-- SLIDE OVERVIEW DRAWER -->
+    <div class="drawer-overlay" id="drawerOverlay">
+      <div class="drawer">
+        <div class="drawer-header">
+          <h3>Mục lục Slide</h3>
+          <button class="close-drawer" id="closeDrawer">✕</button>
+        </div>
+        <ul class="drawer-list" id="drawerList"></ul>
+      </div>
+    </div>
+
+    <!-- MAIN PRESENTATION CONTAINER -->
+    <main>
+      <!-- SLIDE 1: HERO -->
+      <section class="slide" id="hero">
+        <div class="eyebrow reveal">Phân tích thiết kế hệ thống · Session 03</div>
+        <h1 class="display reveal">
+          Khảo sát &amp; <br />
+          <span class="gradient-text">Thu thập thông tin</span>
+        </h1>
+        <p class="section-desc reveal" style="margin: 0 auto">
+          Từ quan sát bối cảnh thực tế đến tập yêu cầu rõ ràng, chính xác và có thể kiểm
+          chứng.
+        </p>
+
+        <!-- Dynamic SVG Flow Map -->
+        <div class="svg-container reveal">
+          <svg
+            viewBox="0 0 880 160"
+            width="100%"
+            height="auto"
+            aria-label="Quy trình 4 bước khảo sát"
+          >
+            <defs>
+              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ff2e55" />
+                <stop offset="100%" stop-color="#8b5cf6" />
+              </linearGradient>
+            </defs>
+
+            <!-- Track line -->
+            <line
+              x1="110"
+              y1="60"
+              x2="770"
+              y2="60"
+              stroke="var(--line)"
+              stroke-width="2"
+              stroke-dasharray="6 6"
+            />
+
+            <!-- Node 1 -->
+            <g class="hero-node" transform="translate(110, 60)">
+              <circle
+                r="32"
+                fill="var(--card-bg)"
+                stroke="var(--accent)"
+                stroke-width="2"
+              />
+              <text
+                text-anchor="middle"
+                dy="4"
+                fill="var(--accent)"
+                font-family="JetBrains Mono"
+                font-size="12"
+                font-weight="700"
+              >
+                01
+              </text>
+              <text
+                text-anchor="middle"
+                y="55"
+                fill="var(--ink)"
+                font-family="Plus Jakarta Sans"
+                font-size="13"
+                font-weight="700"
+              >
+                Hiên trạng AS-IS
+              </text>
+            </g>
+
+            <!-- Node 2 -->
+            <g class="hero-node" transform="translate(330, 60)">
+              <circle
+                r="32"
+                fill="var(--card-bg)"
+                stroke="var(--purple-accent)"
+                stroke-width="2"
+              />
+              <text
+                text-anchor="middle"
+                dy="4"
+                fill="var(--purple-accent)"
+                font-family="JetBrains Mono"
+                font-size="12"
+                font-weight="700"
+              >
+                02
+              </text>
+              <text
+                text-anchor="middle"
+                y="55"
+                fill="var(--ink)"
+                font-family="Plus Jakarta Sans"
+                font-size="13"
+                font-weight="700"
+              >
+                Stakeholder
+              </text>
+            </g>
+
+            <!-- Node 3 -->
+            <g class="hero-node" transform="translate(550, 60)">
+              <circle
+                r="32"
+                fill="var(--card-bg)"
+                stroke="var(--blue-accent)"
+                stroke-width="2"
+              />
+              <text
+                text-anchor="middle"
+                dy="4"
+                fill="var(--blue-accent)"
+                font-family="JetBrains Mono"
+                font-size="12"
+                font-weight="700"
+              >
+                03
+              </text>
+              <text
+                text-anchor="middle"
+                y="55"
+                fill="var(--ink)"
+                font-family="Plus Jakarta Sans"
+                font-size="13"
+                font-weight="700"
+              >
+                Bóc tách FR/NFR
+              </text>
+            </g>
+
+            <!-- Node 4 -->
+            <g class="hero-node" transform="translate(770, 60)">
+              <circle
+                r="32"
+                fill="var(--accent)"
+                stroke="var(--accent)"
+                stroke-width="2"
+              />
+              <text
+                text-anchor="middle"
+                dy="4"
+                fill="#fff"
+                font-family="JetBrains Mono"
+                font-size="12"
+                font-weight="700"
+              >
+                04
+              </text>
+              <text
+                text-anchor="middle"
+                y="55"
+                fill="var(--ink)"
+                font-family="Plus Jakarta Sans"
+                font-size="13"
+                font-weight="700"
+              >
+                User Story TO-BE
+              </text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="hero-badges reveal">
+          <div class="hero-badge"><b>05</b> Chủ đề cốt lõi</div>
+          <div class="hero-badge"><b>04</b> Kỹ thuật khảo sát</div>
+          <div class="hero-badge"><b>01</b> Tư duy điều tra thám tử</div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: OBJECTIVES -->
+      <section class="slide" id="slide2">
+        <div class="eyebrow reveal">
+          <span>Mục tiêu bài học</span>
+          <span class="slide-badge-pill"
+            ><span class="pulse-dot"></span> 4 Năng lực cốt lõi</span
+          >
+        </div>
+        <h2 class="section-title reveal">
+          Bạn sẽ làm được gì <span class="accent">sau buổi học?</span>
+        </h2>
+        <p class="section-desc reveal">
+          Nắm vững các năng lực phân tích thực chiến để chuyển giao yêu cầu bài bản, chính
+          xác và giảm thiểu rủi ro làm lại.
+        </p>
+
+        <div class="grid-4">
+          <!-- Card 1: Context & As-Is/To-Be -->
+          <div class="obj-card-v2 reveal" data-theme-card="teal">
+            <div class="obj-top-row">
+              <div class="obj-icon-wrap" aria-hidden="true">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path
+                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                  ></path>
+                </svg>
+              </div>
+              <span class="obj-num-badge">01 · BỐI CẢNH</span>
+            </div>
+            <h3>Đọc bối cảnh</h3>
+            <p>
+              Nhận diện môi trường nội bộ, bên ngoài và đo lường khoảng cách hiện trạng
+              AS-IS sang TO-BE.
+            </p>
+            <div class="obj-tags">
+              <span class="obj-tag">AS-IS → TO-BE</span>
+              <span class="obj-tag">PESTEL / 7S</span>
+              <span class="obj-tag">Gap Analysis</span>
+            </div>
+            <div class="obj-outcome">
+              <span>🎯</span> <span>Lập ma trận khoảng cách hiện trạng</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Stakeholder & RACI -->
+          <div class="obj-card-v2 reveal" data-theme-card="purple">
+            <div class="obj-top-row">
+              <div class="obj-icon-wrap" aria-hidden="true">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <span class="obj-num-badge">02 · ĐỐI TƯỢNG</span>
+            </div>
+            <h3>Đúng đối tượng</h3>
+            <p>
+              Xác định chuẩn Stakeholder, mức độ ảnh hưởng và ma trận ưu tiên giao tiếp
+              RACI.
+            </p>
+            <div class="obj-tags">
+              <span class="obj-tag">Stakeholder Matrix</span>
+              <span class="obj-tag">RACI</span>
+              <span class="obj-tag">Power / Interest</span>
+            </div>
+            <div class="obj-outcome">
+              <span>👥</span> <span>Phân loại &amp; gán vai trò giao tiếp chuẩn</span>
+            </div>
+          </div>
+
+          <!-- Card 3: 4 Techniques -->
+          <div class="obj-card-v2 reveal" data-theme-card="amber">
+            <div class="obj-top-row">
+              <div class="obj-icon-wrap" aria-hidden="true">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                  ></path>
+                </svg>
+              </div>
+              <span class="obj-num-badge">03 · KỸ THUẬT</span>
+            </div>
+            <h3>Chọn kỹ thuật</h3>
+            <p>
+              Lựa chọn và phối hợp linh hoạt 4 kỹ thuật: Phỏng vấn, Quan sát, Bảng hỏi,
+              Phân tích tài liệu.
+            </p>
+            <div class="obj-tags">
+              <span class="obj-tag">Phỏng vấn</span>
+              <span class="obj-tag">Quan sát</span>
+              <span class="obj-tag">Bảng hỏi</span>
+              <span class="obj-tag">Tài liệu</span>
+            </div>
+            <div class="obj-outcome">
+              <span>⚡</span> <span>Thu thập dữ liệu đa chiều &amp; đối chứng</span>
+            </div>
+          </div>
+
+          <!-- Card 4: FR/NFR & User Story -->
+          <div class="obj-card-v2 reveal" data-theme-card="rose">
+            <div class="obj-top-row">
+              <div class="obj-icon-wrap" aria-hidden="true">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  ></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <polyline points="9 15 12 18 20 10"></polyline>
+                </svg>
+              </div>
+              <span class="obj-num-badge">04 · ĐẶC TẢ</span>
+            </div>
+            <h3>Đặc tả yêu cầu</h3>
+            <p>
+              Bóc tách rõ Yêu cầu chức năng (FR), phi chức năng (NFR) và diễn đạt chuẩn
+              User Story.
+            </p>
+            <div class="obj-tags">
+              <span class="obj-tag">FR (Chức năng)</span>
+              <span class="obj-tag">NFR (Phi chức năng)</span>
+              <span class="obj-tag">User Story</span>
+            </div>
+            <div class="obj-outcome">
+              <span>✨</span> <span>Đặc tả rõ ràng, kiểm chứng được (Testable)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Milestone Banner -->
+        <div class="obj-summary-banner reveal">
+          <div class="obj-summary-text">
+            <span>💡</span>
+            <span
+              ><b>Tư duy cốt lõi:</b> Chuyển hoá từ
+              <i>"Khách hàng nói họ muốn gì"</i> sang
+              <i>"Hệ thống thực sự cần giải quyết bài toán gì"</i>.</span
+            >
+          </div>
+          <div class="obj-summary-stats">
+            <span><b>4/4</b> Năng lực</span>
+            <span>•</span>
+            <span><b>100%</b> Thực chiến</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: ROADMAP -->
+      <section class="slide" id="slide3">
+        <div class="eyebrow reveal">
+          <span>Quy trình chuẩn</span>
+          <span class="slide-badge-pill"
+            ><span class="pulse-dot"></span> Pipeline 5 bước</span
+          >
+        </div>
+        <h2 class="section-title reveal">
+          5 bước <span class="accent">điều tra yêu cầu</span>
+        </h2>
+        <p class="section-desc reveal">
+          Khảo sát bài bản từ khám phá hiện trường thực tế đến tập đặc tả chuẩn có thể
+          nghiệm thu.
+        </p>
+
+        <div class="roadmap-grid-v2">
+          <!-- Step 1 -->
+          <div class="pipeline-card reveal" data-step="1">
+            <div>
+              <div class="pipeline-top">
+                <span class="pipeline-badge">BƯỚC 01</span>
+                <div class="pipeline-icon" aria-hidden="true">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </div>
+              </div>
+              <h4>Khảo sát hiện trường</h4>
+              <p>Khám phá hiện trạng AS-IS và điểm nghẽn thực tế.</p>
+            </div>
+            <span class="pipeline-tag">🔍 Hiện trạng AS-IS</span>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="pipeline-card reveal" data-step="2">
+            <div>
+              <div class="pipeline-top">
+                <span class="pipeline-badge">BƯỚC 02</span>
+                <div class="pipeline-icon" aria-hidden="true">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+              </div>
+              <h4>Chọn nhân chứng</h4>
+              <p>Xác định chuẩn Stakeholders nắm giữ dữ liệu đúng.</p>
+            </div>
+            <span class="pipeline-tag">👥 Stakeholder / RACI</span>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="pipeline-card reveal" data-step="3">
+            <div>
+              <div class="pipeline-top">
+                <span class="pipeline-badge">BƯỚC 03</span>
+                <div class="pipeline-icon" aria-hidden="true">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                  </svg>
+                </div>
+              </div>
+              <h4>Thu thập chứng cứ</h4>
+              <p>Phối hợp linh hoạt 4 kỹ thuật thu thập thông tin.</p>
+            </div>
+            <span class="pipeline-tag">📁 4 Kỹ thuật</span>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="pipeline-card reveal" data-step="4">
+            <div>
+              <div class="pipeline-top">
+                <span class="pipeline-badge">BƯỚC 04</span>
+                <div class="pipeline-icon" aria-hidden="true">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polygon
+                      points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+                    ></polygon>
+                  </svg>
+                </div>
+              </div>
+              <h4>Sàng lọc dữ liệu</h4>
+              <p>Bóc tách ranh giới rõ ràng giữa FR và NFR.</p>
+            </div>
+            <span class="pipeline-tag">⚡ FR vs NFR</span>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="pipeline-card reveal" data-step="5">
+            <div>
+              <div class="pipeline-top">
+                <span class="pipeline-badge">BƯỚC 05</span>
+                <div class="pipeline-icon" aria-hidden="true">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <h4>Chốt hồ sơ TO-BE</h4>
+              <p>Đặc tả User Story rõ ràng, có thể nghiệm thu.</p>
+            </div>
+            <span class="pipeline-tag">🎯 User Story TO-BE</span>
+          </div>
+        </div>
+
+        <!-- Pipeline Track Bar -->
+        <div class="pipeline-track-bar reveal">
+          <div class="pipeline-track-flow">
+            <span>🔴 <b>AS-IS</b> (Hiện trạng)</span>
+            <span class="flow-arrow">→</span>
+            <span>🟣 <b>Nhân chứng</b></span>
+            <span class="flow-arrow">→</span>
+            <span>🔵 <b>Chứng cứ</b></span>
+            <span class="flow-arrow">→</span>
+            <span>🟡 <b>Phân loại</b></span>
+            <span class="flow-arrow">→</span>
+            <span>🟢 <b>TO-BE</b> (Đặc tả chuẩn)</span>
+          </div>
+          <div
+            style="
+              font-family: &quot;JetBrains Mono&quot;, monospace;
+              font-size: 11px;
+              color: var(--accent);
+              font-weight: 700;
+            "
+          >
+            ✓ 5/5 Giai đoạn
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: TOPIC 01 - ENVIRONMENT -->
+      <section class="slide" id="slide4">
+        <div class="eyebrow reveal">Chủ đề 01 · Môi trường</div>
+        <div class="grid-2">
+          <div>
+            <h2 class="section-title reveal">
+              Nhà phân tích như một <span class="accent">“thám tử”</span>
+            </h2>
+            <p class="section-desc reveal">
+              Khảo sát bối cảnh trước khi đặt câu hỏi: Hiểu rõ hệ thống đang vận hành
+              trong điều kiện nào và vì sao cần thay đổi.
+            </p>
+            <div class="analogy-box reveal">
+              💡 <b>Ví dụ thực tế:</b> Bỏ qua khảo sát môi trường giống như thiết kế biệt
+              thự ven biển cao cấp nhưng lại đem đi xây trên đỉnh núi.
+            </div>
+          </div>
+
+          <div class="qa-cards reveal">
+            <div class="qa-item">
+              <span class="qa-badge">WHY</span>
+              <div class="qa-content">
+                <h4>Vì sao phải thay đổi?</h4>
+                <p>Nhận diện đúng vấn đề, cơ hội kinh doanh và áp lực thị trường.</p>
+              </div>
+            </div>
+
+            <div class="qa-item">
+              <span class="qa-badge">WHERE</span>
+              <div class="qa-content">
+                <h4>Hệ thống vận hành ở đâu?</h4>
+                <p>Con người, quy trình, hạ tầng công nghệ và ràng buộc pháp lý.</p>
+              </div>
+            </div>
+
+            <div class="qa-item">
+              <span class="qa-badge">WHAT</span>
+              <div class="qa-content">
+                <h4>Điều gì thật sự đang diễn ra?</h4>
+                <p>Căn cứ vào dữ kiện quan sát trực tiếp, không chỉ qua lời kể.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: TOPIC 01 - AS-IS VS TO-BE -->
+      <section class="slide" id="slide5">
+        <div class="eyebrow reveal">Mô hình hóa thay đổi</div>
+        <h2 class="section-title reveal">
+          Khoảng cách <span class="accent">AS-IS</span> →
+          <span class="accent-purple">TO-BE</span>
+        </h2>
+        <p class="section-desc reveal">
+          Yêu cầu hệ thống chính là cầu nối thu hẹp khoảng cách giữa hai trạng thái.
+        </p>
+
+        <div class="compare-container">
+          <div class="glass-card compare-card reveal">
+            <h3>
+              AS-IS
+              <span class="mono" style="font-size: 12px; color: var(--sub)"
+                >[HIỆN TẠI]</span
+              >
+            </h3>
+            <ul>
+              <li>Quy trình nghiệp vụ đang vận hành</li>
+              <li>Các điểm nghẽn và thao tác dư thừa</li>
+              <li>Dữ liệu &amp; công nghệ sẵn có</li>
+              <li>Ràng buộc nội bộ và bên ngoài</li>
+            </ul>
+          </div>
+
+          <div class="compare-arrow reveal">➔</div>
+
+          <div class="glass-card compare-card to-be reveal">
+            <h3 style="color: var(--accent)">
+              TO-BE
+              <span class="mono" style="font-size: 12px; color: var(--accent)"
+                >[MONG MUỐN]</span
+              >
+            </h3>
+            <ul>
+              <li>Mục tiêu kinh doanh cần đạt được</li>
+              <li>Quy trình mới được tinh gọn tối ưu</li>
+              <li>Năng lực hệ thống &amp; tính năng mới</li>
+              <li>Tiêu chí đo lường sự thành công</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: TOPIC 02 - STAKEHOLDERS -->
+      <section class="slide" id="slide6">
+        <div class="eyebrow reveal">
+          <span>Chủ đề 02 · Stakeholders</span>
+          <span class="slide-badge-pill"
+            ><span class="pulse-dot"></span> Đa góc nhìn</span
+          >
+        </div>
+        <div class="grid-2">
+          <div>
+            <h2 class="section-title reveal">
+              Ai nắm giữ <span class="accent">mảnh ghép sự thật?</span>
+            </h2>
+            <p class="section-desc reveal">
+              Stakeholder không chỉ là người dùng cuối. Mỗi nhóm nắm giữ một góc nhìn sống
+              còn để bức tranh yêu cầu không bị sai lệch.
+            </p>
+
+            <div class="stakeholder-groups-list reveal">
+              <!-- Group 1 -->
+              <div class="sh-group-card" data-type="internal">
+                <div class="sh-group-header">
+                  <div class="sh-group-title">
+                    <span>🏢</span> <span>Nhóm Nội bộ</span>
+                  </div>
+                  <span class="sh-group-badge">Chiến lược &amp; Vận hành</span>
+                </div>
+                <p class="sh-group-desc">
+                  Ban quản lý, Chuyên viên nghiệp vụ, Đội ngũ kỹ thuật IT.
+                </p>
+                <div class="sh-group-tags">
+                  <span class="sh-tag">Mục tiêu kinh doanh</span>
+                  <span class="sh-tag">Quy trình vận hành</span>
+                  <span class="sh-tag">Tính khả thi IT</span>
+                </div>
+              </div>
+
+              <!-- Group 2 -->
+              <div class="sh-group-card" data-type="external">
+                <div class="sh-group-header">
+                  <div class="sh-group-title">
+                    <span>🌐</span> <span>Nhóm Bên ngoài</span>
+                  </div>
+                  <span class="sh-group-badge">Trải nghiệm &amp; Giá trị</span>
+                </div>
+                <p class="sh-group-desc">
+                  Khách hàng, Người dùng cuối (End-User), Đối tác liên kết.
+                </p>
+                <div class="sh-group-tags">
+                  <span class="sh-tag">Trải nghiệm UX</span>
+                  <span class="sh-tag">Điểm nghẽn thao tác</span>
+                  <span class="sh-tag">Kỳ vọng lợi ích</span>
+                </div>
+              </div>
+
+              <!-- Group 3 -->
+              <div class="sh-group-card" data-type="regulatory">
+                <div class="sh-group-header">
+                  <div class="sh-group-title">
+                    <span>⚖️</span> <span>Nhóm Ràng buộc</span>
+                  </div>
+                  <span class="sh-group-badge">Tuân thủ &amp; Tiêu chuẩn</span>
+                </div>
+                <p class="sh-group-desc">
+                  Cơ quan pháp lý, Đơn vị kiểm toán, Tiêu chuẩn an toàn dữ liệu.
+                </p>
+                <div class="sh-group-tags">
+                  <span class="sh-tag">Bảo mật ISO / GDPR</span>
+                  <span class="sh-tag">Chế tài pháp luật</span>
+                  <span class="sh-tag">Ranh giới hệ thống</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stakeholder Orbit Radar Graphic -->
+          <div class="stakeholder-radar-panel reveal">
+            <div class="radar-svg-wrap">
+              <svg
+                viewBox="0 0 480 480"
+                width="100%"
+                height="auto"
+                aria-label="Sơ đồ quỹ đạo các nhóm Stakeholder xoay quanh Hệ thống"
+              >
+                <defs>
+                  <linearGradient id="centerGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ff2e55" />
+                    <stop offset="100%" stop-color="#8b5cf6" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Ambient Orbit Rings -->
+                <circle
+                  cx="240"
+                  cy="240"
+                  r="172"
+                  fill="none"
+                  stroke="var(--line)"
+                  stroke-width="1.5"
+                  stroke-dasharray="6 6"
+                />
+                <circle
+                  cx="240"
+                  cy="240"
+                  r="105"
+                  fill="none"
+                  stroke="var(--line)"
+                  stroke-width="1"
+                  stroke-dasharray="3 3"
+                  opacity="0.6"
+                />
+
+                <!-- Connecting Radial Laser Lines -->
+                <line
+                  x1="240"
+                  y1="240"
+                  x2="240"
+                  y2="72"
+                  stroke="#8b5cf6"
+                  stroke-width="1.5"
+                  stroke-dasharray="4 4"
+                  opacity="0.6"
+                />
+                <line
+                  x1="240"
+                  y1="240"
+                  x2="345"
+                  y2="240"
+                  stroke="#06b6d4"
+                  stroke-width="1.5"
+                  stroke-dasharray="4 4"
+                  opacity="0.6"
+                />
+                <line
+                  x1="240"
+                  y1="240"
+                  x2="240"
+                  y2="408"
+                  stroke="#3b82f6"
+                  stroke-width="1.5"
+                  stroke-dasharray="4 4"
+                  opacity="0.6"
+                />
+                <line
+                  x1="240"
+                  y1="240"
+                  x2="133"
+                  y2="240"
+                  stroke="#f59e0b"
+                  stroke-width="1.5"
+                  stroke-dasharray="4 4"
+                  opacity="0.6"
+                />
+
+                <!-- Pulsing Outer Aura Rings for Large Center -->
+                <circle cx="240" cy="240" r="85" fill="url(#centerGlow)" opacity="0.18" />
+                <circle
+                  cx="240"
+                  cy="240"
+                  r="68"
+                  fill="none"
+                  stroke="var(--accent)"
+                  stroke-width="2"
+                  class="radar-center-pulse"
+                />
+                <circle
+                  cx="240"
+                  cy="240"
+                  r="76"
+                  fill="none"
+                  stroke="rgba(255, 46, 85, 0.35)"
+                  stroke-width="1"
+                  stroke-dasharray="4 4"
+                />
+
+                <!-- Large Commanding Central Core Hub -->
+                <circle
+                  cx="240"
+                  cy="240"
+                  r="66"
+                  fill="var(--bg-alt)"
+                  stroke="var(--accent)"
+                  stroke-width="3"
+                />
+                <circle
+                  cx="240"
+                  cy="240"
+                  r="56"
+                  fill="rgba(255, 46, 85, 0.08)"
+                  stroke="rgba(255, 46, 85, 0.3)"
+                  stroke-dasharray="3 3"
+                />
+
+                <text
+                  x="240"
+                  y="218"
+                  text-anchor="middle"
+                  font-family="Plus Jakarta Sans"
+                  font-size="11"
+                  font-weight="800"
+                  letter-spacing="0.14em"
+                  fill="var(--accent)"
+                >
+                  TRỌNG TÂM
+                </text>
+                <text
+                  x="240"
+                  y="244"
+                  text-anchor="middle"
+                  font-family="Space Grotesk, Plus Jakarta Sans"
+                  font-size="18"
+                  font-weight="800"
+                  letter-spacing="-0.02em"
+                  fill="var(--ink)"
+                >
+                  HỆ THỐNG
+                </text>
+                <text
+                  x="240"
+                  y="262"
+                  text-anchor="middle"
+                  font-family="JetBrains Mono"
+                  font-size="9"
+                  font-weight="600"
+                  fill="var(--sub)"
+                >
+                  [CORE FOCUS]
+                </text>
+
+                <!-- Orbit Node 1: Quản lý (Top - Purple) -->
+                <g class="radar-node" transform="translate(240, 52)">
+                  <rect
+                    x="-58"
+                    y="-20"
+                    width="116"
+                    height="40"
+                    rx="20"
+                    fill="var(--card-bg)"
+                    stroke="#8b5cf6"
+                    stroke-width="2"
+                  />
+                  <text x="-26" y="5" text-anchor="middle" font-size="17">👑</text>
+                  <text
+                    x="14"
+                    y="5"
+                    text-anchor="middle"
+                    font-family="Plus Jakarta Sans"
+                    font-size="12.5"
+                    font-weight="700"
+                    fill="var(--ink)"
+                  >
+                    Quản lý
+                  </text>
+                </g>
+
+                <!-- Orbit Node 2: End-User (Right - Teal) -->
+                <g class="radar-node" transform="translate(405, 240)">
+                  <rect
+                    x="-60"
+                    y="-20"
+                    width="120"
+                    height="40"
+                    rx="20"
+                    fill="var(--card-bg)"
+                    stroke="#06b6d4"
+                    stroke-width="2"
+                  />
+                  <text x="-28" y="5" text-anchor="middle" font-size="17">👤</text>
+                  <text
+                    x="14"
+                    y="5"
+                    text-anchor="middle"
+                    font-family="Plus Jakarta Sans"
+                    font-size="12.5"
+                    font-weight="700"
+                    fill="var(--ink)"
+                  >
+                    End-User
+                  </text>
+                </g>
+
+                <!-- Orbit Node 3: Đối tác (Bottom - Blue) -->
+                <g class="radar-node" transform="translate(240, 428)">
+                  <rect
+                    x="-58"
+                    y="-20"
+                    width="116"
+                    height="40"
+                    rx="20"
+                    fill="var(--card-bg)"
+                    stroke="#3b82f6"
+                    stroke-width="2"
+                  />
+                  <text x="-26" y="5" text-anchor="middle" font-size="17">🤝</text>
+                  <text
+                    x="14"
+                    y="5"
+                    text-anchor="middle"
+                    font-family="Plus Jakarta Sans"
+                    font-size="12.5"
+                    font-weight="700"
+                    fill="var(--ink)"
+                  >
+                    Đối tác
+                  </text>
+                </g>
+
+                <!-- Orbit Node 4: Pháp lý (Left - Amber) -->
+                <g class="radar-node" transform="translate(75, 240)">
+                  <rect
+                    x="-58"
+                    y="-20"
+                    width="116"
+                    height="40"
+                    rx="20"
+                    fill="var(--card-bg)"
+                    stroke="#f59e0b"
+                    stroke-width="2"
+                  />
+                  <text x="-26" y="5" text-anchor="middle" font-size="17">⚖️</text>
+                  <text
+                    x="14"
+                    y="5"
+                    text-anchor="middle"
+                    font-family="Plus Jakarta Sans"
+                    font-size="12.5"
+                    font-weight="700"
+                    fill="var(--ink)"
+                  >
+                    Pháp lý
+                  </text>
+                </g>
+              </svg>
+            </div>
+
+            <div
+              style="
+                margin-top: 14px;
+                text-align: center;
+                font-size: 11.5px;
+                color: var(--sub);
+                font-family: &quot;JetBrains Mono&quot;, monospace;
+              "
+            >
+              💡
+              <span style="color: var(--ink); font-weight: 600">Nguyên tắc thám tử:</span>
+              Ghép nối đa chiều để tìm sự thật
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: STAKEHOLDER MATRIX -->
+      <section class="slide" id="slide7">
+        <div class="eyebrow reveal">Ưu tiên giao tiếp</div>
+        <h2 class="section-title reveal">
+          Ma trận <span class="accent">Quyền lực × Quan tâm</span>
+        </h2>
+        <p class="section-desc reveal">
+          Phân loại Stakeholder giúp tối ưu thời gian và kênh giao tiếp hiệu quả nhất.
+        </p>
+
+        <div class="matrix-board-wrapper reveal">
+          <!-- Top Horizontal Axis (Interest) -->
+          <div class="matrix-axis-header">
+            <div></div>
+            <div class="matrix-axis-label">
+              <span>◀ QUAN TÂM THẤP</span>
+            </div>
+            <div
+              class="matrix-axis-label"
+              style="
+                border-color: rgba(255, 46, 85, 0.35);
+                color: var(--ink);
+                background: rgba(255, 46, 85, 0.08);
+              "
+            >
+              <span>QUAN TÂM CAO ▶</span>
+            </div>
+          </div>
+
+          <!-- Main Matrix Body with Vertical Axis (Power) -->
+          <div class="matrix-main-layout">
+            <!-- Left Vertical Axis -->
+            <div class="matrix-y-axis">
+              <div
+                class="matrix-y-label"
+                style="
+                  border-color: rgba(255, 46, 85, 0.35);
+                  color: var(--ink);
+                  background: rgba(255, 46, 85, 0.08);
+                "
+              >
+                <span>▲</span>
+                <span>QUYỀN</span>
+                <span>LỰC</span>
+                <span>CAO</span>
+              </div>
+              <div class="matrix-y-label">
+                <span>QUYỀN</span>
+                <span>LỰC</span>
+                <span>THẤP</span>
+                <span>▼</span>
+              </div>
+            </div>
+
+            <!-- 2x2 Quadrants Grid -->
+            <div class="matrix-grid-2x2">
+              <!-- Top-Left: High Power - Low Interest (Keep Satisfied) -->
+              <div class="matrix-quadrant-card" data-quad="satisfy">
+                <div class="quad-header">
+                  <div class="quad-title-group">
+                    <span class="quad-icon">🛡️</span>
+                    <span class="quad-title">Giữ hài lòng</span>
+                  </div>
+                  <span class="quad-badge">Keep Satisfied</span>
+                </div>
+                <div class="quad-action">
+                  Báo cáo cô đọng theo tiến độ tổng quan, tham vấn đúng thời điểm then
+                  chốt, không spam chi tiết kỹ thuật.
+                </div>
+                <div class="quad-roles-box">
+                  <span class="quad-roles-label">👤 Đại diện tiêu biểu</span>
+                  <span class="quad-roles-list"
+                    >CFO, Giám đốc Pháp chế, Hội đồng Quản trị</span
+                  >
+                </div>
+                <div class="quad-tags">
+                  <span class="quad-tag">Executive Summary</span>
+                  <span class="quad-tag">Milestone Review</span>
+                </div>
+              </div>
+
+              <!-- Top-Right: High Power - High Interest (Key Player) -->
+              <div class="matrix-quadrant-card" data-quad="key-player">
+                <div class="quad-header">
+                  <div class="quad-title-group">
+                    <span class="quad-icon">⭐</span>
+                    <span class="quad-title" style="color: #ff4d6d">Quản lý sát sao</span>
+                  </div>
+                  <span class="quad-badge">Key Players</span>
+                </div>
+                <div class="quad-action">
+                  Phối hợp chặt chẽ hàng tuần, cùng tham gia ra quyết định kiến trúc cốt
+                  lõi, ký duyệt và nghiệm thu hệ thống.
+                </div>
+                <div
+                  class="quad-roles-box"
+                  style="
+                    background: rgba(255, 46, 85, 0.12);
+                    border-color: rgba(255, 46, 85, 0.3);
+                  "
+                >
+                  <span class="quad-roles-label" style="color: #ff6b8b"
+                    >🔥 Đối tác trọng yếu</span
+                  >
+                  <span class="quad-roles-list" style="color: #ffffff"
+                    >Project Sponsor, Product Owner, Trưởng phòng Nghiệp vụ</span
+                  >
+                </div>
+                <div class="quad-tags">
+                  <span
+                    class="quad-tag"
+                    style="
+                      background: rgba(255, 46, 85, 0.2);
+                      color: #ff8fa3;
+                      border-color: rgba(255, 46, 85, 0.4);
+                    "
+                    >1-on-1 Workshop</span
+                  >
+                  <span
+                    class="quad-tag"
+                    style="
+                      background: rgba(255, 46, 85, 0.2);
+                      color: #ff8fa3;
+                      border-color: rgba(255, 46, 85, 0.4);
+                    "
+                    >Sign-off Quyết định</span
+                  >
+                </div>
+              </div>
+
+              <!-- Bottom-Left: Low Power - Low Interest (Monitor) -->
+              <div class="matrix-quadrant-card" data-quad="monitor">
+                <div class="quad-header">
+                  <div class="quad-title-group">
+                    <span class="quad-icon">📡</span>
+                    <span class="quad-title">Theo dõi</span>
+                  </div>
+                  <span class="quad-badge">Monitor</span>
+                </div>
+                <div class="quad-action">
+                  Cập nhật tin tức qua kênh chung, theo dõi thụ động, không tốn quá nhiều
+                  nguồn lực giao tiếp.
+                </div>
+                <div class="quad-roles-box">
+                  <span class="quad-roles-label">👤 Đại diện tiêu biểu</span>
+                  <span class="quad-roles-list"
+                    >Phòng ban liên đới gián tiếp, Nhà cung cấp phụ trợ</span
+                  >
+                </div>
+                <div class="quad-tags">
+                  <span class="quad-tag">Newsletter</span>
+                  <span class="quad-tag">General Notice</span>
+                </div>
+              </div>
+
+              <!-- Bottom-Right: Low Power - High Interest (Keep Informed) -->
+              <div class="matrix-quadrant-card" data-quad="informed">
+                <div class="quad-header">
+                  <div class="quad-title-group">
+                    <span class="quad-icon">📢</span>
+                    <span class="quad-title">Giữ thông tin</span>
+                  </div>
+                  <span class="quad-badge">Keep Informed</span>
+                </div>
+                <div class="quad-action">
+                  Trao đổi đều đặn, demo sớm tính năng để lắng nghe phản hồi thực tế từ
+                  người trực tiếp vận hành.
+                </div>
+                <div class="quad-roles-box">
+                  <span class="quad-roles-label">👤 Đại diện tiêu biểu</span>
+                  <span class="quad-roles-list"
+                    >Nhân viên vận hành trực tiếp, End-user, Helpdesk Support</span
+                  >
+                </div>
+                <div class="quad-tags">
+                  <span class="quad-tag">Demo Buổi sáng</span>
+                  <span class="quad-tag">Khảo sát Survey</span>
+                  <span class="quad-tag">User Testing</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Takeaway / Rule of Thumb -->
+          <div class="matrix-summary-pill reveal">
+            <span style="font-size: 16px">💡</span>
+            <span
+              ><strong style="color: var(--ink)">Quy tắc BA thực chiến:</strong> Dành
+              <strong style="color: var(--accent)">70% thời gian & năng lượng</strong>
+              giao tiếp cho <strong style="color: #ff6b8b">Key Players</strong> &
+              <strong style="color: #22d3ee">End-Users trực tiếp</strong> để đảm bảo dự án
+              thành công đúng hạn.</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8: TOPIC 03 - 4 TECHNIQUES -->
+      <section class="slide" id="slide8">
+        <div class="eyebrow reveal">Chủ đề 03 · Kỹ thuật thu thập</div>
+        <h2 class="section-title reveal">4 Kỹ thuật — 4 Loại bằng chứng</h2>
+        <p class="section-desc reveal">
+          Phối hợp linh hoạt theo quy trình: Đọc tài liệu ➔ Quan sát ➔ Phỏng vấn ➔ Khảo
+          sát diện rộng.
+        </p>
+
+        <div class="grid-4">
+          <div class="glass-card tech-card reveal">
+            <div class="tech-icon">💬</div>
+            <h3>Phỏng vấn</h3>
+            <p>Khai thác sâu mục tiêu, vấn đề và kỳ vọng thực tế từ từng vai trò.</p>
+            <span class="tech-pill">Sâu · Linh hoạt</span>
+          </div>
+
+          <div class="glass-card tech-card reveal">
+            <div class="tech-icon">👁️</div>
+            <h3>Quan sát</h3>
+            <p>Ghi nhận thực tế quy trình đang diễn ra và các thao tác thủ công bị ẩn.</p>
+            <span class="tech-pill">Thực tế · Ngữ cảnh</span>
+          </div>
+
+          <div class="glass-card tech-card reveal">
+            <div class="tech-icon">📝</div>
+            <h3>Bảng hỏi</h3>
+            <p>Thu thập dữ liệu định lượng nhanh chóng từ số lượng lớn người dùng.</p>
+            <span class="tech-pill">Diện rộng · Số liệu</span>
+          </div>
+
+          <div class="glass-card tech-card reveal">
+            <div class="tech-icon">📄</div>
+            <h3>Tài liệu</h3>
+            <p>Phân tích quy định, biểu mẫu, quy trình sẵn có để đối chiếu chứng cứ.</p>
+            <span class="tech-pill">Nền tảng · Kiểm chứng</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9: TOPIC 04 - FR VS NFR -->
+      <section class="slide" id="slide9">
+        <div class="eyebrow reveal">Chủ đề 04 · Phân loại yêu cầu</div>
+        <h2 class="section-title reveal">
+          Chức năng <span class="accent">(FR)</span> vs Phi chức năng
+          <span class="accent-purple">(NFR)</span>
+        </h2>
+        <p class="section-desc reveal">
+          Hệ thống làm được gì (FR) — và vận hành tốt ở mức độ nào (NFR)?
+        </p>
+
+        <div class="fr-nfr-container reveal">
+          <!-- Left Pillar: FR (Functional Requirement) -->
+          <div class="req-pillar-card fr-card">
+            <div class="req-pillar-header">
+              <div class="req-title-wrap">
+                <div class="req-icon-box">⚙️</div>
+                <div class="req-heading-text">
+                  <h3>Yêu cầu Chức năng</h3>
+                  <span>[FUNCTIONAL REQUIREMENTS · WHAT]</span>
+                </div>
+              </div>
+              <span class="req-badge">WHAT TO DO</span>
+            </div>
+
+            <div class="req-core-question">
+              <span>🎯</span>
+              <span
+                ><strong>Câu hỏi cốt lõi:</strong> Hệ thống <u>LÀM ĐƯỢC GÌ</u> cho người
+                dùng?</span
+              >
+            </div>
+
+            <div class="req-sub-items">
+              <div class="req-sub-item">
+                <div class="req-sub-left">
+                  <span>👤</span>
+                  <span>Hành động người dùng</span>
+                </div>
+                <span class="req-sub-desc">Thực hiện trực tiếp trên màn hình</span>
+              </div>
+              <div class="req-sub-item">
+                <div class="req-sub-left">
+                  <span>⚡</span>
+                  <span>Phản hồi nghiệp vụ</span>
+                </div>
+                <span class="req-sub-desc">Xử lý dữ liệu & tính toán tự động</span>
+              </div>
+            </div>
+
+            <!-- Real-world Example in E-commerce App -->
+            <div class="req-example-box">
+              <div class="req-example-title">
+                <span>🛒</span>
+                <span>Ví dụ thực tế (Ứng dụng TMĐT):</span>
+              </div>
+              <div class="req-chips-grid">
+                <span class="req-chip">🔑 Đăng nhập OTP / FaceID</span>
+                <span class="req-chip">🔍 Tìm kiếm & Lọc sản phẩm</span>
+                <span class="req-chip">💳 Thanh toán QR / Thẻ</span>
+                <span class="req-chip">📦 Xem lịch sử & Huỷ đơn</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Pillar: NFR (Non-Functional Requirement) -->
+          <div class="req-pillar-card nfr-card">
+            <div class="req-pillar-header">
+              <div class="req-title-wrap">
+                <div class="req-icon-box">🛡️</div>
+                <div class="req-heading-text">
+                  <h3 style="color: #c084fc">Yêu cầu Phi chức năng</h3>
+                  <span>[NON-FUNCTIONAL REQUIREMENTS · HOW]</span>
+                </div>
+              </div>
+              <span class="req-badge">HOW WELL</span>
+            </div>
+
+            <div class="req-core-question">
+              <span>📏</span>
+              <span
+                ><strong>Câu hỏi cốt lõi:</strong> Hệ thống vận hành
+                <u>TỐT & MƯỢT ĐẾN ĐÂU</u>?</span
+              >
+            </div>
+
+            <!-- 3 Standard NFR Categories -->
+            <div class="req-sub-items">
+              <div class="req-sub-item">
+                <div class="req-sub-left">
+                  <span>⚡</span>
+                  <span>Sản phẩm (Product)</span>
+                </div>
+                <span class="req-sub-desc">Load &lt; 2s · Uptime 99.9% · SHA-256</span>
+              </div>
+              <div class="req-sub-item">
+                <div class="req-sub-left">
+                  <span>🏢</span>
+                  <span>Tổ chức (Organizational)</span>
+                </div>
+                <span class="req-sub-desc">Chuẩn Docker/K8s · Quy trình Agile</span>
+              </div>
+              <div class="req-sub-item">
+                <div class="req-sub-left">
+                  <span>⚖️</span>
+                  <span>Bên ngoài (External)</span>
+                </div>
+                <span class="req-sub-desc">Tuân thủ Luật ATTT · GDPR · PCI-DSS</span>
+              </div>
+            </div>
+
+            <!-- Real-world Metrics -->
+            <div class="req-example-box" style="border-color: rgba(139, 92, 246, 0.25)">
+              <div class="req-example-title" style="color: #c084fc">
+                <span>🎯</span>
+                <span>Ví dụ chỉ số NFR có thể đo lường:</span>
+              </div>
+              <div class="req-chips-grid">
+                <span class="req-chip">⚡ 10.000 user truy cập cùng lúc</span>
+                <span class="req-chip">🔒 Mã hóa đường truyền HTTPS/TLS 1.3</span>
+                <span class="req-chip">⏱️ Phản hồi API &lt; 500ms</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Formula Summary for Students -->
+          <div class="fr-nfr-formula-footer">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="font-size: 18px">💡</span>
+              <span
+                ><strong style="color: var(--ink)"
+                  >Mẹo ghi nhớ nhanh cho sinh viên:</strong
+                ></span
+              >
+            </div>
+            <div
+              style="
+                font-family: &quot;JetBrains Mono&quot;, monospace;
+                font-size: 12.5px;
+                color: var(--ink);
+              "
+            >
+              <span style="color: #ff4d6d; font-weight: 700">FR (Tính năng)</span> +
+              <span style="color: #c084fc; font-weight: 700">NFR (Chất lượng)</span> =
+              <span style="color: #34d399; font-weight: 700">Hệ thống thành công</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: TOPIC 05 - USER STORY -->
+      <section class="slide" id="slide10">
+        <div class="eyebrow reveal">Chủ đề 05 · Đặc tả yêu cầu</div>
+        <h2 class="section-title reveal" style="text-align: center">
+          User Story — <span class="accent">Câu chuyện ngắn, Giá trị rõ</span>
+        </h2>
+        <p class="section-desc reveal" style="text-align: center; margin: 0 auto 24px">
+          Cấu trúc chuẩn hóa giúp kết nối đội ngũ phát triển với mục tiêu người dùng.
+        </p>
+
+        <div class="formula-box reveal">
+          <div class="formula-pill">Là một <em>[Vai trò]</em></div>
+          <span class="formula-plus">+</span>
+          <div class="formula-pill">Tôi muốn <em>[Mục tiêu]</em></div>
+          <span class="formula-plus">+</span>
+          <div class="formula-pill">Để <em>[Giá trị nhận được]</em></div>
+        </div>
+
+        <div class="story-demo reveal">
+          “Là một <b>khách hàng mua sắm</b>, tôi muốn
+          <b>theo dõi trạng thái đơn hàng theo thời gian thực</b> để
+          <b>chủ động thời gian nhận hàng</b>.”
+        </div>
+
+        <div class="grid-4">
+          <div class="glass-card reveal" style="padding: 16px; text-align: center">
+            <h4 style="color: var(--accent)">Giá trị</h4>
+            <p style="font-size: 12px; color: var(--sub); margin-top: 4px">
+              Tập trung vào lợi ích người dùng
+            </p>
+          </div>
+          <div class="glass-card reveal" style="padding: 16px; text-align: center">
+            <h4>Rõ ràng</h4>
+            <p style="font-size: 12px; color: var(--sub); margin-top: 4px">
+              Dễ hiểu, dễ ước lượng scope
+            </p>
+          </div>
+          <div class="glass-card reveal" style="padding: 16px; text-align: center">
+            <h4>Linh hoạt</h4>
+            <p style="font-size: 12px; color: var(--sub); margin-top: 4px">
+              Dễ điều chỉnh theo phản hồi
+            </p>
+          </div>
+          <div class="glass-card reveal" style="padding: 16px; text-align: center">
+            <h4>Hợp tác</h4>
+            <p style="font-size: 12px; color: var(--sub); margin-top: 4px">
+              Khuyến khích thảo luận team
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 11: QUIZ -->
+      <section class="slide" id="slide11">
+        <div class="eyebrow reveal">Thực hành nhanh</div>
+        <h2 class="section-title reveal">Kiểm tra tư duy phân tích</h2>
+
+        <div class="quiz-container">
+          <!-- Left: Case Study Card -->
+          <div class="quiz-case-card">
+            <div class="quiz-case-header">
+              <div style="display: flex; align-items: center; gap: 8px">
+                <span style="font-size: 20px">🕵️‍♂️</span>
+                <span
+                  style="
+                    font-family: &quot;Space Grotesk&quot;, sans-serif;
+                    font-weight: 700;
+                    font-size: 16px;
+                    color: var(--ink);
+                  "
+                  >Case Study Thực Tế</span
+                >
+              </div>
+              <span class="quiz-tag-live">Tình huống khẩn cấp</span>
+            </div>
+
+            <div class="quiz-case-body">
+              <div class="quiz-statement">
+                Đội ngũ BA & Dev đã ghi nhận và hoàn thành yêu cầu:
+                <br />
+                <em>“Người dùng có thể đăng nhập hệ thống bằng email và mật khẩu.”</em>
+              </div>
+
+              <!-- Real Metric Incident -->
+              <div class="quiz-metric-alert">
+                <span class="quiz-metric-badge">⚠️ SỰ CỐ VẬN HÀNH</span>
+                <span
+                  >Khi hệ thống đạt <strong>5.000 user</strong> cùng lúc vào giờ cao điểm,
+                  người dùng phải chờ tới
+                  <strong style="color: #ef4444">12 GIÂY</strong> mới vào được tài
+                  khoản!</span
+                >
+              </div>
+            </div>
+
+            <div class="quiz-question-callout">
+              <span>❓</span>
+              <span
+                ><strong>Câu hỏi BA:</strong> Đội ngũ dự án đã
+                <u>bỏ sót loại yêu cầu nào</u> khi lấy Requirement?</span
+              >
+            </div>
+          </div>
+
+          <!-- Right: Interactive Options Panel -->
+          <div class="quiz-options-panel reveal">
+            <button class="quiz-opt-btn" data-correct="false">
+              <div class="quiz-opt-key">A</div>
+              <div>
+                <div style="color: var(--ink); font-weight: 700">
+                  Thêm một tính năng FR mới
+                </div>
+                <div
+                  style="
+                    font-size: 12px;
+                    color: var(--sub);
+                    font-weight: normal;
+                    margin-top: 2px;
+                  "
+                >
+                  Bổ sung thêm hình thức đăng nhập mạng xã hội (Google/Facebook)
+                </div>
+              </div>
+            </button>
+
+            <button class="quiz-opt-btn" data-correct="true">
+              <div class="quiz-opt-key">B</div>
+              <div>
+                <div style="color: var(--ink); font-weight: 700">
+                  Yêu cầu Phi chức năng (NFR) về Hiệu năng
+                </div>
+                <div
+                  style="
+                    font-size: 12px;
+                    color: var(--sub);
+                    font-weight: normal;
+                    margin-top: 2px;
+                  "
+                >
+                  Đặc tả rõ giới hạn thời gian phản hồi: <code>&lt; 2s</code> khi có
+                  <code>5.000 user</code> đồng thời
+                </div>
+              </div>
+            </button>
+
+            <button class="quiz-opt-btn" data-correct="false">
+              <div class="quiz-opt-key">C</div>
+              <div>
+                <div style="color: var(--ink); font-weight: 700">
+                  Bổ sung Stakeholder mới
+                </div>
+                <div
+                  style="
+                    font-size: 12px;
+                    color: var(--sub);
+                    font-weight: normal;
+                    margin-top: 2px;
+                  "
+                >
+                  Cần thêm chuyên viên pháp chế vào ma trận Stakeholder
+                </div>
+              </div>
+            </button>
+
+            <!-- Dynamic Feedback Box -->
+            <div class="quiz-feedback-box" id="quizFeedback">
+              <span style="font-size: 16px">👉</span>
+              <span style="color: var(--sub); font-style: italic"
+                >Chọn một đáp án ở trên để kiểm tra phân tích của bạn!</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 12: OUTRO -->
+      <section class="slide" id="outro">
+        <div class="eyebrow reveal">Tổng kết buổi học</div>
+        <h1 class="display reveal" style="font-size: clamp(32px, 5vw, 60px)">
+          Hiểu đúng trước khi <span class="accent">xây đúng</span>
+        </h1>
+        <p class="section-desc reveal" style="text-align: center; margin: 16px auto">
+          Yêu cầu chất lượng không tự nhiên xuất hiện. Nó được khám phá qua bối cảnh, con
+          người, chứng cứ và đối thoại bài bản.
+        </p>
+
+        <div class="takeaways-flex reveal">
+          <span class="takeaway-chip">01 · Môi trường AS-IS/TO-BE</span>
+          <span class="takeaway-chip">02 · Stakeholders Matrix</span>
+          <span class="takeaway-chip">03 · 4 Kỹ thuật khảo sát</span>
+          <span class="takeaway-chip">04 · Phân loại FR / NFR</span>
+          <span class="takeaway-chip">05 · Cấu trúc User Story</span>
+        </div>
+
+        <p
+          class="mono reveal"
+          style="font-size: 12px; color: var(--sub); margin-top: 16px"
+        >
+          Dùng phím
+          <kbd style="border: 1px solid var(--line); padding: 2px 6px; border-radius: 4px"
+            >←</kbd
+          >
+          <kbd style="border: 1px solid var(--line); padding: 2px 6px; border-radius: 4px"
+            >→</kbd
+          >
+          hoặc cuộn chuột để điều hướng
+        </p>
+      </section>
+    </main>
+
+    <!-- SCRIPT FOR PRESENTATION LOGIC -->
+    <script>
+      // SELECTORS
+      const slides = [...document.querySelectorAll(".slide")];
+      const totalSlides = slides.length;
+      const curSlideEl = document.getElementById("curSlide");
+      const totalSlidesEl = document.getElementById("totalSlides");
+      const navDotsEl = document.getElementById("navDots");
+      const progressBar = document.getElementById("progress");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+
+      const themeToggle = document.getElementById("themeToggle");
+      const themeIcon = document.getElementById("themeIcon");
+      const themeText = document.getElementById("themeText");
+
+      const menuToggle = document.getElementById("menuToggle");
+      const closeDrawer = document.getElementById("closeDrawer");
+      const drawerOverlay = document.getElementById("drawerOverlay");
+      const drawerList = document.getElementById("drawerList");
+
+      let currentIndex = 0;
+      let isScrolling = false;
+
+      totalSlidesEl.textContent = String(totalSlides).padStart(2, "0");
+
+      // BUILD NAV DOTS & DRAWER ITEMS
+      slides.forEach((slide, idx) => {
+        // Dot
+        const dot = document.createElement("button");
+        dot.setAttribute("aria-label", `Đến slide ${idx + 1}`);
+        dot.onclick = () => goToSlide(idx);
+        navDotsEl.appendChild(dot);
+
+        // Drawer Item
+        const item = document.createElement("li");
+        item.className = "drawer-item";
+        const title =
+          slide.querySelector("h1, h2")?.innerText.replace(/\n/g, " ") ||
+          `Slide ${idx + 1}`;
+        item.innerHTML = `<span>${String(idx + 1).padStart(2, "0")}</span> ${title}`;
+        item.onclick = () => {
+          goToSlide(idx);
+          toggleDrawer(false);
+        };
+        drawerList.appendChild(item);
+      });
+
+      const dotButtons = [...navDotsEl.children];
+      const drawerItems = [...drawerList.children];
+
+      // UPDATE ACTIVE STATE
+      function updateActiveState(idx) {
+        currentIndex = idx;
+        curSlideEl.textContent = String(idx + 1).padStart(2, "0");
+
+        // Progress bar width
+        const progressPercent = (idx / (totalSlides - 1)) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+
+        // Update Dots
+        dotButtons.forEach((btn, i) => btn.classList.toggle("active", i === idx));
+
+        // Update Drawer items
+        drawerItems.forEach((item, i) => item.classList.toggle("active", i === idx));
+      }
+
+      // GO TO SLIDE
+      function goToSlide(idx) {
+        if (idx < 0 || idx >= totalSlides) return;
+        slides[idx].scrollIntoView({ behavior: "smooth" });
+        updateActiveState(idx);
+      }
+
+      // NAV BUTTONS
+      prevBtn.onclick = () => goToSlide(currentIndex - 1);
+      nextBtn.onclick = () => goToSlide(currentIndex + 1);
+
+      // KEYBOARD NAVIGATION
+      window.addEventListener("keydown", (e) => {
+        if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) {
+          e.preventDefault();
+          goToSlide(currentIndex + 1);
+        } else if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) {
+          e.preventDefault();
+          goToSlide(currentIndex - 1);
+        } else if (e.key === "Home") {
+          goToSlide(0);
+        } else if (e.key === "End") {
+          goToSlide(totalSlides - 1);
+        }
+      });
+
+      // OBSERVER FOR SNAP SCROLL DETECTION
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const idx = slides.indexOf(entry.target);
+              if (idx !== -1) updateActiveState(idx);
+            }
+          });
+        },
+        { threshold: 0.55 },
+      );
+
+      slides.forEach((slide) => observer.observe(slide));
+
+      // THEME TOGGLE (DARK / LIGHT)
+      let currentTheme = "dark";
+      themeToggle.onclick = () => {
+        currentTheme = currentTheme === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", currentTheme);
+        themeIcon.textContent = currentTheme === "dark" ? "🌙" : "☀️";
+        themeText.textContent = currentTheme === "dark" ? "Tối" : "Sáng";
+      };
+
+      // DRAWER TOGGLE
+      function toggleDrawer(open) {
+        drawerOverlay.classList.toggle("open", open);
+      }
+      menuToggle.onclick = () => toggleDrawer(true);
+      closeDrawer.onclick = () => toggleDrawer(false);
+      drawerOverlay.onclick = (e) => {
+        if (e.target === drawerOverlay) toggleDrawer(false);
+      };
+
+      // GSAP REVEAL ANIMATIONS
+      if (window.gsap && window.ScrollTrigger) {
+        gsap.registerPlugin(ScrollTrigger);
+        document.querySelectorAll(".reveal").forEach((el) => {
+          gsap.to(el, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 88%",
+              once: true,
+            },
+          });
+        });
+      } else {
+        document.querySelectorAll(".reveal").forEach((el) => {
+          el.style.opacity = "1";
+          el.style.transform = "none";
+        });
+      }
+
+      // INTERACTIVE QUIZ LOGIC
+      const quizOptions = document.querySelectorAll(".quiz-opt-btn");
+      const quizFeedback = document.getElementById("quizFeedback");
+
+      quizOptions.forEach((opt) => {
+        opt.onclick = () => {
+          quizOptions.forEach((o) => o.classList.remove("correct", "wrong"));
+          const isCorrect = opt.dataset.correct === "true";
+          if (isCorrect) {
+            opt.classList.add("correct");
+            quizFeedback.innerHTML =
+              '<span style="font-size: 18px;">🎉</span> <div><strong style="color: #34d399">CHÍNH XÁC!</strong> Thời gian chờ 12 giây là chỉ số <strong>Yêu cầu Phi chức năng (NFR)</strong> về Hiệu năng (Performance SLA). Cần đặc tả: <em>Thời gian phản hồi &lt; 2s khi có 5.000 user đồng thời</em>.</div>';
+            quizFeedback.style.borderColor = "rgba(16, 185, 129, 0.4)";
+            quizFeedback.style.background = "rgba(16, 185, 129, 0.1)";
+          } else {
+            opt.classList.add("wrong");
+            quizFeedback.innerHTML =
+              '<span style="font-size: 18px;">💡</span> <div><strong style="color: #f87171">CHƯA CHÍNH XÁC.</strong> Tính năng đăng nhập (FR) đã có và hoạt động được. Vấn đề nghẽn mạng 12s là do thiếu chỉ số <strong>Phi chức năng (NFR Hiệu năng)</strong>!</div>';
+            quizFeedback.style.borderColor = "rgba(239, 68, 68, 0.4)";
+            quizFeedback.style.background = "rgba(239, 68, 68, 0.1)";
+          }
+        };
+      });
+    </script>
+  </body>
+</html>
