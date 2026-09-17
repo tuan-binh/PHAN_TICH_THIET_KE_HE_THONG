@@ -1,0 +1,2372 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Bài giảng Session 05 — Activity Diagram và Use Case Diagram trong Phân tích Thiết kế Hệ thống"
+    />
+    <title>Session 05 · Activity & Use Case Diagram</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+      :root {
+        --bg: #fff;
+        --panel: #f7f4f4;
+        --panel2: #fbe9e9;
+        --red: #c0002f;
+        --red2: #7f0824;
+        --redDim: rgba(192, 0, 47, 0.14);
+        --amber: #b4740a;
+        --green: #1e7d4f;
+        --navy: #25215b;
+        --ink: #141416;
+        --text: #202026;
+        --sub: #716d76;
+        --line: #e7e1e1;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+      }
+      html,
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, Arial, sans-serif;
+        overflow-x: hidden;
+      }
+      body {
+        counter-reset: slide;
+      }
+      ::selection {
+        background: var(--red);
+        color: #fff;
+      }
+      .display {
+        font-family: 'Space Grotesk', Arial, sans-serif;
+      }
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+      #progress {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 3px;
+        width: 0;
+        background: var(--red);
+        z-index: 110;
+      }
+      .brand {
+        position: fixed;
+        left: 26px;
+        top: 22px;
+        z-index: 95;
+        font:
+          500 10px 'JetBrains Mono',
+          monospace;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--sub);
+      }
+      .brand b {
+        color: var(--red);
+      }
+      .counter {
+        position: fixed;
+        left: 26px;
+        bottom: 22px;
+        z-index: 95;
+        font:
+          500 11px 'JetBrains Mono',
+          monospace;
+        color: var(--sub);
+      }
+      .counter b {
+        color: var(--red);
+      }
+      .navdots {
+        position: fixed;
+        right: 22px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        z-index: 100;
+      }
+      .navdots button {
+        width: 6px;
+        height: 6px;
+        border: 0;
+        border-radius: 50%;
+        background: var(--line);
+        cursor: pointer;
+        transition: 0.25s;
+      }
+      .navdots button:hover {
+        background: var(--red);
+        transform: scale(1.5);
+      }
+      .navdots button.active {
+        width: 9px;
+        height: 9px;
+        background: var(--red);
+        box-shadow: 0 0 0 4px var(--redDim);
+      }
+      .navbtns {
+        position: fixed;
+        right: 22px;
+        bottom: 20px;
+        display: flex;
+        gap: 8px;
+        z-index: 100;
+      }
+      .navbtns button {
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        background: #fff;
+        color: var(--ink);
+        font-size: 19px;
+        cursor: pointer;
+        transition: 0.25s;
+      }
+      .navbtns button:hover {
+        border-color: var(--red);
+        color: var(--red);
+        transform: translateY(-2px);
+      }
+      .slide {
+        min-height: 100vh;
+        width: 100%;
+        padding: 9vh 9vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        border-bottom: 1px solid var(--line);
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        overflow: hidden;
+      }
+      .slide::after {
+        content: attr(data-section);
+        position: absolute;
+        right: 5vw;
+        bottom: -0.12em;
+        font:
+          700 clamp(72px, 13vw, 180px) 'Space Grotesk',
+          sans-serif;
+        color: rgba(20, 20, 22, 0.025);
+        pointer-events: none;
+        z-index: 0;
+      }
+      .slide > * {
+        position: relative;
+        z-index: 1;
+      }
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        color: var(--red);
+        font:
+          500 11px 'JetBrains Mono',
+          monospace;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .eyebrow i {
+        width: 22px;
+        height: 1px;
+        background: var(--red);
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+      .title {
+        font-size: clamp(29px, 4.3vw, 58px);
+        line-height: 1.06;
+        letter-spacing: -0.035em;
+      }
+      .title .accent {
+        color: var(--red);
+      }
+      .lead {
+        max-width: 700px;
+        color: var(--sub);
+        font-size: clamp(14px, 1.35vw, 18px);
+        line-height: 1.7;
+      }
+      .small {
+        font-size: 13px;
+        color: var(--sub);
+        line-height: 1.6;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(30px, 5vw, 74px);
+        align-items: center;
+      }
+      .grid6040 {
+        grid-template-columns: 1.18fr 0.82fr;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 28px;
+        min-height: 330px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .panel:hover {
+        transform: translateY(-4px);
+        border-color: rgba(192, 0, 47, 0.35);
+        box-shadow: 0 20px 45px rgba(20, 20, 22, 0.08);
+      }
+      .tag {
+        position: absolute;
+        top: 16px;
+        left: 20px;
+        color: var(--sub);
+        font:
+          500 9px 'JetBrains Mono',
+          monospace;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .list {
+        list-style: none;
+        margin-top: 24px;
+      }
+      .list li {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+        border-radius: 14px;
+        transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .list li:hover {
+        background: var(--panel);
+        padding-left: 22px;
+        border-left: 4px solid var(--red);
+        border-color: transparent transparent var(--line) var(--red);
+        transform: translateX(4px);
+        box-shadow: 0 4px 18px rgba(192, 0, 47, 0.06);
+      }
+      .list li:hover .idx {
+        transform: scale(1.1) rotate(4deg);
+        background: var(--red);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(192, 0, 47, 0.25);
+      }
+      .idx {
+        flex: 0 0 44px;
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        background: var(--panel2);
+        border: 1.5px solid rgba(192, 0, 47, 0.2);
+        color: var(--red);
+        font:
+          700 16px 'JetBrains Mono',
+          monospace;
+        transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .list h3 {
+        font-size: 16px;
+        margin-bottom: 4px;
+      }
+      .list p {
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--sub);
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 32px;
+      }
+      .card {
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fff;
+        transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: default;
+      }
+      .card:hover {
+        transform: translateY(-6px);
+        border-color: var(--red);
+        box-shadow: 0 16px 36px rgba(192, 0, 47, 0.1), 0 4px 10px rgba(0, 0, 0, 0.02);
+      }
+      .card .num {
+        color: var(--red);
+        font:
+          700 12px 'JetBrains Mono',
+          monospace;
+        display: inline-block;
+        transition: transform 0.25s ease;
+      }
+      .card:hover .num {
+        transform: translateX(3px);
+      }
+      .card h3 {
+        font-size: 17px;
+        margin: 22px 0 8px;
+      }
+      .card p {
+        color: var(--sub);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      .quote {
+        padding: 24px 28px;
+        border-left: 4px solid var(--red);
+        background: var(--panel2);
+        border-radius: 0 14px 14px 0;
+        font:
+          600 clamp(18px, 2vw, 28px) 'Space Grotesk',
+          sans-serif;
+        line-height: 1.35;
+        transition: all 0.3s ease;
+      }
+      .quote:hover {
+        border-left-width: 6px;
+        box-shadow: 0 10px 30px rgba(192, 0, 47, 0.08);
+        transform: translateX(4px);
+      }
+      .quote small {
+        display: block;
+        margin-top: 12px;
+        font:
+          400 12px 'JetBrains Mono',
+          monospace;
+        color: var(--sub);
+      }
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-top: 36px;
+      }
+      .step {
+        position: relative;
+        padding: 25px 18px 20px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fff;
+        transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .step:hover {
+        transform: translateY(-6px);
+        border-color: var(--red);
+        box-shadow: 0 16px 36px rgba(192, 0, 47, 0.09);
+      }
+      .step:hover b {
+        transform: scale(1.15);
+        box-shadow: 0 0 0 5px var(--redDim);
+      }
+      .step::before {
+        content: '';
+        position: absolute;
+        left: 100%;
+        top: 38px;
+        width: 12px;
+        height: 1px;
+        background: var(--red);
+      }
+      .step:last-child::before {
+        display: none;
+      }
+      .step b {
+        display: grid;
+        place-items: center;
+        width: 29px;
+        height: 29px;
+        border-radius: 50%;
+        background: var(--red);
+        color: #fff;
+        font:
+          600 11px 'JetBrains Mono',
+          monospace;
+        margin-bottom: 18px;
+      }
+      .step h3 {
+        font-size: 15px;
+        margin-bottom: 7px;
+      }
+      .step p {
+        font-size: 12px;
+        color: var(--sub);
+        line-height: 1.5;
+      }
+      .hero {
+        align-items: center;
+        text-align: center;
+        background:
+          radial-gradient(circle at 18% 76%, rgba(192, 0, 47, 0.09), transparent 22%),
+          radial-gradient(circle at 82% 70%, rgba(37, 33, 91, 0.09), transparent 22%),
+          linear-gradient(rgba(37, 33, 91, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(37, 33, 91, 0.025) 1px, transparent 1px),
+          #fff;
+        background-size: auto, auto, 38px 38px, 38px 38px, auto;
+      }
+      .hero::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent 49.9%,rgba(192,0,47,.08) 50%,transparent 50.1%); pointer-events:none }
+      .hero .title {
+        font-size: clamp(38px, 5.6vw, 76px);
+        max-width: 980px;
+        line-height: .98;
+      }
+      .hero .lead {
+        margin: 16px auto 0;
+        max-width: 650px;
+      }
+      .hero-stage {
+        width: min(1120px, 90vw);
+        display: grid;
+        grid-template-columns: 1fr 126px 1fr;
+        gap: 20px;
+        align-items: stretch;
+        margin: 30px auto 0;
+        text-align: left;
+      }
+      .hero-card { position:relative; min-height:245px; padding:25px; border:1px solid var(--line); border-radius:20px; background:rgba(255,255,255,.9); box-shadow:0 18px 50px rgba(20,20,22,.055); overflow:hidden; transition:.35s }
+      .hero-card:hover { transform:translateY(-5px); box-shadow:0 22px 55px rgba(20,20,22,.1) }
+      .hero-card.activity { border-top:4px solid var(--red) }.hero-card.usecase { border-top:4px solid var(--navy) }
+      .hero-card .card-kicker { font:600 9px 'JetBrains Mono',monospace; letter-spacing:.13em; text-transform:uppercase; color:var(--sub) }
+      .hero-card h3 { margin:8px 0 4px; font-size:clamp(19px,2vw,27px) }.hero-card.activity h3{color:var(--red)}.hero-card.usecase h3{color:var(--navy)}
+      .hero-card p { color:var(--sub); font-size:12px; line-height:1.5 }
+      .mini-flow { display:flex; align-items:center; justify-content:space-between; margin-top:25px; gap:7px }
+      .flow-node { display:grid; place-items:center; height:42px; min-width:42px; padding:0 12px; border-radius:21px; background:var(--panel2); border:1px solid var(--red); font:500 9px 'JetBrains Mono',monospace; text-align:center }
+      .flow-node.start { min-width:16px; width:16px; height:16px; padding:0; background:var(--red) }.flow-node.decision{width:42px;min-width:42px;border-radius:7px;transform:rotate(45deg);background:#fff}.flow-node.decision span{transform:rotate(-45deg)}
+      .mini-arrow { flex:1; height:2px; background:var(--red); position:relative; overflow:visible }.mini-arrow::after{content:'';position:absolute;right:-1px;top:-3px;border-left:6px solid var(--red);border-top:4px solid transparent;border-bottom:4px solid transparent}
+      .usecase-scene { display:grid; grid-template-columns:68px 1fr; gap:14px; align-items:center; margin-top:16px }.actor-mini{text-align:center;color:var(--navy)}.actor-mini svg{width:46px;height:82px}.actor-mini span{display:block;font:500 8px 'JetBrains Mono',monospace}.system-mini{padding:12px;border:1.5px solid var(--navy);border-radius:10px;display:grid;gap:8px}.usecase-pill{padding:7px 12px;border:1px solid var(--navy);border-radius:50%;background:#fff;text-align:center;font:500 9px 'JetBrains Mono',monospace}
+      .hero-bridge { display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative }.hero-core-badge{display:grid;place-items:center;width:112px;height:112px;border-radius:28px;background:var(--navy);color:#fff;box-shadow:0 18px 40px rgba(37,33,91,.24);z-index:2}.hero-core-badge b{font:700 14px 'Space Grotesk',sans-serif}.hero-core-badge span{font:500 8px 'JetBrains Mono',monospace;color:#fda4af;margin-top:-28px}.bridge-line{position:absolute;left:-24px;right:-24px;top:50%;height:2px;background:linear-gradient(90deg,var(--red),var(--navy));z-index:1}.bridge-dot{position:absolute;top:calc(50% - 5px);left:-20px;width:10px;height:10px;border-radius:50%;background:var(--red);z-index:3;box-shadow:0 0 0 5px rgba(192,0,47,.12)}
+      .hero-insight { display:flex; gap:10px; justify-content:center; margin-top:14px }.hero-insight span{padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;font:500 9px 'JetBrains Mono',monospace;color:var(--sub)}.hero-insight b{color:var(--red)}
+      @keyframes flowPulse { 0%{left:-20px;background:var(--red)} 48%{background:var(--red)} 52%{background:var(--navy)} 100%{left:calc(100% + 10px);background:var(--navy)} }
+      @keyframes nodeBreathe { 50%{box-shadow:0 20px 54px rgba(37,33,91,.38);transform:scale(1.035)} }
+      .bridge-dot{animation:flowPulse 3s ease-in-out infinite}.hero-core-badge{animation:nodeBreathe 2.6s ease-in-out infinite}
+      .hero-meta {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+        width: min(560px, 90vw);
+        gap: 42px;
+        margin-top: 18px;
+        color: var(--sub);
+        font:
+          500 10px 'JetBrains Mono',
+          monospace;
+        text-transform: uppercase;
+      }
+      .hero-meta b {
+        display: block;
+        color: var(--ink);
+        font:
+          700 22px 'Space Grotesk',
+          sans-serif;
+      }
+      .hero-meta > div { flex:1 1 0; min-width:120px }
+      .agenda {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0;
+        margin-top: 48px;
+        position: relative;
+      }
+      .agenda::before {
+        content: '';
+        position: absolute;
+        left: 8%;
+        right: 8%;
+        top: 26px;
+        height: 2px;
+        background: var(--line);
+      }
+      .agenda-item {
+        text-align: center;
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .agenda-item:hover {
+        transform: translateY(-6px);
+      }
+      .agenda-item b {
+        display: grid;
+        place-items: center;
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 16px;
+        background: #fff;
+        border: 2px solid var(--red);
+        border-radius: 50%;
+        color: var(--red);
+        font:
+          600 12px 'JetBrains Mono',
+          monospace;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 4px 12px rgba(192, 0, 47, 0.08);
+      }
+      .agenda-item:hover b {
+        background: var(--red);
+        color: #fff;
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 8px 20px rgba(192, 0, 47, 0.28);
+      }
+      .agenda-item h3 {
+        font-size: 14px;
+        transition: color 0.25s ease;
+      }
+      .agenda-item:hover h3 {
+        color: var(--red);
+      }
+      .agenda-item p {
+        font-size: 11px;
+        color: var(--sub);
+        margin-top: 5px;
+      }
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 22px;
+        align-items: center;
+        margin-top: 35px;
+      }
+      .compare-block {
+        padding: 30px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+        cursor: default;
+      }
+      .compare-block:hover {
+        transform: translateY(-6px);
+        border-color: rgba(192, 0, 47, 0.35);
+        box-shadow: 0 16px 36px rgba(37, 33, 91, 0.09);
+      }
+      .compare-block strong {
+        font:
+          600 19px 'Space Grotesk',
+          sans-serif;
+      }
+      .compare-block p {
+        margin-top: 10px;
+        color: var(--sub);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .arrow {
+        color: var(--red);
+        font-size: 28px;
+        transition: transform 0.3s ease;
+      }
+      .compare:hover .arrow {
+        transform: scale(1.2) translateX(4px);
+      }
+      .swim {
+        width: 100%;
+      }
+      .swim-story .lane-step,
+      .swim-story .handoff { transform-box:fill-box; transform-origin:center; transition:transform .25s ease, opacity .25s ease }
+      .swim-story .lane-step:hover { transform:translateY(-4px) scale(1.035) }
+      .swim-story .handoff { animation:handoffPulse 2.2s ease-in-out infinite }
+      .swim-story .handoff:nth-of-type(2) { animation-delay:.35s }
+      .swim-story .handoff:nth-of-type(3) { animation-delay:.7s }
+      @keyframes handoffPulse { 50% { opacity:.58; transform:scale(.94) } }
+      .lane {
+        display: grid;
+        grid-template-columns: 125px 1fr;
+        min-height: 100px;
+        border: 1px solid var(--line);
+        border-bottom: 0;
+      }
+      .lane:first-child {
+        border-radius: 12px 12px 0 0;
+      }
+      .lane:last-child {
+        border-bottom: 1px solid var(--line);
+        border-radius: 0 0 12px 12px;
+      }
+      .lane-name {
+        display: grid;
+        place-items: center;
+        background: var(--navy);
+        color: #fff;
+        font:
+          500 11px 'JetBrains Mono',
+          monospace;
+      }
+      .lane-flow {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 16px;
+        background: #fff;
+      }
+      .pill {
+        padding: 10px 14px;
+        border: 1px solid var(--red);
+        border-radius: 999px;
+        background: var(--panel2);
+        font-size: 11px;
+        white-space: nowrap;
+        transition: all 0.25s ease;
+        cursor: default;
+      }
+      .pill:hover {
+        transform: scale(1.06) translateY(-2px);
+        background: #f8d5d5;
+        box-shadow: 0 6px 14px rgba(192, 0, 47, 0.15);
+      }
+      .flow-arrow {
+        color: var(--red);
+      }
+      .diagram {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+      }
+      .diagram text {
+        font-family: 'JetBrains Mono', monospace;
+      }
+      .diagram g[filter] {
+        cursor: pointer;
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+      .diagram g[filter]:hover {
+        transform: scale(1.035) translateY(-2px);
+      }
+      .activity-story .activity-node,
+      .activity-story .decision-node { cursor:pointer; transform-box:fill-box; transform-origin:center; transition:transform .25s ease }
+      .activity-story .activity-node:hover,
+      .activity-story .decision-node:hover { transform:scale(1.045) }
+      .activity-story .decision-node { animation:decisionPulse 2.5s ease-in-out infinite }
+      .activity-story path[stroke-dasharray] { animation:dashTravel 1.6s linear infinite }
+      @keyframes decisionPulse { 50% { filter:drop-shadow(0 0 7px rgba(192,0,47,.22)) } }
+      @keyframes dashTravel { to { stroke-dashoffset:-22 } }
+      .dashline {
+        stroke-dasharray: 6 5;
+      }
+      .stakeholders {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .stake {
+        padding: 22px 16px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+        cursor: default;
+      }
+      .stake:hover {
+        transform: translateY(-5px);
+        border-color: var(--red);
+        box-shadow: 0 12px 28px rgba(192, 0, 47, 0.08);
+      }
+      .stake b {
+        font-size: 12px;
+        color: var(--red);
+      }
+      .stake h3 {
+        font-size: 15px;
+        margin: 10px 0 5px;
+        transition: color 0.25s ease;
+      }
+      .stake:hover h3 {
+        color: var(--navy);
+      }
+      .stake p {
+        font-size: 11px;
+        color: var(--sub);
+        line-height: 1.5;
+      }
+      .notation {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        width: 100%;
+      }
+      .boundary {
+        border: 2px solid var(--navy);
+        border-radius: 12px;
+        padding: 28px 38px;
+        display: grid;
+        gap: 16px;
+      }
+      .oval {
+        border: 1.5px solid var(--red);
+        border-radius: 50%;
+        padding: 15px 25px;
+        font-size: 11px;
+        background: var(--panel2);
+        transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+        cursor: pointer;
+      }
+      .oval:hover {
+        transform: scale(1.05);
+        background: #f8d5d5;
+        box-shadow: 0 6px 16px rgba(192, 0, 47, 0.16);
+      }
+      .relations {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 34px;
+      }
+      .relation {
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+        cursor: default;
+      }
+      .relation:hover {
+        transform: translateY(-6px);
+        border-color: var(--red);
+        box-shadow: 0 14px 32px rgba(192, 0, 47, 0.08);
+      }
+      .relation code {
+        color: var(--red);
+        font:
+          600 13px 'JetBrains Mono',
+          monospace;
+      }
+      .relation h3 {
+        margin: 14px 0 7px;
+        font-size: 17px;
+        transition: color 0.25s ease;
+      }
+      .relation:hover h3 {
+        color: var(--navy);
+      }
+      .relation p {
+        font-size: 12px;
+        line-height: 1.55;
+        color: var(--sub);
+      }
+      .spec {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 11px;
+      }
+      .spec-card {
+        padding: 13px 15px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: default;
+      }
+      .spec-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--red);
+        box-shadow: 0 12px 26px rgba(192, 0, 47, 0.09);
+      }
+      .spec-card b {
+        display: inline-block;
+        font: 700 10.5px 'JetBrains Mono', monospace;
+        color: var(--red);
+        background: #fbe9e9;
+        padding: 2px 7px;
+        border-radius: 5px;
+      }
+      .spec-card span {
+        display: block;
+        margin-top: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #1e1e24;
+      }
+      .spec-card small {
+        display: block;
+        margin-top: 2px;
+        font-size: 10.5px;
+        color: var(--sub);
+      }
+      .spec-window {
+        background: #141419;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 45px rgba(20, 20, 22, 0.22);
+        overflow: hidden;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+      }
+      .spec-window:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 24px 50px rgba(20, 20, 22, 0.32);
+      }
+      .spec-win-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .win-dots {
+        display: flex;
+        gap: 6px;
+      }
+      .win-dots span {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .win-dots span:nth-child(1) { background: #ef4444; }
+      .win-dots span:nth-child(2) { background: #f59e0b; }
+      .win-dots span:nth-child(3) { background: #10b981; }
+      .win-title {
+        font: 600 10px 'JetBrains Mono', monospace;
+        color: #94a3b8;
+        letter-spacing: 0.06em;
+      }
+      .win-badge {
+        font: 600 8.5px 'JetBrains Mono', monospace;
+        color: #10b981;
+        background: rgba(16, 185, 129, 0.15);
+        padding: 2px 8px;
+        border-radius: 999px;
+      }
+      .spec-meta-bar {
+        display: flex;
+        gap: 18px;
+        padding: 10px 18px;
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        font: 500 10px 'JetBrains Mono', monospace;
+        color: #94a3b8;
+      }
+      .spec-meta-bar b {
+        color: #e2e8f0;
+      }
+      .flow-list {
+        padding: 14px 18px;
+        display: grid;
+        gap: 9px;
+      }
+      .flow-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 9px 12px;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: default;
+      }
+      .flow-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateX(5px);
+      }
+      .flow-step {
+        display: grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        font: 700 10px 'JetBrains Mono', monospace;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .flow-step.alt {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.4);
+      }
+      .flow-tag {
+        font: 700 8.5px 'JetBrains Mono', monospace;
+        padding: 3px 8px;
+        border-radius: 5px;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+      }
+      .actor-tag {
+        background: rgba(244, 63, 94, 0.2);
+        color: #fda4af;
+        border: 1px solid rgba(244, 63, 94, 0.35);
+      }
+      .system-tag {
+        background: rgba(99, 102, 241, 0.2);
+        color: #c7d2fe;
+        border: 1px solid rgba(99, 102, 241, 0.35);
+      }
+      .alt-tag {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fde68a;
+        border: 1px solid rgba(245, 158, 11, 0.35);
+      }
+      .flow-desc {
+        font: 400 11.5px 'JetBrains Mono', monospace;
+        color: #e2e8f0;
+        line-height: 1.4;
+      }
+      .flow-item.alt-flow {
+        background: rgba(245, 158, 11, 0.06);
+        border-color: rgba(245, 158, 11, 0.25);
+      }
+      .case-grid {
+        display: grid;
+        grid-template-columns: 0.8fr 1.2fr;
+        gap: 45px;
+        align-items: center;
+      }
+      .actors {
+        display: grid;
+        gap: 12px;
+      }
+      .actor-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 18px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+        transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: default;
+      }
+      .actor-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--red);
+        box-shadow: 0 12px 28px rgba(192, 0, 47, 0.09);
+      }
+      .actor-badge-icon {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--panel2);
+        color: var(--red);
+        font-size: 20px;
+        flex-shrink: 0;
+        border: 1px solid rgba(192, 0, 47, 0.15);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+      }
+      .actor-card:hover .actor-badge-icon {
+        transform: scale(1.1) rotate(5deg);
+        background: #f8d5d5;
+      }
+      .actor-card h3 {
+        font-size: 15px;
+        color: #1e1e24;
+      }
+      .actor-card p {
+        font-size: 11.5px;
+        color: var(--sub);
+        margin-top: 3px;
+      }
+      .takeaway {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 32px;
+      }
+      .take {
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+        cursor: default;
+      }
+      .take:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 36px rgba(37, 33, 91, 0.12);
+      }
+      .take:first-child {
+        background: var(--navy);
+        color: #fff;
+      }
+      .take:first-child:hover {
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+      .take:last-child {
+        background: var(--panel2);
+        border-color: rgba(192, 0, 47, 0.2);
+      }
+      .take:last-child:hover {
+        border-color: var(--red);
+        background: #f8d5d5;
+      }
+      .take .k {
+        font:
+          500 10px 'JetBrains Mono',
+          monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #fda4af;
+      }
+      .take h3 {
+        font-size: 23px;
+        margin: 13px 0;
+      }
+      .take p {
+        font-size: 13px;
+        line-height: 1.65;
+        opacity: 0.76;
+      }
+      .outro {
+        align-items: center;
+        text-align: center;
+      }
+      .outro .title {
+        max-width: 850px;
+      }
+      .outro .lead {
+        margin: 20px auto 34px;
+      }
+      .keys {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+      .key {
+        padding: 8px 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        font:
+          500 11px 'JetBrains Mono',
+          monospace;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+      }
+      .key:hover {
+        border-color: var(--red);
+        color: var(--red);
+        transform: translateY(-3px) scale(1.05);
+        background: var(--panel2);
+        box-shadow: 0 6px 14px rgba(192, 0, 47, 0.12);
+      }
+      @media (max-width: 900px) {
+        .grid2,
+        .case-grid {
+          grid-template-columns: 1fr;
+        }
+        .cards,
+        .relations {
+          grid-template-columns: 1fr 1fr;
+        }
+        .steps {
+          grid-template-columns: 1fr 1fr;
+        }
+        .agenda {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+        .agenda::before {
+          display: none;
+        }
+        .agenda-item {
+          display: flex;
+          text-align: left;
+          align-items: center;
+          gap: 12px;
+        }
+        .agenda-item b {
+          margin: 0;
+        }
+        .hero-visual {
+          height: 200px;
+        }
+        .hero-stage { grid-template-columns:1fr; max-width:620px; margin-top:24px }
+        .hero-bridge { min-height:54px }.hero-core-badge{width:180px;height:54px;border-radius:16px}.hero-core-badge span{margin-top:-12px}.bridge-line{top:50%;left:12%;right:12%}
+        .hero-card{min-height:205px}.hero-meta{margin-bottom:20px}
+        .slide {
+          padding: 9vh 7vw;
+          min-height: 100svh;
+        }
+        .panel {
+          min-height: 260px;
+        }
+        .brand,
+        .navdots,
+        .navbtns,
+        .counter {
+          display: none;
+        }
+      }
+      @media (max-width: 560px) {
+        .cards,
+        .relations,
+        .spec,
+        .takeaway {
+          grid-template-columns: 1fr;
+        }
+        .compare {
+          grid-template-columns: 1fr;
+        }
+        .arrow {
+          transform: rotate(90deg);
+          text-align: center;
+        }
+        .steps {
+          grid-template-columns: 1fr;
+        }
+        .step::before {
+          display: none;
+        }
+        .hero-meta {
+          gap: 18px;
+        }
+        .lane {
+          grid-template-columns: 85px 1fr;
+        }
+        .pill {
+          padding: 8px;
+          font-size: 9px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress"></div>
+    <div class="brand"><b>PTTKHT</b> · Session 05</div>
+    <div class="counter"><b id="cur">01</b> / <span id="total">17</span></div>
+    <nav class="navdots" id="dots" aria-label="Điều hướng slide"></nav>
+    <div class="navbtns">
+      <button id="prev" aria-label="Slide trước">‹</button
+      ><button id="next" aria-label="Slide sau">›</button>
+    </div>
+    <main id="deck">
+      <section class="slide hero" data-section="05">
+        <div class="eyebrow"><i></i>Phân tích & Thiết kế Hệ thống</div>
+        <h1 class="title">
+          Hai góc nhìn. <span class="accent">Một hệ thống.</span>
+        </h1>
+        <p class="lead">
+          Activity Diagram kể câu chuyện hệ thống vận hành. Use Case Diagram làm rõ
+          người dùng cần gì.
+        </p>
+        <div class="hero-stage" role="img" aria-label="Activity Diagram và Use Case Diagram là hai góc nhìn bổ trợ quanh hệ thống">
+          <article class="hero-card activity hero-left">
+            <div class="card-kicker">Góc nhìn 01 · Quy trình</div>
+            <h3>Activity Diagram</h3>
+            <p>Luồng công việc diễn ra <strong>như thế nào?</strong></p>
+            <div class="mini-flow" aria-hidden="true">
+              <span class="flow-node start"></span><i class="mini-arrow"></i>
+              <span class="flow-node">Xử lý</span><i class="mini-arrow"></i>
+              <span class="flow-node decision"><span>?</span></span><i class="mini-arrow"></i>
+              <span class="flow-node">Kết quả</span>
+            </div>
+            <div class="hero-insight"><span><b>HOW</b> · workflow</span><span>decision</span><span>swimlane</span></div>
+          </article>
+          <div class="hero-bridge hero-core">
+            <div class="bridge-line"></div><div class="bridge-dot"></div>
+            <div class="hero-core-badge"><b>HỆ THỐNG</b><span>WHAT × HOW</span></div>
+          </div>
+          <article class="hero-card usecase hero-right">
+            <div class="card-kicker">Góc nhìn 02 · Yêu cầu</div>
+            <h3>Use Case Diagram</h3>
+            <p>Người dùng cần <strong>điều gì?</strong></p>
+            <div class="usecase-scene" aria-hidden="true">
+              <div class="actor-mini"><svg viewBox="0 0 50 86"><circle cx="25" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M25 21V52M7 33H43M25 52L8 79M25 52L42 79" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>ACTOR</span></div>
+              <div class="system-mini"><span class="usecase-pill">Đăng ký</span><span class="usecase-pill">Tra cứu</span></div>
+            </div>
+            <div class="hero-insight"><span><b>WHAT</b> · goal</span><span>actor</span><span>boundary</span></div>
+          </article>
+        </div>
+        <div class="hero-meta">
+          <div><b>05</b>chủ đề</div>
+          <div><b>02</b>loại biểu đồ</div>
+          <div><b>02</b>case study</div>
+        </div>
+      </section>
+
+      <section class="slide" data-section="MAP">
+        <div class="eyebrow"><i></i>Bản đồ buổi học</div>
+        <h2 class="title">
+          Từ luồng nghiệp vụ đến <span class="accent">yêu cầu hệ thống</span>
+        </h2>
+        <div class="agenda">
+          <div class="agenda-item">
+            <b>01</b>
+            <div>
+              <h3>Activity Diagram</h3>
+              <p>Khái niệm & sức mạnh</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <b>02</b>
+            <div>
+              <h3>Cách vẽ Activity</h3>
+              <p>4 bước + ATM</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <b>03</b>
+            <div>
+              <h3>Use Case Diagram</h3>
+              <p>WHAT, không phải HOW</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <b>04</b>
+            <div>
+              <h3>Xây dựng Use Case</h3>
+              <p>Quan hệ & đặc tả</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <b>05</b>
+            <div>
+              <h3>Case Study</h3>
+              <p>Đăng ký môn học</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-section="01">
+        <div class="grid2 grid6040">
+          <div>
+            <div class="eyebrow"><i></i>01 · Activity Diagram</div>
+            <h2 class="title">Một bản đồ của <span class="accent">workflow</span></h2>
+            <ul class="list">
+              <li>
+                <span class="idx">01</span>
+                <div>
+                  <h3>Biểu đồ hành vi UML</h3>
+                  <p>Mô tả trình tự hoạt động, điều kiện và các nhánh xử lý.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">02</span>
+                <div>
+                  <h3>Từ bắt đầu đến kết thúc</h3>
+                  <p>Trực quan hoá logic xuyên suốt một quy trình nghiệp vụ.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">03</span>
+                <div>
+                  <h3>Cầu nối với lập trình</h3>
+                  <p>
+                    Làm rõ quyết định, vòng lặp và xử lý song song trước khi viết code.
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="panel">
+            <span class="tag">workflow anatomy · interactive flow</span>
+            <svg class="diagram activity-story" viewBox="0 0 520 540" role="img" aria-label="Workflow xử lý yêu cầu gồm nhánh thành công và nhánh điều chỉnh">
+              <defs>
+                <linearGradient id="flowBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fbe9e9"/></linearGradient>
+                <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#25215b" flood-opacity=".12"/></filter>
+                <marker id="flowArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#c0002f"/></marker>
+                <marker id="loopArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#b4740a"/></marker>
+                <path id="successPath" d="M260 45V95V164V210V260H390H475"/>
+                <path id="retryPath" d="M260 310V403H155V130H185"/>
+              </defs>
+
+              <rect x="72" y="16" width="376" height="329" rx="22" fill="url(#flowBg)" stroke="#eadfe2"/>
+              <text x="94" y="43" fill="#75717a" font-size="9" letter-spacing="1.5">LUỒNG CHÍNH</text>
+              <rect x="116" y="375" width="288" height="135" rx="20" fill="#fff9ed" stroke="#efd49a" stroke-dasharray="6 5"/>
+              <text x="138" y="402" fill="#b4740a" font-size="9" letter-spacing="1.2">LUỒNG THAY THẾ</text>
+
+              <circle cx="260" cy="58" r="13" fill="#c0002f" filter="url(#softShadow)"/>
+              <text x="290" y="62" fill="#75717a" font-size="8">BẮT ĐẦU</text>
+              <path d="M260 71V95" stroke="#c0002f" stroke-width="2" marker-end="url(#flowArrow)"/>
+
+              <g class="activity-node" filter="url(#softShadow)">
+                <rect x="185" y="96" width="150" height="68" rx="18" fill="#fff" stroke="#c0002f" stroke-width="2"/>
+                <circle cx="215" cy="130" r="13" fill="#fbe9e9"/><path d="M209 130L214 135L222 124" fill="none" stroke="#c0002f" stroke-width="2" stroke-linecap="round"/>
+                <text x="273" y="126" text-anchor="middle" font-size="11" font-weight="600">Xử lý yêu cầu</text><text x="273" y="143" text-anchor="middle" fill="#75717a" font-size="8">activity</text>
+              </g>
+              <path d="M260 164V207" stroke="#c0002f" stroke-width="2" marker-end="url(#flowArrow)"/>
+
+              <g class="decision-node" filter="url(#softShadow)">
+                <path d="M260 210L310 260L260 310L210 260Z" fill="#fff" stroke="#c0002f" stroke-width="2"/>
+                <text x="260" y="257" text-anchor="middle" font-size="10" font-weight="600">Hợp lệ?</text><text x="260" y="273" text-anchor="middle" fill="#75717a" font-size="7">decision</text>
+              </g>
+              <path d="M310 260H365" stroke="#1e7d4f" stroke-width="2" marker-end="url(#flowArrow)"/>
+              <rect x="321" y="232" width="38" height="20" rx="10" fill="#e7f6ee"/><text x="340" y="245" text-anchor="middle" fill="#1e7d4f" font-size="8" font-weight="600">CÓ</text>
+
+              <g class="activity-node" filter="url(#softShadow)"><rect x="365" y="226" width="92" height="68" rx="18" fill="#25215b" stroke="#25215b" stroke-width="2"/><text x="411" y="256" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Hoàn tất</text><text x="411" y="273" text-anchor="middle" fill="#fda4af" font-size="7">success</text></g>
+              <path d="M457 260H479" stroke="#25215b" stroke-width="2"/>
+              <circle cx="493" cy="260" r="13" fill="#fff" stroke="#141416" stroke-width="3"/><circle cx="493" cy="260" r="7" fill="#141416"/><text x="493" y="291" text-anchor="middle" fill="#75717a" font-size="8">KẾT THÚC</text>
+
+              <path d="M260 310V401" stroke="#b4740a" stroke-width="2" marker-end="url(#loopArrow)"/>
+              <rect x="272" y="337" width="54" height="20" rx="10" fill="#fff3d9"/><text x="299" y="350" text-anchor="middle" fill="#b4740a" font-size="8" font-weight="600">KHÔNG</text>
+              <g filter="url(#softShadow)"><rect x="172" y="418" width="176" height="62" rx="16" fill="#fff" stroke="#b4740a" stroke-width="1.6"/><text x="260" y="444" text-anchor="middle" font-size="10" font-weight="600">Điều chỉnh dữ liệu</text><text x="260" y="462" text-anchor="middle" fill="#b4740a" font-size="8">sau đó thử lại</text></g>
+              <path d="M172 449H126V130H185" fill="none" stroke="#b4740a" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#loopArrow)"/>
+
+              <circle r="5" fill="#c0002f"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#successPath"/></animateMotion></circle>
+              <circle r="4" fill="#b4740a"><animateMotion dur="2.7s" begin="1.1s" repeatCount="indefinite"><mpath href="#retryPath"/></animateMotion></circle>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-section="WHY">
+        <div class="eyebrow"><i></i>3 sức mạnh</div>
+        <h2 class="title">
+          Vì sao Activity Diagram <span class="accent">hữu ích?</span>
+        </h2>
+        <div class="cards">
+          <article class="card">
+            <span class="num">01 / NHÌN</span>
+            <h3>Trực quan hoá logic</h3>
+            <p>
+              Biến quy trình dài và khó đọc thành một luồng có điểm bắt đầu, kết thúc và
+              quyết định rõ ràng.
+            </p>
+          </article>
+          <article class="card">
+            <span class="num">02 / TÌM</span>
+            <h3>Phát hiện vấn đề</h3>
+            <p>
+              Nhìn thấy bước thừa, nút thắt, trường hợp bỏ sót hoặc trách nhiệm chưa rõ.
+            </p>
+          </article>
+          <article class="card">
+            <span class="num">03 / NÓI</span>
+            <h3>Giao tiếp chung</h3>
+            <p>
+              Business Analyst, khách hàng và Developer cùng thảo luận trên một mô hình
+              thống nhất.
+            </p>
+          </article>
+        </div>
+        <div class="quote" style="margin-top: 28px">
+          Một quy trình tốt không chỉ chạy được — nó phải được mọi bên hiểu giống
+          nhau.<small>ACTIVITY DIAGRAM · SHARED UNDERSTANDING</small>
+        </div>
+      </section>
+
+      <section class="slide" data-section="LANE">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow"><i></i>Swimlane</div>
+            <h2 class="title">Phân làn để rõ <span class="accent">trách nhiệm</span></h2>
+            <p class="lead" style="margin-top: 18px">
+              Mỗi lane đại diện cho một vai trò hoặc bộ phận. Hoạt động nằm ở lane nào,
+              bên đó chịu trách nhiệm thực hiện.
+            </p>
+            <div class="quote" style="margin-top: 26px; font-size: 19px">
+              Ai làm gì? Khi nào chuyển giao?<small
+                >Hai câu hỏi swimlane trả lời ngay trên sơ đồ.</small
+              >
+            </div>
+          </div>
+          <div class="panel">
+            <span class="tag">ATM · responsibility flow</span>
+            <svg class="diagram swim-story" viewBox="0 0 620 390" role="img" aria-label="Swimlane quy trình rút tiền ATM với sáu bước chuyển giao giữa khách hàng và máy ATM">
+              <defs>
+                <filter id="laneShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#25215b" flood-opacity=".1"/></filter>
+                <marker id="laneArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#c0002f"/></marker>
+                <path id="atmJourney" d="M155 105V270H305L315 105V270H470V105"/>
+              </defs>
+              <rect x="20" y="34" width="580" height="145" rx="18" fill="#fff" stroke="#eadfe2"/>
+              <rect x="20" y="205" width="580" height="150" rx="18" fill="#f4f3f8" stroke="#dedbe9"/>
+              <g transform="translate(430 18)"><circle cx="0" cy="0" r="9" fill="#fff" stroke="#c0002f"/><path d="M-4 0H4M1-3L4 0L1 3" fill="none" stroke="#c0002f" stroke-width="1.2"/><text x="15" y="3" fill="#75717a" font-size="7">ĐỔI BÊN THỰC HIỆN</text></g>
+              <rect x="20" y="34" width="94" height="145" rx="18" fill="#c0002f"/><path d="M96 34H114V179H96Z" fill="#c0002f"/>
+              <rect x="20" y="205" width="94" height="150" rx="18" fill="#25215b"/><path d="M96 205H114V355H96Z" fill="#25215b"/>
+              <g fill="#fff" text-anchor="middle"><text x="67" y="91" font-size="10" font-weight="600">KHÁCH</text><text x="67" y="107" font-size="10" font-weight="600">HÀNG</text><text x="67" y="268" font-size="10" font-weight="600">MÁY ATM</text></g>
+              <g fill="#fff" opacity=".7" text-anchor="middle" font-size="7"><text x="67" y="129">ACTOR</text><text x="67" y="290">SYSTEM</text></g>
+
+              <path d="M155 137V233" stroke="#c0002f" stroke-width="2" marker-end="url(#laneArrow)"/>
+              <path d="M200 270H255" stroke="#25215b" stroke-width="2" marker-end="url(#laneArrow)"/>
+              <path d="M305 238V137" stroke="#c0002f" stroke-width="2" marker-end="url(#laneArrow)"/>
+              <path d="M315 137V233" stroke="#c0002f" stroke-width="2" marker-end="url(#laneArrow)"/>
+              <path d="M360 270H420" stroke="#25215b" stroke-width="2" marker-end="url(#laneArrow)"/>
+              <path d="M470 238V137" stroke="#c0002f" stroke-width="2" marker-end="url(#laneArrow)"/>
+
+              <g class="handoff"><circle cx="155" cy="193" r="14" fill="#fff" stroke="#c0002f"/><path d="M149 193H161M157 189L161 193L157 197" fill="none" stroke="#c0002f" stroke-width="1.5"/></g>
+              <g class="handoff"><circle cx="310" cy="193" r="14" fill="#fff" stroke="#c0002f"/><path d="M304 193H316M312 189L316 193L312 197" fill="none" stroke="#c0002f" stroke-width="1.5"/></g>
+              <g class="handoff"><circle cx="470" cy="193" r="14" fill="#fff" stroke="#c0002f"/><path d="M464 193H476M472 189L476 193L472 197" fill="none" stroke="#c0002f" stroke-width="1.5"/></g>
+
+              <g class="lane-step" filter="url(#laneShadow)"><rect x="120" y="73" width="80" height="64" rx="16" fill="#fff" stroke="#c0002f"/><text x="160" y="109" text-anchor="middle" font-size="11" font-weight="600">Đưa thẻ</text></g>
+              <g class="lane-step" filter="url(#laneShadow)"><rect x="120" y="238" width="80" height="64" rx="16" fill="#fff" stroke="#25215b"/><text x="160" y="274" text-anchor="middle" font-size="11" font-weight="600">Đọc thẻ</text></g>
+              <g class="lane-step" filter="url(#laneShadow)"><rect x="270" y="73" width="90" height="64" rx="16" fill="#fff" stroke="#c0002f"/><text x="315" y="109" text-anchor="middle" font-size="11" font-weight="600">Nhập PIN</text></g>
+              <g class="lane-step" filter="url(#laneShadow)"><rect x="270" y="238" width="90" height="64" rx="16" fill="#fff" stroke="#25215b"/><text x="315" y="274" text-anchor="middle" font-size="11" font-weight="600">Xác thực</text></g>
+              <g class="lane-step" filter="url(#laneShadow)"><rect x="425" y="238" width="90" height="64" rx="16" fill="#25215b" stroke="#25215b"/><text x="470" y="274" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">Xuất tiền</text></g>
+              <g class="lane-step" filter="url(#laneShadow)"><rect x="425" y="73" width="90" height="64" rx="16" fill="#fff" stroke="#c0002f"/><text x="470" y="109" text-anchor="middle" font-size="11" font-weight="600">Nhận tiền</text></g>
+
+              <circle r="6" fill="#f59e0b" stroke="#fff" stroke-width="2"><animateMotion dur="5.5s" repeatCount="indefinite"><mpath href="#atmJourney"/></animateMotion></circle>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-section="04">
+        <div class="eyebrow"><i></i>02 · Hướng dẫn vẽ Activity Diagram</div>
+        <h2 class="title">Một quy trình, <span class="accent">bốn bước</span></h2>
+        <div class="steps">
+          <article class="step">
+            <b>01</b>
+            <h3>Xác định phạm vi</h3>
+            <p>Chọn quy trình cần mô tả; xác định điểm bắt đầu và kết thúc.</p>
+          </article>
+          <article class="step">
+            <b>02</b>
+            <h3>Liệt kê hoạt động</h3>
+            <p>Ghi các hành động theo đúng trật tự nghiệp vụ.</p>
+          </article>
+          <article class="step">
+            <b>03</b>
+            <h3>Thêm logic</h3>
+            <p>Bổ sung điều kiện, nhánh, lặp và xử lý song song.</p>
+          </article>
+          <article class="step">
+            <b>04</b>
+            <h3>Phân lane & kiểm tra</h3>
+            <p>Gán trách nhiệm, đọc lại từng đường đi và xác nhận với stakeholder.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide" data-section="ATM">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow"><i></i>Case Study · Rút tiền ATM</div>
+            <h2 class="title">Từ nghiệp vụ đến <span class="accent">if / else</span></h2>
+            <p class="lead" style="margin-top: 18px">
+              Luồng ATM cho thấy Activity Diagram có thể trở thành cơ sở trực tiếp để
+              Developer hiện thực hoá điều kiện và ngoại lệ.
+            </p>
+            <ul class="list">
+              <li>
+                <span class="idx">A</span>
+                <div>
+                  <h3>PIN hợp lệ?</h3>
+                  <p>Không → báo lỗi; Có → tiếp tục chọn giao dịch.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">B</span>
+                <div>
+                  <h3>Số dư đủ?</h3>
+                  <p>Không → yêu cầu nhập lại; Có → xuất tiền.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="panel">
+            <span class="tag">activity · ATM withdrawal</span>
+            <svg class="diagram" viewBox="0 0 520 370" role="img" aria-label="Sơ đồ luồng điều kiện và ngoại lệ rút tiền ATM">
+              <defs>
+                <filter id="atmCardGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#25215b" flood-opacity="0.08" />
+                </filter>
+                <marker id="atmArrowRed" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                  <path d="M0 0L7 3.5L0 7Z" fill="#c0002f" />
+                </marker>
+                <marker id="atmArrowAmber" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                  <path d="M0 0L7 3.5L0 7Z" fill="#d97706" />
+                </marker>
+                <marker id="atmArrowGreen" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                  <path d="M0 0L7 3.5L0 7Z" fill="#16a34a" />
+                </marker>
+              </defs>
+
+              <!-- Initial State -->
+              <circle cx="32" cy="48" r="16" fill="rgba(192,0,47,0.12)" />
+              <circle cx="32" cy="48" r="10" fill="#c0002f" />
+              <path d="M44 48 H78" stroke="#c0002f" stroke-width="2" marker-end="url(#atmArrowRed)" />
+
+              <!-- Step 1: Nhập PIN -->
+              <g filter="url(#atmCardGlow)">
+                <rect x="84" y="26" width="106" height="44" rx="14" fill="#ffffff" stroke="#c0002f" stroke-width="1.8" />
+                <text x="137" y="52" text-anchor="middle" font-size="11" font-weight="600" fill="#1e1e24">Nhập PIN</text>
+              </g>
+
+              <!-- Connection to Decision 1 -->
+              <path d="M190 48 H222" stroke="#c0002f" stroke-width="2" marker-end="url(#atmArrowRed)" />
+
+              <!-- Decision 1: Đúng? -->
+              <g filter="url(#atmCardGlow)">
+                <path d="M260 24 L292 48 L260 72 L228 48 Z" fill="#ffffff" stroke="#c0002f" stroke-width="1.8" />
+                <text x="260" y="52" text-anchor="middle" font-size="9.5" font-weight="700" fill="#c0002f">Đúng?</text>
+              </g>
+
+              <!-- Decision 1 -> CÓ -> Chọn số tiền -->
+              <path d="M292 48 H430 V122" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#atmArrowGreen)" />
+              <g transform="translate(330, 23)">
+                <rect width="36" height="18" rx="9" fill="#dcfce7" stroke="#86efac" stroke-width="1" />
+                <text x="18" y="12.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#15803d">CÓ</text>
+              </g>
+
+              <!-- Decision 1 -> KHÔNG -> Thông báo lỗi (Dời nhãn sang bên phải đường kẻ, không đè nét) -->
+              <path d="M260 72 V102 H137 V122" fill="none" stroke="#d97706" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#atmArrowAmber)" />
+              <g transform="translate(272, 78)">
+                <rect width="48" height="18" rx="9" fill="#fef3c7" stroke="#fcd34d" stroke-width="1" />
+                <text x="24" y="12.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#b45309">KHÔNG</text>
+              </g>
+
+              <!-- Exception 1: Thông báo lỗi -->
+              <g filter="url(#atmCardGlow)">
+                <rect x="72" y="128" width="130" height="44" rx="14" fill="#ffffff" stroke="#d97706" stroke-width="1.6" />
+                <circle cx="91" cy="150" r="4.5" fill="#fef3c7" stroke="#d97706" stroke-width="1.5" />
+                <text x="141" y="154" text-anchor="middle" font-size="10.5" font-weight="600" fill="#92400e">Thông báo lỗi</text>
+              </g>
+
+              <!-- Step 2: Chọn số tiền -->
+              <g filter="url(#atmCardGlow)">
+                <rect x="368" y="128" width="124" height="44" rx="14" fill="#ffffff" stroke="#c0002f" stroke-width="1.8" />
+                <text x="430" y="154" text-anchor="middle" font-size="11" font-weight="600" fill="#1e1e24">Chọn số tiền</text>
+              </g>
+
+              <!-- Connection to Decision 2 -->
+              <path d="M430 172 V206" stroke="#c0002f" stroke-width="2" marker-end="url(#atmArrowRed)" />
+
+              <!-- Decision 2: Đủ dư? -->
+              <g filter="url(#atmCardGlow)">
+                <path d="M430 212 L462 236 L430 260 L398 236 Z" fill="#ffffff" stroke="#c0002f" stroke-width="1.8" />
+                <text x="430" y="240" text-anchor="middle" font-size="9.5" font-weight="700" fill="#c0002f">Đủ dư?</text>
+              </g>
+
+              <!-- Decision 2 -> CÓ -> Xuất tiền -->
+              <path d="M430 260 V292" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#atmArrowGreen)" />
+              <g transform="translate(444, 266)">
+                <rect width="36" height="18" rx="9" fill="#dcfce7" stroke="#86efac" stroke-width="1" />
+                <text x="18" y="12.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#15803d">CÓ</text>
+              </g>
+
+              <!-- Decision 2 -> KHÔNG -> Nhập lại số tiền -->
+              <path d="M398 236 H230 V292" fill="none" stroke="#d97706" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#atmArrowAmber)" />
+              <g transform="translate(290, 211)">
+                <rect width="48" height="18" rx="9" fill="#fef3c7" stroke="#fcd34d" stroke-width="1" />
+                <text x="24" y="12.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#b45309">KHÔNG</text>
+              </g>
+
+              <!-- Exception 2: Nhập lại số tiền -->
+              <g filter="url(#atmCardGlow)">
+                <rect x="164" y="298" width="132" height="44" rx="14" fill="#ffffff" stroke="#d97706" stroke-width="1.6" />
+                <circle cx="183" cy="320" r="4.5" fill="#fef3c7" stroke="#d97706" stroke-width="1.5" />
+                <text x="234" y="324" text-anchor="middle" font-size="10.5" font-weight="600" fill="#92400e">Nhập lại số tiền</text>
+              </g>
+
+              <!-- Step 3: Xuất tiền (End/Success State) -->
+              <g filter="url(#atmCardGlow)">
+                <rect x="368" y="298" width="124" height="44" rx="14" fill="#25215b" stroke="#25215b" stroke-width="1.8" />
+                <text x="430" y="324" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="600">Xuất tiền</text>
+              </g>
+
+              <!-- Flow Signal Animation -->
+              <circle r="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5">
+                <animateMotion dur="4.6s" repeatCount="indefinite" path="M32 48 H137 H260 H430 V154 V236 V324" />
+              </circle>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-section="03">
+        <div class="eyebrow"><i></i>03 · Use Case Diagram</div>
+        <h2 class="title">
+          Từ văn bản dài đến <span class="accent">bức tranh chung</span>
+        </h2>
+        <div class="compare">
+          <div class="compare-block">
+            <strong>Yêu cầu dạng văn bản</strong>
+            <p>Dễ dài, mơ hồ, khó phát hiện phạm vi và bỏ sót chức năng.</p>
+          </div>
+          <div class="arrow">→</div>
+          <div
+            class="compare-block"
+            style="background: var(--panel2); border-color: rgba(192, 0, 47, 0.24)"
+          >
+            <strong>Use Case Diagram</strong>
+            <p>Cho thấy ngay ai tương tác với hệ thống và họ muốn đạt mục tiêu gì.</p>
+          </div>
+        </div>
+        <div class="quote" style="margin-top: 30px">
+          Ai sử dụng hệ thống? Họ LÀM GÌ với hệ thống?<small
+            >Hai câu hỏi cốt lõi của Use Case Diagram</small
+          >
+        </div>
+      </section>
+
+      <section class="slide" data-section="WHAT">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow"><i></i>Định nghĩa</div>
+            <h2 class="title">Mô tả <span class="accent">WHAT</span>, không mô tả HOW</h2>
+            <ul class="list">
+              <li>
+                <span class="idx">01</span>
+                <div>
+                  <h3>Actor</h3>
+                  <p>Người hoặc hệ thống bên ngoài tương tác với hệ thống đang xét.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">02</span>
+                <div>
+                  <h3>Use Case</h3>
+                  <p>Mục tiêu/chức năng mà Actor muốn thực hiện.</p>
+                </div>
+              </li>
+              <li>
+                <span class="idx">03</span>
+                <div>
+                  <h3>System Boundary</h3>
+                  <p>Ranh giới xác định cái gì thuộc và không thuộc phạm vi hệ thống.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="panel">
+            <span class="tag">notation · use case diagram</span>
+            <svg class="diagram" viewBox="0 0 540 360" role="img" aria-label="Sơ đồ mô hình hóa Actor, Use Case và System Boundary">
+              <defs>
+                <filter id="ucCardShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#25215b" flood-opacity="0.07" />
+                </filter>
+                <filter id="actorGlow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#25215b" flood-opacity="0.12" />
+                </filter>
+              </defs>
+
+              <!-- System Boundary (Khung ranh giới hệ thống) -->
+              <g filter="url(#ucCardShadow)">
+                <rect x="180" y="24" width="340" height="312" rx="18" fill="#ffffff" stroke="#25215b" stroke-width="2" />
+              </g>
+
+              <!-- Boundary Title & Tag -->
+              <rect x="195" y="38" width="138" height="26" rx="13" fill="#25215b" />
+              <text x="264" y="55" text-anchor="middle" font-size="9" font-weight="700" fill="#ffffff" font-family="'JetBrains Mono', monospace">SYSTEM: MÁY ATM</text>
+
+              <g transform="translate(396, 38)">
+                <rect width="112" height="22" rx="11" fill="#f4f3f8" stroke="#dedbe9" stroke-width="1" />
+                <text x="56" y="14.5" text-anchor="middle" font-size="8" font-weight="700" fill="#25215b" font-family="'JetBrains Mono', monospace">03 · SYSTEM BOUNDARY</text>
+              </g>
+
+              <!-- Association Lines (Đường liên kết) -->
+              <line x1="100" y1="170" x2="242" y2="108" stroke="#25215b" stroke-width="1.8" opacity="0.75" />
+              <line x1="100" y1="170" x2="242" y2="185" stroke="#25215b" stroke-width="1.8" opacity="0.75" />
+              <line x1="100" y1="170" x2="242" y2="262" stroke="#25215b" stroke-width="1.8" opacity="0.75" />
+
+              <!-- Animated Signal Dots from Actor to Use Cases -->
+              <circle r="3.5" fill="#c0002f">
+                <animateMotion dur="2.8s" repeatCount="indefinite" path="M 100 170 L 242 108" />
+              </circle>
+              <circle r="3.5" fill="#c0002f">
+                <animateMotion dur="2.8s" begin="0.9s" repeatCount="indefinite" path="M 100 170 L 242 185" />
+              </circle>
+              <circle r="3.5" fill="#c0002f">
+                <animateMotion dur="2.8s" begin="1.8s" repeatCount="indefinite" path="M 100 170 L 242 262" />
+              </circle>
+
+              <!-- Actor (Stick Figure & Tag) -->
+              <g filter="url(#actorGlow)">
+                <!-- Halo / Aura -->
+                <circle cx="75" cy="120" r="16" fill="rgba(37,33,91,0.06)" />
+                <!-- Head -->
+                <circle cx="75" cy="120" r="12" fill="#ffffff" stroke="#25215b" stroke-width="2.4" />
+                <!-- Body -->
+                <line x1="75" y1="132" x2="75" y2="178" stroke="#25215b" stroke-width="2.4" stroke-linecap="round" />
+                <!-- Arms -->
+                <line x1="50" y1="150" x2="100" y2="150" stroke="#25215b" stroke-width="2.4" stroke-linecap="round" />
+                <!-- Left Leg -->
+                <line x1="75" y1="178" x2="56" y2="216" stroke="#25215b" stroke-width="2.4" stroke-linecap="round" />
+                <!-- Right Leg -->
+                <line x1="75" y1="178" x2="94" y2="216" stroke="#25215b" stroke-width="2.4" stroke-linecap="round" />
+              </g>
+
+              <text x="75" y="244" text-anchor="middle" font-size="12" font-weight="700" fill="#25215b" font-family="'Space Grotesk', sans-serif">ACTOR</text>
+              <text x="75" y="260" text-anchor="middle" font-size="9" font-weight="500" fill="#75717a" font-family="'JetBrains Mono', monospace">Chủ thẻ ATM</text>
+              <g transform="translate(28, 275)">
+                <rect width="94" height="20" rx="10" fill="#f4f3f8" stroke="#dedbe9" stroke-width="1" />
+                <text x="47" y="13.5" text-anchor="middle" font-size="8" font-weight="700" fill="#25215b" font-family="'JetBrains Mono', monospace">01 · BÊN NGOÀI</text>
+              </g>
+
+              <!-- Use Cases (Ovals) -->
+              <!-- Use Case 1: Rút tiền -->
+              <g filter="url(#ucCardShadow)">
+                <ellipse cx="350" cy="108" rx="108" ry="26" fill="#fff5f6" stroke="#c0002f" stroke-width="1.8" />
+                <text x="350" y="112.5" text-anchor="middle" font-size="12" font-weight="700" fill="#c0002f" font-family="'Space Grotesk', sans-serif">Rút tiền</text>
+              </g>
+
+              <!-- Use Case 2: Kiểm tra số dư -->
+              <g filter="url(#ucCardShadow)">
+                <ellipse cx="350" cy="185" rx="108" ry="26" fill="#fff5f6" stroke="#c0002f" stroke-width="1.8" />
+                <text x="350" y="189.5" text-anchor="middle" font-size="12" font-weight="700" fill="#c0002f" font-family="'Space Grotesk', sans-serif">Kiểm tra số dư</text>
+              </g>
+
+              <!-- Use Case 3: Chuyển khoản -->
+              <g filter="url(#ucCardShadow)">
+                <ellipse cx="350" cy="262" rx="108" ry="26" fill="#fff5f6" stroke="#c0002f" stroke-width="1.8" />
+                <text x="350" y="266.5" text-anchor="middle" font-size="12" font-weight="700" fill="#c0002f" font-family="'Space Grotesk', sans-serif">Chuyển khoản</text>
+              </g>
+
+              <!-- Tag for Use Cases -->
+              <g transform="translate(422, 298)">
+                <rect width="86" height="20" rx="10" fill="#ffe4e8" stroke="#fecdd3" stroke-width="1" />
+                <text x="43" y="13.5" text-anchor="middle" font-size="8" font-weight="700" fill="#c0002f" font-family="'JetBrains Mono', monospace">02 · USE CASES</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-section="4×">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow"><i></i>Ngôn ngữ chung</div>
+            <h2 class="title">Một sơ đồ, <span class="accent">bốn góc nhìn</span></h2>
+            <p class="lead" style="margin-top: 18px">
+              Use Case Diagram đứng ở vùng giao nhau giữa nhu cầu kinh doanh, trải nghiệm
+              người dùng và giải pháp kỹ thuật.
+            </p>
+          </div>
+          <div class="stakeholders">
+            <article class="stake">
+              <b>01</b>
+              <h3>Khách hàng</h3>
+              <p>Xác nhận phạm vi và giá trị mong muốn.</p>
+            </article>
+            <article class="stake">
+              <b>02</b>
+              <h3>Business Analyst</h3>
+              <p>Khám phá, tổ chức và truyền đạt yêu cầu.</p>
+            </article>
+            <article class="stake">
+              <b>03</b>
+              <h3>Developer</h3>
+              <p>Hiểu các chức năng cần hiện thực.</p>
+            </article>
+            <article class="stake">
+              <b>04</b>
+              <h3>Tester</h3>
+              <p>Suy ra kịch bản và phạm vi kiểm thử.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-section="REL">
+        <div class="eyebrow"><i></i>Mối quan hệ</div>
+        <h2 class="title">Ba cách Use Case <span class="accent">kết nối</span></h2>
+        <div class="relations">
+          <article class="relation">
+            <code>&lt;&lt;include&gt;&gt;</code>
+            <h3>Luôn tái sử dụng</h3>
+            <p>
+              Use Case chính luôn gọi một chức năng chung. Ví dụ: “Rút tiền” include “Xác
+              thực PIN”.
+            </p>
+          </article>
+          <article class="relation">
+            <code>&lt;&lt;extend&gt;&gt;</code>
+            <h3>Mở rộng có điều kiện</h3>
+            <p>
+              Hành vi bổ sung chỉ xảy ra trong một điều kiện nhất định. Ví dụ: “In biên
+              lai”.
+            </p>
+          </article>
+          <article class="relation">
+            <code>GENERALIZATION</code>
+            <h3>Khái quát hoá</h3>
+            <p>Actor hoặc Use Case con kế thừa hành vi chung từ phần tử tổng quát hơn.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide" data-section="SDLC">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow"><i></i>Vị trí trong SDLC</div>
+            <h2 class="title">
+              Use Case là cầu nối từ <span class="accent">yêu cầu</span> sang thiết kế
+            </h2>
+            <p class="lead" style="margin-top: 18px">
+              Được xây dựng trong giai đoạn phân tích, Use Case tạo đầu vào cho đặc tả,
+              thiết kế, phát triển và kiểm thử.
+            </p>
+          </div>
+          <div class="panel">
+            <span class="tag">software development lifecycle</span>
+            <svg class="diagram" viewBox="0 0 540 370" role="img" aria-label="Use Case là cầu nối và trọng tâm kết nối bốn giai đoạn SDLC">
+              <defs>
+                <filter id="sdlcCardShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#25215b" flood-opacity="0.08" />
+                </filter>
+                <filter id="sdlcCoreShadow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#25215b" flood-opacity="0.22" />
+                </filter>
+                <marker id="sdlcArrowRed" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                  <path d="M0 0L7 3.5L0 7Z" fill="#c0002f" />
+                </marker>
+                <marker id="sdlcArrowLoop" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <path d="M0 0L6 3L0 6Z" fill="#94a3b8" />
+                </marker>
+              </defs>
+
+              <!-- SDLC Cycle Orbit -->
+              <ellipse cx="270" cy="185" rx="195" ry="132" fill="none" stroke="#e2e0eb" stroke-width="1.6" stroke-dasharray="6 5" />
+
+              <!-- Orbital flow arrows -->
+              <path d="M 250 53 Q 270 53 290 53" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#sdlcArrowLoop)" />
+              <path d="M 465 170 Q 465 185 465 200" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#sdlcArrowLoop)" />
+              <path d="M 290 317 Q 270 317 250 317" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#sdlcArrowLoop)" />
+              <path d="M 75 200 Q 75 185 75 170" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#sdlcArrowLoop)" />
+
+              <!-- Connecting Beams (Central Bridge) -->
+              <!-- 01 Khảo sát -> Center -->
+              <line x1="140" y1="84" x2="228" y2="150" stroke="#c0002f" stroke-width="2" marker-end="url(#sdlcArrowRed)" />
+              <!-- Center -> 02 Thiết kế -->
+              <line x1="305" y1="152" x2="395" y2="86" stroke="#c0002f" stroke-width="2" marker-end="url(#sdlcArrowRed)" />
+              <!-- Center -> 03 Phát triển -->
+              <line x1="305" y1="218" x2="395" y2="284" stroke="#c0002f" stroke-width="2" marker-end="url(#sdlcArrowRed)" />
+              <!-- Center -> 04 Kiểm thử -->
+              <line x1="235" y1="218" x2="145" y2="284" stroke="#c0002f" stroke-width="2" marker-end="url(#sdlcArrowRed)" />
+
+              <!-- Animated Signal Pulses -->
+              <circle r="3.5" fill="#c0002f">
+                <animateMotion dur="2.4s" repeatCount="indefinite" path="M 140 84 L 228 150" />
+              </circle>
+              <circle r="3.5" fill="#c0002f">
+                <animateMotion dur="2.4s" begin="0.6s" repeatCount="indefinite" path="M 305 152 L 395 86" />
+              </circle>
+              <circle r="3.5" fill="#c0002f">
+                <animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M 305 218 L 395 284" />
+              </circle>
+              <circle r="3.5" fill="#c0002f">
+                <animateMotion dur="2.4s" begin="1.8s" repeatCount="indefinite" path="M 235 218 L 145 284" />
+              </circle>
+
+              <!-- Central Hub: USE CASE -->
+              <!-- Outer Glow Rings -->
+              <circle cx="270" cy="185" r="62" fill="rgba(37,33,91,0.05)" />
+              <circle cx="270" cy="185" r="54" fill="#ffffff" stroke="#c0002f" stroke-width="2" stroke-dasharray="5 3" />
+
+              <!-- Core Hub Circle -->
+              <g filter="url(#sdlcCoreShadow)">
+                <circle cx="270" cy="185" r="44" fill="#25215b" />
+              </g>
+              <text x="270" y="179" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700" font-family="'Space Grotesk', sans-serif">USE CASE</text>
+              <text x="270" y="196" text-anchor="middle" fill="#fda4af" font-size="8.5" font-weight="600" font-family="'JetBrains Mono', monospace">CẦU NỐI YÊU CẦU</text>
+
+              <!-- Phase 01: KHẢO SÁT (Top-Left) -->
+              <g filter="url(#sdlcCardShadow)">
+                <rect x="25" y="32" width="136" height="54" rx="14" fill="#ffffff" stroke="#c0002f" stroke-width="1.8" />
+                <rect x="35" y="42" width="22" height="18" rx="6" fill="#fbe9e9" />
+                <text x="46" y="55" text-anchor="middle" fill="#c0002f" font-size="9" font-weight="700" font-family="'JetBrains Mono', monospace">01</text>
+                <text x="64" y="55" font-size="11" font-weight="700" fill="#1e1e24" font-family="'Space Grotesk', sans-serif">KHẢO SÁT</text>
+                <text x="35" y="74" font-size="8.5" fill="#75717a" font-family="'JetBrains Mono', monospace">Thu thập yêu cầu</text>
+              </g>
+
+              <!-- Phase 02: THIẾT KẾ (Top-Right) -->
+              <g filter="url(#sdlcCardShadow)">
+                <rect x="379" y="32" width="136" height="54" rx="14" fill="#ffffff" stroke="#c0002f" stroke-width="1.8" />
+                <rect x="389" y="42" width="22" height="18" rx="6" fill="#fbe9e9" />
+                <text x="400" y="55" text-anchor="middle" fill="#c0002f" font-size="9" font-weight="700" font-family="'JetBrains Mono', monospace">02</text>
+                <text x="418" y="55" font-size="11" font-weight="700" fill="#1e1e24" font-family="'Space Grotesk', sans-serif">THIẾT KẾ</text>
+                <text x="389" y="74" font-size="8.5" fill="#75717a" font-family="'JetBrains Mono', monospace">Kiến trúc & UI / DB</text>
+              </g>
+
+              <!-- Phase 03: PHÁT TRIỂN (Bottom-Right) -->
+              <g filter="url(#sdlcCardShadow)">
+                <rect x="379" y="284" width="136" height="54" rx="14" fill="#ffffff" stroke="#c0002f" stroke-width="1.8" />
+                <rect x="389" y="294" width="22" height="18" rx="6" fill="#fbe9e9" />
+                <text x="400" y="307" text-anchor="middle" fill="#c0002f" font-size="9" font-weight="700" font-family="'JetBrains Mono', monospace">03</text>
+                <text x="418" y="307" font-size="11" font-weight="700" fill="#1e1e24" font-family="'Space Grotesk', sans-serif">PHÁT TRIỂN</text>
+                <text x="389" y="326" font-size="8.5" fill="#75717a" font-family="'JetBrains Mono', monospace">Lập trình chức năng</text>
+              </g>
+
+              <!-- Phase 04: KIỂM THỬ (Bottom-Left) -->
+              <g filter="url(#sdlcCardShadow)">
+                <rect x="25" y="284" width="136" height="54" rx="14" fill="#ffffff" stroke="#c0002f" stroke-width="1.8" />
+                <rect x="35" y="294" width="22" height="18" rx="6" fill="#fbe9e9" />
+                <text x="46" y="307" text-anchor="middle" fill="#c0002f" font-size="9" font-weight="700" font-family="'JetBrains Mono', monospace">04</text>
+                <text x="64" y="307" font-size="11" font-weight="700" fill="#1e1e24" font-family="'Space Grotesk', sans-serif">KIỂM THỬ</text>
+                <text x="35" y="326" font-size="8.5" fill="#75717a" font-family="'JetBrains Mono', monospace">Test Case & Nghiệm thu</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-section="06">
+        <div class="grid2">
+          <div>
+            <div class="eyebrow"><i></i>04 · Đặc tả Use Case</div>
+            <h2 class="title">
+              Sơ đồ cho tổng quan. <span class="accent">Đặc tả</span> cho chi tiết.
+            </h2>
+            <div class="spec" style="margin-top: 28px">
+              <div class="spec-card">
+                <b>01</b>
+                <span>Tên & Mục tiêu</span>
+                <small>Goal & Scope</small>
+              </div>
+              <div class="spec-card">
+                <b>02</b>
+                <span>Actor chính</span>
+                <small>Primary Actor</small>
+              </div>
+              <div class="spec-card">
+                <b>03</b>
+                <span>Tiền điều kiện</span>
+                <small>Pre-conditions</small>
+              </div>
+              <div class="spec-card">
+                <b>04</b>
+                <span>Hậu điều kiện</span>
+                <small>Post-conditions</small>
+              </div>
+              <div class="spec-card">
+                <b>05</b>
+                <span>Luồng chính</span>
+                <small>Basic / Main Flow</small>
+              </div>
+              <div class="spec-card">
+                <b>06</b>
+                <span>Luồng rẽ nhánh</span>
+                <small>Alternative Flows</small>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="spec-window">
+              <div class="spec-win-header">
+                <div class="win-dots">
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="win-title">SPECIFICATION · UC01 - RÚT TIỀN ATM</div>
+                <div class="win-badge">BASELINE</div>
+              </div>
+              <div class="spec-meta-bar">
+                <span>Actor: <b>Chủ thẻ ATM</b></span>
+                <span>Tiền đề: <b>Thẻ hợp lệ & Máy sẵn sàng</b></span>
+              </div>
+              <div class="flow-list">
+                <div class="flow-item">
+                  <span class="flow-step">1</span>
+                  <span class="flow-tag actor-tag">ACTOR</span>
+                  <span class="flow-desc">Chủ thẻ đưa thẻ ATM vào khe nhận thẻ.</span>
+                </div>
+                <div class="flow-item">
+                  <span class="flow-step">2</span>
+                  <span class="flow-tag system-tag">SYSTEM</span>
+                  <span class="flow-desc">Hệ thống đọc thẻ và yêu cầu nhập mã PIN.</span>
+                </div>
+                <div class="flow-item">
+                  <span class="flow-step">3</span>
+                  <span class="flow-tag actor-tag">ACTOR</span>
+                  <span class="flow-desc">Chủ thẻ nhập mã PIN gồm 6 chữ số.</span>
+                </div>
+                <div class="flow-item">
+                  <span class="flow-step">4</span>
+                  <span class="flow-tag system-tag">SYSTEM</span>
+                  <span class="flow-desc">Hệ thống xác thực PIN & hiển thị menu giao dịch.</span>
+                </div>
+                <div class="flow-item alt-flow">
+                  <span class="flow-step alt">A1</span>
+                  <span class="flow-tag alt-tag">ALT FLOW</span>
+                  <span class="flow-desc">Nếu PIN sai → Báo lỗi và cho nhập lại (tối đa 3 lần).</span>
+                </div>
+              </div>
+            </div>
+            <p class="small" style="margin-top: 15px">
+              Nguyên tắc vàng: Mỗi bước chỉ chứa một hành động — <b>“Actor làm gì”</b> hoặc <b>“Hệ thống làm gì”</b>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-section="04">
+        <div class="eyebrow"><i></i>Quy trình xây dựng Use Case Diagram</div>
+        <h2 class="title">
+          Bốn bước từ stakeholder đến <span class="accent">mô hình hoàn chỉnh</span>
+        </h2>
+        <div class="steps">
+          <article class="step">
+            <b>01</b>
+            <h3>Xác định Actor</h3>
+            <p>Ai hoặc hệ thống nào tương tác từ bên ngoài?</p>
+          </article>
+          <article class="step">
+            <b>02</b>
+            <h3>Tìm mục tiêu</h3>
+            <p>Mỗi Actor muốn đạt được điều gì qua hệ thống?</p>
+          </article>
+          <article class="step">
+            <b>03</b>
+            <h3>Vẽ boundary</h3>
+            <p>Đặt Use Case vào đúng phạm vi hệ thống.</p>
+          </article>
+          <article class="step">
+            <b>04</b>
+            <h3>Thêm quan hệ</h3>
+            <p>Nối Actor, include, extend và generalization; kiểm tra lại.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide" data-section="CASE">
+        <div class="eyebrow"><i></i>05 · Case Study</div>
+        <h2 class="title">Hệ thống đăng ký <span class="accent">môn học online</span></h2>
+        <div class="case-grid" style="margin-top: 30px">
+          <div class="actors">
+            <article class="actor-card">
+              <div class="actor-badge-icon">🎓</div>
+              <div>
+                <h3>Sinh viên</h3>
+                <p>Đăng ký & tra cứu lớp học phần</p>
+              </div>
+            </article>
+            <article class="actor-card">
+              <div class="actor-badge-icon">👨‍🏫</div>
+              <div>
+                <h3>Giảng viên</h3>
+                <p>Xem danh sách sinh viên lớp giảng dạy</p>
+              </div>
+            </article>
+            <article class="actor-card">
+              <div class="actor-badge-icon">🏛️</div>
+              <div>
+                <h3>Phòng Đào tạo</h3>
+                <p>Quản lý môn học, chương trình & mở lớp HP</p>
+              </div>
+            </article>
+          </div>
+          <div class="panel">
+            <span class="tag">use case · course registration</span>
+            <svg class="diagram" viewBox="0 0 540 370" role="img" aria-label="Sơ đồ Use Case hệ thống đăng ký môn học online">
+              <defs>
+                <filter id="csCardShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#25215b" flood-opacity="0.07" />
+                </filter>
+                <filter id="csActorGlow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#25215b" flood-opacity="0.1" />
+                </filter>
+              </defs>
+
+              <!-- System Boundary -->
+              <g filter="url(#csCardShadow)">
+                <rect x="160" y="22" width="365" height="326" rx="18" fill="#ffffff" stroke="#25215b" stroke-width="2" />
+              </g>
+
+              <!-- Boundary Header & Tag -->
+              <rect x="175" y="36" width="182" height="26" rx="13" fill="#25215b" />
+              <text x="266" y="53" text-anchor="middle" font-size="9" font-weight="700" fill="#ffffff" font-family="'JetBrains Mono', monospace">SYSTEM: ĐĂNG KÝ MÔN HỌC</text>
+
+              <g transform="translate(415, 36)">
+                <rect width="95" height="22" rx="11" fill="#f4f3f8" stroke="#dedbe9" stroke-width="1" />
+                <text x="47.5" y="14.5" text-anchor="middle" font-size="8" font-weight="700" fill="#25215b" font-family="'JetBrains Mono', monospace">CASE STUDY · ĐKTC</text>
+              </g>
+
+              <!-- Association Lines (Đường liên kết Actor -> Use Case) -->
+              <line x1="82" y1="78" x2="233" y2="102" stroke="#25215b" stroke-width="1.8" opacity="0.75" />
+              <line x1="82" y1="185" x2="233" y2="185" stroke="#25215b" stroke-width="1.8" opacity="0.75" />
+              <line x1="82" y1="292" x2="233" y2="268" stroke="#25215b" stroke-width="1.8" opacity="0.75" />
+
+              <!-- Animated Signal Pulses -->
+              <circle r="3.5" fill="#c0002f">
+                <animateMotion dur="2.6s" repeatCount="indefinite" path="M 82 78 L 233 102" />
+              </circle>
+              <circle r="3.5" fill="#c0002f">
+                <animateMotion dur="2.6s" begin="0.8s" repeatCount="indefinite" path="M 82 185 L 233 185" />
+              </circle>
+              <circle r="3.5" fill="#c0002f">
+                <animateMotion dur="2.6s" begin="1.6s" repeatCount="indefinite" path="M 82 292 L 233 268" />
+              </circle>
+
+              <!-- Actor 1: Sinh viên -->
+              <g filter="url(#csActorGlow)">
+                <circle cx="60" cy="58" r="10" fill="#ffffff" stroke="#25215b" stroke-width="2.2" />
+                <line x1="60" y1="68" x2="60" y2="98" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="42" y1="78" x2="78" y2="78" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="60" y1="98" x2="46" y2="120" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="60" y1="98" x2="74" y2="120" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+              </g>
+              <text x="60" y="136" text-anchor="middle" font-size="10.5" font-weight="700" fill="#25215b" font-family="'Space Grotesk', sans-serif">Sinh viên</text>
+
+              <!-- Actor 2: Giảng viên -->
+              <g filter="url(#csActorGlow)">
+                <circle cx="60" cy="165" r="10" fill="#ffffff" stroke="#25215b" stroke-width="2.2" />
+                <line x1="60" y1="175" x2="60" y2="205" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="42" y1="185" x2="78" y2="185" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="60" y1="205" x2="46" y2="227" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="60" y1="205" x2="74" y2="227" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+              </g>
+              <text x="60" y="243" text-anchor="middle" font-size="10.5" font-weight="700" fill="#25215b" font-family="'Space Grotesk', sans-serif">Giảng viên</text>
+
+              <!-- Actor 3: Phòng Đào tạo -->
+              <g filter="url(#csActorGlow)">
+                <circle cx="60" cy="272" r="10" fill="#ffffff" stroke="#25215b" stroke-width="2.2" />
+                <line x1="60" y1="282" x2="60" y2="312" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="42" y1="292" x2="78" y2="292" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="60" y1="312" x2="46" y2="334" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+                <line x1="60" y1="312" x2="74" y2="334" stroke="#25215b" stroke-width="2.2" stroke-linecap="round" />
+              </g>
+              <text x="60" y="350" text-anchor="middle" font-size="10.5" font-weight="700" fill="#25215b" font-family="'Space Grotesk', sans-serif">Phòng Đào tạo</text>
+
+              <!-- Use Case 1: Đăng ký lớp học phần -->
+              <g filter="url(#csCardShadow)">
+                <ellipse cx="345" cy="102" rx="112" ry="26" fill="#fff5f6" stroke="#c0002f" stroke-width="1.8" />
+                <text x="345" y="106.5" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c0002f" font-family="'Space Grotesk', sans-serif">Đăng ký lớp học phần</text>
+              </g>
+              <g transform="translate(466, 90)">
+                <rect width="38" height="18" rx="9" fill="#ffe4e8" stroke="#fecdd3" stroke-width="1" />
+                <text x="19" y="12.5" text-anchor="middle" font-size="8" font-weight="700" fill="#c0002f" font-family="'JetBrains Mono', monospace">UC01</text>
+              </g>
+
+              <!-- Use Case 2: Xem danh sách sinh viên -->
+              <g filter="url(#csCardShadow)">
+                <ellipse cx="345" cy="185" rx="112" ry="26" fill="#fff5f6" stroke="#c0002f" stroke-width="1.8" />
+                <text x="345" y="189.5" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c0002f" font-family="'Space Grotesk', sans-serif">Xem danh sách sinh viên</text>
+              </g>
+              <g transform="translate(466, 173)">
+                <rect width="38" height="18" rx="9" fill="#ffe4e8" stroke="#fecdd3" stroke-width="1" />
+                <text x="19" y="12.5" text-anchor="middle" font-size="8" font-weight="700" fill="#c0002f" font-family="'JetBrains Mono', monospace">UC02</text>
+              </g>
+
+              <!-- Use Case 3: Quản lý môn & lớp HP -->
+              <g filter="url(#csCardShadow)">
+                <ellipse cx="345" cy="268" rx="112" ry="26" fill="#fff5f6" stroke="#c0002f" stroke-width="1.8" />
+                <text x="345" y="272.5" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c0002f" font-family="'Space Grotesk', sans-serif">Quản lý môn & lớp HP</text>
+              </g>
+              <g transform="translate(466, 256)">
+                <rect width="38" height="18" rx="9" fill="#ffe4e8" stroke="#fecdd3" stroke-width="1" />
+                <text x="19" y="12.5" text-anchor="middle" font-size="8" font-weight="700" fill="#c0002f" font-family="'JetBrains Mono', monospace">UC03</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-section="KEY">
+        <div class="eyebrow"><i></i>Tổng kết</div>
+        <h2 class="title">
+          Hai biểu đồ, hai câu hỏi <span class="accent">khác nhau</span>
+        </h2>
+        <div class="takeaway">
+          <article class="take">
+            <div class="k">ACTIVITY DIAGRAM · HOW</div>
+            <h3>Quy trình diễn ra như thế nào?</h3>
+            <p>
+              Mô tả luồng hoạt động, điều kiện, nhánh xử lý và trách nhiệm của từng bên
+              qua swimlane.
+            </p>
+          </article>
+          <article class="take">
+            <div class="k" style="color: var(--red)">USE CASE DIAGRAM · WHAT</div>
+            <h3>Ai cần gì từ hệ thống?</h3>
+            <p>
+              Xác định Actor, mục tiêu, phạm vi và quan hệ chức năng — không đi sâu vào
+              cách hiện thực.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="slide outro" data-section="END">
+        <div class="eyebrow"><i></i>Kết thúc Session 05</div>
+        <h2 class="title">
+          Mô hình đúng trước.<br /><span class="accent">Code đúng sau.</span>
+        </h2>
+        <p class="lead">
+          Dùng Activity Diagram để hiểu luồng. Dùng Use Case Diagram để thống nhất phạm vi
+          và nhu cầu.
+        </p>
+        <div class="keys">
+          <span class="key">ACTOR</span><span class="key">WORKFLOW</span
+          ><span class="key">SWIMLANE</span><span class="key">WHAT ≠ HOW</span
+          ><span class="key">MAIN FLOW</span><span class="key">ALTERNATIVE FLOW</span>
+        </div>
+      </section>
+    </main>
+    <script>
+      const slides = [...document.querySelectorAll('.slide')],
+        dots = document.getElementById('dots');
+      let current = 0,
+        lastWheel = 0;
+      document.getElementById('total').textContent = String(slides.length).padStart(
+        2,
+        '0',
+      );
+      slides.forEach((s, i) => {
+        s.id = `slide-${i + 1}`;
+        const b = document.createElement('button');
+        b.setAttribute('aria-label', `Đến slide ${i + 1}`);
+        b.title = `Slide ${i + 1}`;
+        b.onclick = () => go(i);
+        dots.appendChild(b);
+      });
+      const dotList = [...dots.children];
+      dotList[0].classList.add('active');
+      function go(i) {
+        current = Math.max(0, Math.min(slides.length - 1, i));
+        slides[current].scrollIntoView({ behavior: 'smooth' });
+      }
+      function setCurrent(i) {
+        current = i;
+        document.getElementById('cur').textContent = String(i + 1).padStart(2, '0');
+        dotList.forEach((d, j) => d.classList.toggle('active', j === i));
+      }
+      document.getElementById('prev').onclick = () => go(current - 1);
+      document.getElementById('next').onclick = () => go(current + 1);
+      addEventListener('keydown', (e) => {
+        if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) {
+          e.preventDefault();
+          go(current + 1);
+        }
+        if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) {
+          e.preventDefault();
+          go(current - 1);
+        }
+        if (e.key === 'Home') {
+          e.preventDefault();
+          go(0);
+        }
+        if (e.key === 'End') {
+          e.preventDefault();
+          go(slides.length - 1);
+        }
+      });
+      addEventListener(
+        'wheel',
+        (e) => {
+          if (innerWidth < 900) return;
+          const now = Date.now();
+          if (now - lastWheel < 750) {
+            e.preventDefault();
+            return;
+          }
+          if (Math.abs(e.deltaY) < 12) return;
+          e.preventDefault();
+          lastWheel = now;
+          go(current + (e.deltaY > 0 ? 1 : -1));
+        },
+        { passive: false },
+      );
+      if (window.gsap && window.ScrollTrigger) {
+        gsap.registerPlugin(ScrollTrigger);
+        ScrollTrigger.create({
+          trigger: document.body,
+          start: 'top top',
+          end: 'bottom bottom',
+          onUpdate: (self) =>
+            (document.getElementById('progress').style.width = `${self.progress * 100}%`),
+        });
+        slides.forEach((s, i) => {
+          ScrollTrigger.create({
+            trigger: s,
+            start: 'top center',
+            end: 'bottom center',
+            onToggle: (self) => {
+              if (self.isActive) setCurrent(i);
+            },
+          });
+          
+          const titleElements = s.querySelectorAll('.eyebrow, .title, .lead');
+          if (titleElements.length) {
+            gsap.set(titleElements, { opacity: 0, y: 22 });
+            ScrollTrigger.create({
+              trigger: s,
+              start: 'top 75%',
+              once: true,
+              onEnter: () =>
+                gsap.to(titleElements, {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.65,
+                  stagger: 0.1,
+                  ease: 'power3.out',
+                }),
+            });
+          }
+
+          const items = s.querySelectorAll(
+            '.card, .step, .relation, .stake, .actor-card, .spec-card, .spec-window, .list li, .take, .key, .agenda-item, .compare-block, .panel, .diagram',
+          );
+          if (items.length) {
+            gsap.set(items, { opacity: 0, y: 24 });
+            ScrollTrigger.create({
+              trigger: s,
+              start: 'top 65%',
+              once: true,
+              onEnter: () =>
+                gsap.to(items, {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.6,
+                  stagger: 0.07,
+                  ease: 'power2.out',
+                }),
+            });
+          }
+        });
+
+        gsap.to('.mini-arrow', {
+          opacity: 0.38,
+          duration: 0.55,
+          stagger: 0.14,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        });
+      } else {
+        const observer = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) setCurrent(slides.indexOf(e.target));
+            }),
+          { threshold: 0.55 },
+        );
+        slides.forEach((s) => observer.observe(s));
+        addEventListener('scroll', () => {
+          const max = document.documentElement.scrollHeight - innerHeight;
+          document.getElementById('progress').style.width =
+            `${max ? (scrollY / max) * 100 : 0}%`;
+        });
+      }
+    </script>
+  </body>
+</html>
